@@ -32,4 +32,10 @@ dotnet build
 
 Después, importa el `.zip` generado por el proyecto de solución en Dataverse y agrega el control a la aplicación de lienzo desde **Insertar > Obtener más componentes**.
 
+## Habilitar controles PCF en Canvas
+
+En el Power Platform admin center, abre el entorno destino y ve a **Settings > Product > Features**. Activa **Power Apps component framework for canvas apps**. Esta configuración es del entorno y no se reemplaza con una component library.
+
+Importa primero `solution.zip` desde **make.powerapps.com > Solutions**. Luego abre la aplicación de lienzo, selecciona **Insertar > Obtener más componentes > Código**, busca `DateRangePicker` y agrégalo.
+
 En Canvas, las salidas se pueden usar como `DateValue(DateRangePicker1.startDate)` y `DateValue(DateRangePicker1.endDate)` cuando se necesite un valor de fecha nativo.
