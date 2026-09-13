@@ -3,12 +3,22 @@
  * Descripcion: Estilos del selector de rango, incluyendo calendario,
  * estados seleccionados, tipografia y adaptacion al ancho disponible.
  */
-.drp-root { box-sizing: border-box; width: 100%; min-width: 270px; padding: 18px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 8px 24px rgba(77, 63, 43, .10); font-family: 'Segoe UI', sans-serif; }
+.drp-root { position: relative; z-index: 1; box-sizing: border-box; width: 100%; min-width: 270px; padding: 18px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 8px 24px rgba(77, 63, 43, .10); font-family: 'Segoe UI', sans-serif; }
+.drp-root-compact { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 12px; border-radius: 9px; }
+.drp-compact-input { flex: 1; min-width: 0; min-height: 42px; padding: 0; border: 0; outline: 0; color: #35464b; background: transparent; font: inherit; cursor: text; }
+.drp-compact-input:hover:not(:disabled), .drp-compact-input:focus { background: #f7f1e8; }
+.drp-calendar-icon { color: #b86e49; font-size: 16px; }
+.drp-compact-value { overflow: hidden; flex: 1; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.drp-compact-placeholder { flex: 1; color: #927e6e; font-size: 13px; }
+.drp-chevron { color: #927e6e; font-size: 18px; }
 .drp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 2px 2px 16px; }
 .drp-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
 .drp-summary { margin-top: 6px; min-height: 20px; color: #35464b; font-size: 14px; font-weight: 600; }
 .drp-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .drp-status.is-complete { color: #286b58; background: #dcefe6; }
+.drp-header-actions { display: flex; align-items: center; gap: 8px; }
+.drp-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
+.drp-close:hover { color: #fff; background: #b86e49; }
 .drp-calendar { padding: 14px; background: #f7f1e8; border-radius: 12px; }
 .drp-monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; color: #263d42; }
 .drp-monthbar strong { font-size: 15px; text-transform: capitalize; }
