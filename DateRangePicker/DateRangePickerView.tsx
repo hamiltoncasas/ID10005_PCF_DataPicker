@@ -71,10 +71,10 @@ function createCalendarDays(month: Date): ICalendarDay[] {
     });
 }
 
-export class DateRangePickerView extends React.Component<IDateRangePickerProps, { visibleMonth: Date }> {
+export class DateRangePickerView extends React.Component<IDateRangePickerProps, { visibleMonth: Date; isOpen: boolean }> {
     public constructor(props: IDateRangePickerProps) {
         super(props);
-        this.state = { visibleMonth: toDate(props.startDate, normalizeDateFormat(props.dateFormat)) ?? new Date() };
+        this.state = { visibleMonth: toDate(props.startDate, normalizeDateFormat(props.dateFormat)) ?? new Date(), isOpen: false };
     }
 
     private selectDate = (date: Date): void => {
@@ -82,8 +82,21 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
         const start = toDate(this.props.startDate, dateFormat);
         const end = toDate(this.props.endDate, dateFormat);
         if (!start || (start && end)) this.props.onRangeChange(formatDate(date, dateFormat), "");
-        else if (date < start) this.props.onRangeChange(formatDate(date, dateFormat), formatDate(start, dateFormat));
-        else this.props.onRangeChange(formatDate(start, dateFormat), formatDate(date, dateFormat));
+        else if (date < start) {
+            this.props.onRangeChange(formatDate(date, dateFormat), formatDate(start, dateFormat));
+            this.setState({ isOpen: false });
+        } else {
+            this.props.onRangeChange(formatDate(start, dateFormat), formatDate(date, dateFormat));
+            this.setState({ isOpen: false });
+        }
+    };
+
+    private togglePicker = (): void => {
+        this.setState(({ isOpen }) => ({ isOpen: !isOpen }));
+    };
+
+    private openPicker = (): void => {
+        if (!this.props.disabled) this.setState({ isOpen: true });
     };
 
     private moveMonth = (offset: number): void => {
@@ -97,9 +110,12 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
         const end = toDate(endDate, dateFormat);
         const hasRange = !!start && !!end;
         const summary = startDate && endDate ? `${startDate}  →  ${endDate}` : startDate ? `${startDate}  →  Selecciona una fecha final` : "Selecciona una fecha de inicio";
+        if (!this.state.isOpen) {
+            return <section className="drp-root drp-root-compact" aria-label="Selector de rango de fechas"><span className="drp-calendar-icon">▣</span><input className={hasRange ? "drp-compact-input drp-compact-value" : "drp-compact-input drp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona un rango de fechas"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango" /><span className="drp-chevron">⌄</span></section>;
+        }
         return (
             <section className="drp-root" aria-label="Selector de rango de fechas">
-                <div className="drp-header"><div><span className="drp-kicker">RANGO DE FECHAS</span><div className="drp-summary">{summary}</div></div><div className={`drp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "En selección"}</div></div>
+                <div className="drp-header"><div><span className="drp-kicker">RANGO DE FECHAS</span><div className="drp-summary">{summary}</div></div><div className="drp-header-actions"><div className={`drp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "En selección"}</div><button type="button" className="drp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div></div>
                 <div className="drp-calendar">
                     <div className="drp-monthbar"><button type="button" className="drp-nav" onClick={() => this.moveMonth(-1)} disabled={disabled} aria-label="Mes anterior">‹</button><strong>{months[this.state.visibleMonth.getMonth()]} <span>{this.state.visibleMonth.getFullYear()}</span></strong><button type="button" className="drp-nav" onClick={() => this.moveMonth(1)} disabled={disabled} aria-label="Mes siguiente">›</button></div>
                     <div className="drp-weekdays">{weekdays.map((day) => <span key={day}>{day}</span>)}</div>
