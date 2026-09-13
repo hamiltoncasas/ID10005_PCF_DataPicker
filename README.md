@@ -22,6 +22,14 @@ npm install
 npm run build
 ```
 
+Para compilar el segundo control desde su proyecto:
+
+```powershell
+Set-Location DateTimeRangePicker
+npm install
+npm run build
+```
+
 ## Agregar a una solución existente
 
 Desde el directorio de un proyecto de solución que ya tenga `cdsproj`, agrega la referencia al proyecto PCF:
