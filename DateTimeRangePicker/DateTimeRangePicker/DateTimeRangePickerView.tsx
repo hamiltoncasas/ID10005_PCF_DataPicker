@@ -55,10 +55,10 @@ export class DateTimeRangePickerView extends React.Component<IDateTimeRangePicke
         const hasRange = !!startDateTime && !!endDateTime;
         const summary = hasRange ? `${formatDateTime(startDateTime, dateFormat, timeFormat)} → ${formatDateTime(endDateTime, dateFormat, timeFormat)}` : "Selecciona fecha y hora";
         if (!this.state.isOpen) {
-            return <section className="dtrp-root dtrp-root-compact" aria-label="Selector de rango de fecha y hora"><span className="dtrp-calendar-icon">◷</span><input className={hasRange ? "dtrp-compact-input dtrp-compact-value" : "dtrp-compact-input dtrp-compact-placeholder"} type="text" readOnly value={summary} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de fecha y hora" /><span className="dtrp-chevron">⌄</span></section>;
+            return <section className="dtrp-root dtrp-root-compact" aria-label="Selector de rango de fecha y hora"><span className="dtrp-calendar-icon">◷</span><input className={hasRange ? "dtrp-compact-input dtrp-compact-value" : "dtrp-compact-input dtrp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de fecha y hora" /><span className="dtrp-chevron">⌄</span></section>;
         }
         return (
-            <section className="dtrp-root" aria-label="Selector de rango de fecha y hora">
+            <section className="dtrp-root dtrp-root-expanded" aria-label="Selector de rango de fecha y hora">
                 <header className="dtrp-header">
                     <div><span className="dtrp-kicker">RANGO DE FECHA Y HORA</span><h2>Define tu ventana</h2></div>
                     <div className="dtrp-header-actions"><span className={`dtrp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "Pendiente"}</span><button type="button" className="dtrp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div>
