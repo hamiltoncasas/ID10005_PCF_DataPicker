@@ -48,6 +48,7 @@ export class DateTimeRangePicker implements ComponentFramework.ReactControl<IInp
             endDateTime: this.endDateTime,
             dateFormat: String(context.parameters.format?.raw ?? "YYYY-MM-DD"),
             timeFormat: String(context.parameters.timeFormat?.raw ?? "24"),
+            zIndex: context.parameters.zIndex.raw ?? 2147483647,
             disabled: context.mode.isControlDisabled,
             onRangeChange: (startDateTime, endDateTime) => {
                 this.startDateTime = startDateTime;

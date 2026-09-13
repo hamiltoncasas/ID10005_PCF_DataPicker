@@ -4,11 +4,13 @@
  * seleccion visual del rango y estados de inicio, fin y fechas intermedias.
  */
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export interface IDateRangePickerProps {
     startDate: string;
     endDate: string;
     dateFormat: string;
+    zIndex: number;
     disabled: boolean;
     onRangeChange: (startDate: string, endDate: string) => void;
 }
@@ -71,10 +73,11 @@ function createCalendarDays(month: Date): ICalendarDay[] {
     });
 }
 
-export class DateRangePickerView extends React.Component<IDateRangePickerProps, { visibleMonth: Date; isOpen: boolean }> {
+export class DateRangePickerView extends React.Component<IDateRangePickerProps, { visibleMonth: Date; isOpen: boolean; overlayPosition: { top: number; left: number; width: number } }> {
+    private compactInput = React.createRef<HTMLInputElement>();
     public constructor(props: IDateRangePickerProps) {
         super(props);
-        this.state = { visibleMonth: toDate(props.startDate, normalizeDateFormat(props.dateFormat)) ?? new Date(), isOpen: false };
+        this.state = { visibleMonth: toDate(props.startDate, normalizeDateFormat(props.dateFormat)) ?? new Date(), isOpen: false, overlayPosition: { top: 0, left: 0, width: 320 } };
     }
 
     private selectDate = (date: Date): void => {
@@ -96,7 +99,11 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
     };
 
     private openPicker = (): void => {
-        if (!this.props.disabled) this.setState({ isOpen: true });
+        const inputElement = this.compactInput.current;
+        if (!this.props.disabled && inputElement) {
+            const bounds = inputElement.getBoundingClientRect();
+            this.setState({ isOpen: true, overlayPosition: { top: bounds.bottom + 6, left: bounds.left, width: Math.max(bounds.width, 320) } });
+        }
     };
 
     private moveMonth = (offset: number): void => {
@@ -111,10 +118,10 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
         const hasRange = !!start && !!end;
         const summary = startDate && endDate ? `${startDate}  →  ${endDate}` : startDate ? `${startDate}  →  Selecciona una fecha final` : "Selecciona una fecha de inicio";
         if (!this.state.isOpen) {
-            return <section className="drp-root drp-root-compact" aria-label="Selector de rango de fechas"><span className="drp-calendar-icon">▣</span><input className={hasRange ? "drp-compact-input drp-compact-value" : "drp-compact-input drp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango" /><span className="drp-chevron">⌄</span></section>;
+            return <section className="drp-root drp-root-compact" aria-label="Selector de rango de fechas"><span className="drp-calendar-icon">▣</span><input ref={this.compactInput} className={hasRange ? "drp-compact-input drp-compact-value" : "drp-compact-input drp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango" /><span className="drp-chevron">⌄</span></section>;
         }
-        return (
-            <section className="drp-root drp-root-expanded" aria-label="Selector de rango de fechas">
+        const pickerPanel = (
+            <section className="drp-root drp-root-expanded" style={{ ...this.state.overlayPosition, zIndex: Math.max(1, Math.min(this.props.zIndex, 2147483647)) }} aria-label="Selector de rango de fechas">
                 <div className="drp-header"><div><span className="drp-kicker">RANGO DE FECHAS</span><div className="drp-summary">{summary}</div></div><div className="drp-header-actions"><div className={`drp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "En selección"}</div><button type="button" className="drp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div></div>
                 <div className="drp-calendar">
                     <div className="drp-monthbar"><button type="button" className="drp-nav" onClick={() => this.moveMonth(-1)} disabled={disabled} aria-label="Mes anterior">‹</button><strong>{months[this.state.visibleMonth.getMonth()]} <span>{this.state.visibleMonth.getFullYear()}</span></strong><button type="button" className="drp-nav" onClick={() => this.moveMonth(1)} disabled={disabled} aria-label="Mes siguiente">›</button></div>
@@ -124,5 +131,6 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
                 <div className="drp-footer"><span className="drp-dot" /> {hasRange ? "Rango seleccionado" : "Haz clic en dos fechas para completar el rango"}</div>
             </section>
         );
+        return ReactDOM.createPortal(pickerPanel, document.body);
     }
 }

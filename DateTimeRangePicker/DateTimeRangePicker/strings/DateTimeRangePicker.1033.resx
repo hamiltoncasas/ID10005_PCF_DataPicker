@@ -14,6 +14,8 @@
   <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
   <data name="Time_Format" xml:space="preserve"><value>Formato de hora</value></data>
   <data name="Time_Format_Desc" xml:space="preserve"><value>Use 24, 12, 24:00:00 o 12:00:00 para mostrar la hora con o sin segundos.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del selector</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel abierto. Predeterminado 2147483647. Use un valor mayor que el de los elementos superpuestos.</value></data>
   <data name="Start_DateTime" xml:space="preserve"><value>Fecha y hora inicial seleccionada</value></data>
   <data name="Start_DateTime_Desc" xml:space="preserve"><value>Salida en formato técnico YYYY-MM-DDTHH:mm.</value></data>
   <data name="End_DateTime" xml:space="preserve"><value>Fecha y hora final seleccionada</value></data>

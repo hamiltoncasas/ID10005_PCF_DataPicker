@@ -12,6 +12,8 @@
   <data name="Initial_End_Date_Desc" xml:space="preserve"><value>Fecha final opcional usando uno de los formatos admitidos.</value></data>
   <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
   <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del selector</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel abierto. Predeterminado 2147483647. Use un valor mayor que el de los elementos superpuestos.</value></data>
   <data name="Start_Date" xml:space="preserve"><value>Fecha inicial seleccionada</value></data>
   <data name="Start_Date_Desc" xml:space="preserve"><value>Salida con la fecha inicial seleccionada en el formato configurado.</value></data>
   <data name="End_Date" xml:space="preserve"><value>Fecha final seleccionada</value></data>
