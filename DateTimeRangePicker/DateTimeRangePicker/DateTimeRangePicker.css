@@ -1,6 +1,6 @@
 /* Fecha: 2026-09-12. Descripcion: Estilos del selector de rango de fecha y hora. */
 .dtrp-root { position: relative; z-index: 1; box-sizing: border-box; width: 100%; min-width: 290px; padding: 20px; color: #26383b; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 8px 24px rgba(77, 63, 43, .10); font-family: 'Segoe UI', sans-serif; }
-.dtrp-root-expanded { position: absolute; top: 0; left: 0; z-index: 2147483647; width: max(100%, 360px); min-width: 360px; }
+.dtrp-root-expanded { position: fixed; top: 0; left: 0; z-index: 2147483647; width: 360px; min-width: 360px; }
 .dtrp-root-compact { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 12px; border-radius: 9px; }
 .dtrp-compact-input { flex: 1; min-width: 0; min-height: 42px; padding: 0; border: 0; outline: 0; color: #35464b; background: transparent; font: inherit; cursor: text; }
 .dtrp-compact-input:hover:not(:disabled), .dtrp-compact-input:focus { background: #f7f1e8; }

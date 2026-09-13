@@ -10,6 +10,7 @@ Componente personalizado para aplicaciones de lienzo de Power Apps. Permite eleg
 - `initialStartDate`: entrada opcional. Fecha inicial para precargar el control.
 - `initialEndDate`: entrada opcional. Fecha final para precargar el control.
 - `format`: entrada opcional. Formato de fechas: `YYYY-MM-DD` (predeterminado), `YYYY/MM/DD`, `YYYY.MM.DD`, `YYYYMMDD`, `DD/MM/YYYY`, `MM/DD/YYYY`, `DD-MM-YYYY`, `MM-DD-YYYY`, `DD.MM.YYYY`, `MM.DD.YYYY`, `DDMMYYYY` o `MMDDYYYY`.
+- `zIndex`: entrada opcional. Prioridad visual del panel abierto. Predeterminado: `2147483647`.
 - `startDate`: salida. Fecha inicial elegida.
 - `endDate`: salida. Fecha final elegida.
 
@@ -54,6 +55,7 @@ En Canvas, las salidas se pueden usar como `DateValue(DateRangePicker1.startDate
 La solución también incluye `DateTimeRangePicker`, un segundo control para seleccionar fecha y hora de inicio y fin. Sus salidas son `startDateTime` y `endDateTime` en formato `YYYY-MM-DDTHH:mm`, por ejemplo `2026-09-12T08:30`.
 
 Sus entradas son `initialStartDateTime`, `initialEndDateTime`, `format` (los formatos del listado anterior) y `timeFormat` (`24`, `12`, `24:00:00` o `12:00:00`).
+También acepta `zIndex` para controlar la prioridad visual del panel expandido.
 
 Los formatos cubren los usos habituales de Power Platform y Dataverse (`YYYY-MM-DD`), SQL Server (`YYYYMMDD`, ISO y estilos regionales) y configuraciones regionales de Canvas. La salida de `DateTimeRangePicker` conserva siempre el formato técnico sin ambiguedad `YYYY-MM-DDTHH:mm`.
 

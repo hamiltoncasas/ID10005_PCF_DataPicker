@@ -3,12 +3,14 @@
  * Descripcion: Vista de seleccion de fecha y hora para ambos extremos del rango.
  */
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export interface IDateTimeRangePickerProps {
     startDateTime: string;
     endDateTime: string;
     dateFormat: string;
     timeFormat: string;
+    zIndex: number;
     disabled: boolean;
     onRangeChange: (startDateTime: string, endDateTime: string) => void;
 }
@@ -26,10 +28,11 @@ function formatDateTime(value: string, dateFormat: string, timeFormat: string): 
     return `${dateValue} · ${timeValue}`;
 }
 
-export class DateTimeRangePickerView extends React.Component<IDateTimeRangePickerProps, { isOpen: boolean }> {
+export class DateTimeRangePickerView extends React.Component<IDateTimeRangePickerProps, { isOpen: boolean; overlayPosition: { top: number; left: number; width: number } }> {
+    private compactInput = React.createRef<HTMLInputElement>();
     public constructor(props: IDateTimeRangePickerProps) {
         super(props);
-        this.state = { isOpen: false };
+        this.state = { isOpen: false, overlayPosition: { top: 0, left: 0, width: 360 } };
     }
 
     private updateStartDateTime = (value: string, shouldCollapse = false): void => {
@@ -47,7 +50,11 @@ export class DateTimeRangePickerView extends React.Component<IDateTimeRangePicke
     };
 
     private openPicker = (): void => {
-        if (!this.props.disabled) this.setState({ isOpen: true });
+        const inputElement = this.compactInput.current;
+        if (!this.props.disabled && inputElement) {
+            const bounds = inputElement.getBoundingClientRect();
+            this.setState({ isOpen: true, overlayPosition: { top: bounds.bottom + 6, left: bounds.left, width: Math.max(bounds.width, 360) } });
+        }
     };
 
     public render(): React.ReactNode {
@@ -55,10 +62,10 @@ export class DateTimeRangePickerView extends React.Component<IDateTimeRangePicke
         const hasRange = !!startDateTime && !!endDateTime;
         const summary = hasRange ? `${formatDateTime(startDateTime, dateFormat, timeFormat)} → ${formatDateTime(endDateTime, dateFormat, timeFormat)}` : "Selecciona fecha y hora";
         if (!this.state.isOpen) {
-            return <section className="dtrp-root dtrp-root-compact" aria-label="Selector de rango de fecha y hora"><span className="dtrp-calendar-icon">◷</span><input className={hasRange ? "dtrp-compact-input dtrp-compact-value" : "dtrp-compact-input dtrp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de fecha y hora" /><span className="dtrp-chevron">⌄</span></section>;
+            return <section className="dtrp-root dtrp-root-compact" aria-label="Selector de rango de fecha y hora"><span className="dtrp-calendar-icon">◷</span><input ref={this.compactInput} className={hasRange ? "dtrp-compact-input dtrp-compact-value" : "dtrp-compact-input dtrp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de fecha y hora" /><span className="dtrp-chevron">⌄</span></section>;
         }
-        return (
-            <section className="dtrp-root dtrp-root-expanded" aria-label="Selector de rango de fecha y hora">
+        const pickerPanel = (
+            <section className="dtrp-root dtrp-root-expanded" style={{ ...this.state.overlayPosition, zIndex: Math.max(1, Math.min(this.props.zIndex, 2147483647)) }} aria-label="Selector de rango de fecha y hora">
                 <header className="dtrp-header">
                     <div><span className="dtrp-kicker">RANGO DE FECHA Y HORA</span><h2>Define tu ventana</h2></div>
                     <div className="dtrp-header-actions"><span className={`dtrp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "Pendiente"}</span><button type="button" className="dtrp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div>
@@ -70,5 +77,6 @@ export class DateTimeRangePickerView extends React.Component<IDateTimeRangePicke
                 <div className="dtrp-summary"><div><small>INICIO</small><strong>{formatDateTime(startDateTime, dateFormat, timeFormat)}</strong></div><div><small>FIN</small><strong>{formatDateTime(endDateTime, dateFormat, timeFormat)}</strong></div></div>
             </section>
         );
+        return ReactDOM.createPortal(pickerPanel, document.body);
     }
 }
