@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Fecha: 2026-09-12. Descripcion: Proyecto MSBuild utilizado para empaquetar el control PCF. -->
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>
@@ -9,8 +8,8 @@
   <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Pcf.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Pcf.props')" />
 
   <PropertyGroup>
-    <Name>ID10005_PCF_DataPicker</Name>
-    <ProjectGuid>4d2467b2-1a8e-4e8a-a2ca-394c86f38d70</ProjectGuid>
+    <Name>DateTimeRangePicker</Name>
+    <ProjectGuid>f75b4bce-9734-40bc-958f-c8fa65e1c4c0</ProjectGuid>
     <OutputPath>$(MSBuildThisFileDirectory)out\controls</OutputPath>
   </PropertyGroup>
 
@@ -35,7 +34,6 @@
     <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.pcfproj.user" />
     <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.sln" />
     <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\node_modules\**" />
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\DateTimeRangePicker\**" />
   </ItemGroup>
 
   <ItemGroup>

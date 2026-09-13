@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="DateTimeRangePicker" xml:space="preserve"><value>Selector de rango de fecha y hora</value></data>
+  <data name="DateTimeRangePicker description" xml:space="preserve"><value>Selecciona fecha y hora inicial y final. Las salidas usan YYYY-MM-DDTHH:mm.</value></data>
+  <data name="Initial_Start_DateTime" xml:space="preserve"><value>Fecha y hora inicial precargada</value></data>
+  <data name="Initial_Start_DateTime_Desc" xml:space="preserve"><value>Valor opcional con formato YYYY-MM-DDTHH:mm, por ejemplo 2026-09-12T08:30.</value></data>
+  <data name="Initial_End_DateTime" xml:space="preserve"><value>Fecha y hora final precargada</value></data>
+  <data name="Initial_End_DateTime_Desc" xml:space="preserve"><value>Valor opcional con formato YYYY-MM-DDTHH:mm, por ejemplo 2026-09-12T18:30.</value></data>
+  <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
+  <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Time_Format" xml:space="preserve"><value>Formato de hora</value></data>
+  <data name="Time_Format_Desc" xml:space="preserve"><value>Use 24, 12, 24:00:00 o 12:00:00 para mostrar la hora con o sin segundos.</value></data>
+  <data name="Start_DateTime" xml:space="preserve"><value>Fecha y hora inicial seleccionada</value></data>
+  <data name="Start_DateTime_Desc" xml:space="preserve"><value>Salida en formato técnico YYYY-MM-DDTHH:mm.</value></data>
+  <data name="End_DateTime" xml:space="preserve"><value>Fecha y hora final seleccionada</value></data>
+  <data name="End_DateTime_Desc" xml:space="preserve"><value>Salida en formato técnico YYYY-MM-DDTHH:mm.</value></data>
+</root>

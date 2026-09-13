@@ -1,7 +1,3 @@
-/**
- * Fecha: 2026-09-12
- * Descripcion: Configuracion de calidad y reglas de analisis estatico del PCF.
- */
 import eslintjs from "@eslint/js";
 import microsoftPowerApps from "@microsoft/eslint-plugin-power-apps";
 import pluginPromise from "eslint-plugin-promise";
@@ -12,7 +8,7 @@ import typescriptEslint from "typescript-eslint";
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    ignores: ["**/generated", "DateTimeRangePicker/**"],
+    ignores: ["**/generated"],
   },
   eslintjs.configs.recommended,
   ...typescriptEslint.configs.recommendedTypeChecked,

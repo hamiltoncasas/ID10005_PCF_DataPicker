@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="DateRangePicker" xml:space="preserve"><value>Selector de rango de fechas</value></data>
+  <data name="DateRangePicker description" xml:space="preserve"><value>Selecciona una fecha inicial y una fecha final. Las salidas startDate y endDate usan el formato configurado.</value></data>
+  <data name="Initial_Start_Date" xml:space="preserve"><value>Fecha inicial precargada</value></data>
+  <data name="Initial_Start_Date_Desc" xml:space="preserve"><value>Fecha inicial opcional usando uno de los formatos admitidos.</value></data>
+  <data name="Initial_End_Date" xml:space="preserve"><value>Fecha final precargada</value></data>
+  <data name="Initial_End_Date_Desc" xml:space="preserve"><value>Fecha final opcional usando uno de los formatos admitidos.</value></data>
+  <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
+  <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Start_Date" xml:space="preserve"><value>Fecha inicial seleccionada</value></data>
+  <data name="Start_Date_Desc" xml:space="preserve"><value>Salida con la fecha inicial seleccionada en el formato configurado.</value></data>
+  <data name="End_Date" xml:space="preserve"><value>Fecha final seleccionada</value></data>
+  <data name="End_Date_Desc" xml:space="preserve"><value>Salida con la fecha final seleccionada en el formato configurado.</value></data>
+</root>

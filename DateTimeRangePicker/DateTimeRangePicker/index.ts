@@ -1,16 +1,15 @@
 /**
  * Fecha: 2026-09-12
- * Descripcion: Adaptador PCF que conecta el ciclo de vida de Power Apps con
- * la vista React del selector de rango y publica sus fechas seleccionadas.
+ * Descripcion: Adaptador PCF del selector de rango con fecha y hora.
  */
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { DateRangePickerView, IDateRangePickerProps } from "./DateRangePickerView";
+import { DateTimeRangePickerView, IDateTimeRangePickerProps } from "./DateTimeRangePickerView";
 import * as React from "react";
 
-export class DateRangePicker implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+export class DateTimeRangePicker implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
-    private startDate = "";
-    private endDate = "";
+    private startDateTime = "";
+    private endDateTime = "";
 
     /**
      * Empty constructor.
@@ -40,24 +39,24 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const inputStart = context.parameters.initialStartDate?.raw ?? "";
-        const inputEnd = context.parameters.initialEndDate?.raw ?? "";
-        const dateFormat = String(context.parameters.format.raw ?? "YYYY-MM-DD");
-        if (!this.startDate && inputStart) this.startDate = inputStart;
-        if (!this.endDate && inputEnd) this.endDate = inputEnd;
-        const props: IDateRangePickerProps = {
-            startDate: this.startDate,
-            endDate: this.endDate,
-            dateFormat,
-            onRangeChange: (startDate, endDate) => {
-                this.startDate = startDate;
-                this.endDate = endDate;
+        const inputStart = context.parameters.initialStartDateTime?.raw ?? "";
+        const inputEnd = context.parameters.initialEndDateTime?.raw ?? "";
+        if (!this.startDateTime && inputStart) this.startDateTime = inputStart;
+        if (!this.endDateTime && inputEnd) this.endDateTime = inputEnd;
+        const props: IDateTimeRangePickerProps = {
+            startDateTime: this.startDateTime,
+            endDateTime: this.endDateTime,
+            dateFormat: String(context.parameters.format?.raw ?? "YYYY-MM-DD"),
+            timeFormat: String(context.parameters.timeFormat?.raw ?? "24"),
+            disabled: context.mode.isControlDisabled,
+            onRangeChange: (startDateTime, endDateTime) => {
+                this.startDateTime = startDateTime;
+                this.endDateTime = endDateTime;
                 this.notifyOutputChanged();
             },
-            disabled: context.mode.isControlDisabled,
         };
         return React.createElement(
-            DateRangePickerView, props
+            DateTimeRangePickerView, props
         );
     }
 
@@ -66,7 +65,7 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
-        return { startDate: this.startDate, endDate: this.endDate };
+        return { startDateTime: this.startDateTime, endDateTime: this.endDateTime };
     }
 
     /**

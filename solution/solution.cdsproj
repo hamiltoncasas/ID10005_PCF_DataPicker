@@ -48,6 +48,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\ID10005_PCF_DataPicker.pcfproj" />
+    <ProjectReference Include="..\DateTimeRangePicker\DateTimeRangePicker.pcfproj" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
