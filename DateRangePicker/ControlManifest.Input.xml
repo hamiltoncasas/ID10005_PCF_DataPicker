@@ -24,17 +24,6 @@
     <property name="format" display-name-key="Date_Format" description-key="Date_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="startDate" display-name-key="Start_Date" description-key="Start_Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="endDate" display-name-key="End_Date" description-key="End_Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
-    <!--
-      Property node's of-type attribute can be of-type-group attribute.
-      Example:
-      <type-group name="numbers">
-        <type>Whole.None</type>
-        <type>Currency</type>
-        <type>FP</type>
-        <type>Decimal</type>
-      </type-group>
-      <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type-group="numbers" usage="bound" required="true" />
-    -->
     <resources>
       <code path="index.ts" order="1"/>
       <css path="DateRangePicker.css" order="1" />
