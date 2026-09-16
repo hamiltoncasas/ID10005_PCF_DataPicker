@@ -1,21 +1,38 @@
 /* Fecha: 2026-09-12. Descripcion: Estilos del selector de rango de fecha y hora. */
 .dtrp-root { position: relative; z-index: 1; box-sizing: border-box; width: 100%; min-width: 290px; padding: 20px; color: #26383b; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 8px 24px rgba(77, 63, 43, .10); font-family: 'Segoe UI', sans-serif; }
 .dtrp-root-expanded { position: fixed; top: 0; left: 0; z-index: 2147483647; width: 360px; min-width: 360px; }
-.dtrp-root-compact { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 12px; border-radius: 9px; }
-.dtrp-compact-input { flex: 1; min-width: 0; min-height: 42px; padding: 0; border: 0; outline: 0; color: #35464b; background: transparent; font: inherit; cursor: text; }
-.dtrp-compact-input:hover:not(:disabled), .dtrp-compact-input:focus { background: #f7f1e8; }
-.dtrp-calendar-icon { color: #b86e49; font-size: 18px; }
-.dtrp-compact-value { overflow: hidden; flex: 1; font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.dtrp-compact-placeholder { flex: 1; color: #927e6e; font-size: 13px; }
-.dtrp-chevron { color: #927e6e; font-size: 18px; }
+.dtrp-root-compact { display: flex; align-items: stretch; min-width: 0; height: 32px; padding: 0; border: 1px solid #8a8a8a; border-radius: 2px; background: #fff; box-shadow: none; }
+.dtrp-root-compact:focus-within { border-color: #2f5da8; box-shadow: 0 0 0 1px #2f5da8; }
+.dtrp-compact-input { flex: 1; min-width: 0; padding: 0 8px; border: 0; outline: 0; color: #333; background: #fff; font: 13px 'Segoe UI', sans-serif; cursor: text; }
+.dtrp-compact-input:disabled { color: #777; background: #f5f5f5; cursor: default; }
+.dtrp-compact-value { overflow: hidden; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.dtrp-compact-placeholder { color: #666; }
+.dtrp-calendar-button { display: grid; flex: 0 0 31px; place-items: center; padding: 0; border: 0; border-left: 1px solid #244b8b; border-radius: 0 1px 1px 0; background: #2f5da8; cursor: pointer; }
+.dtrp-calendar-button:hover:not(:disabled), .dtrp-calendar-button:focus-visible { background: #244b8b; }
+.dtrp-calendar-button:disabled { background: #a8a8a8; cursor: default; }
+.dtrp-calendar-icon { position: relative; display: block; width: 13px; height: 12px; border: 1px solid #fff; border-radius: 1px; box-sizing: border-box; }
+.dtrp-calendar-icon::before { position: absolute; top: 2px; right: 0; left: 0; border-top: 1px solid #fff; content: ""; }
+.dtrp-calendar-icon::after { position: absolute; top: 5px; left: 2px; width: 2px; height: 2px; background: #fff; box-shadow: 4px 0 #fff, 0 3px #fff, 4px 3px #fff; content: ""; }
 .dtrp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .dtrp-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
-.dtrp-header h2 { margin: 6px 0 20px; font-size: 20px; font-weight: 650; }
 .dtrp-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; }
 .dtrp-status.is-complete { color: #286b58; background: #dcefe6; }
 .dtrp-header-actions { display: flex; align-items: center; gap: 8px; }
 .dtrp-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
 .dtrp-close:hover { color: #fff; background: #b86e49; }
+.dtrp-calendar { padding: 14px; background: #f7f1e8; border-radius: 12px; }
+.dtrp-monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; color: #263d42; }
+.dtrp-monthbar strong { font-size: 15px; text-transform: capitalize; }
+.dtrp-monthbar strong span { color: #92745d; font-weight: 400; }
+.dtrp-nav { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; color: #4f6b6d; background: #fffdf8; font-size: 24px; line-height: 20px; cursor: pointer; }
+.dtrp-nav:hover:not(:disabled) { color: #fff; background: #587d78; }
+.dtrp-weekdays, .dtrp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.dtrp-weekdays { margin-bottom: 5px; color: #927e6e; font-size: 10px; font-weight: 700; }
+.dtrp-day { position: relative; z-index: 1; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; color: #384b4d; background: transparent; font-size: 13px; cursor: pointer; }
+.dtrp-day:hover:not(:disabled) { color: #fff; background: #8baba0; }
+.dtrp-day.is-muted { color: #b9afa4; }
+.dtrp-day.is-between { border-radius: 4px; color: #35645b; background: #d6e9df; }
+.dtrp-day.is-start, .dtrp-day.is-end { color: #fff; background: #b86e49; font-weight: 700; }
 .dtrp-fields { display: grid; gap: 12px; padding: 14px; background: #f7f1e8; border-radius: 12px; }
 .dtrp-field { display: grid; gap: 7px; color: #927e6e; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .dtrp-field div { display: grid; grid-template-columns: 1fr 116px; gap: 8px; }
@@ -28,8 +45,7 @@
 .dtrp-time-picker select { min-width: 0; flex: 1; padding: 7px 0; border: 0; outline: 0; color: inherit; background: transparent; font: inherit; cursor: pointer; }
 .dtrp-field input:focus { outline: 2px solid #8baba0; outline-offset: 1px; }
 .dtrp-time-picker:focus-within { outline: 2px solid #8baba0; outline-offset: 1px; }
-.dtrp-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.dtrp-summary div { display: grid; gap: 5px; padding: 11px; border-left: 3px solid #b86e49; background: #fcf7ef; }
-.dtrp-summary small { color: #927e6e; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
-.dtrp-summary strong { font-size: 12px; font-weight: 600; }
-@media (max-width: 460px) { .dtrp-summary { grid-template-columns: 1fr; } .dtrp-field div { grid-template-columns: 1fr; } }
+.dtrp-summary { margin-top: 6px; min-height: 20px; color: #35464b; font-size: 14px; font-weight: 600; }
+.dtrp-footer { display: flex; align-items: center; gap: 7px; padding: 14px 2px 0; color: #8a7767; font-size: 11px; }
+.dtrp-dot { width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }
+@media (max-width: 460px) { .dtrp-field div { grid-template-columns: 1fr; } }
