@@ -28,6 +28,19 @@ function formatDateTime(value: string, dateFormat: string, timeFormat: string): 
     return `${dateValue} · ${timeValue}`;
 }
 
+function formatTimeOption(value: string, timeFormat: string): string {
+    if (!timeFormat.startsWith("12")) return value;
+    const [hours, minutes] = value.split(":").map(Number);
+    const time = new Date(2026, 0, 1, hours, minutes);
+    return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
+const timeOptions = Array.from({ length: 96 }, (_, index) => {
+    const hours = String(Math.floor(index / 4)).padStart(2, "0");
+    const minutes = String((index % 4) * 15).padStart(2, "0");
+    return `${hours}:${minutes}`;
+});
+
 export class DateTimeRangePickerView extends React.Component<IDateTimeRangePickerProps, { isOpen: boolean; overlayPosition: { top: number; left: number; width: number } }> {
     private compactInput = React.createRef<HTMLInputElement>();
     public constructor(props: IDateTimeRangePickerProps) {
@@ -71,8 +84,8 @@ export class DateTimeRangePickerView extends React.Component<IDateTimeRangePicke
                     <div className="dtrp-header-actions"><span className={`dtrp-status ${hasRange ? "is-complete" : ""}`}>{hasRange ? "Listo" : "Pendiente"}</span><button type="button" className="dtrp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div>
                 </header>
                 <div className="dtrp-fields">
-                    <label className="dtrp-field"><span>Inicio</span><div><input type="date" value={startDateTime.slice(0, 10)} onChange={(event) => this.updateStartDateTime(`${event.target.value}T${startDateTime.slice(11, 16) || "00:00"}`)} disabled={disabled} /><input type="time" value={startDateTime.slice(11, 16)} onChange={(event) => this.updateStartDateTime(`${startDateTime.slice(0, 10)}T${event.target.value}`, true)} disabled={disabled} /></div></label>
-                    <label className="dtrp-field"><span>Fin</span><div><input type="date" value={endDateTime.slice(0, 10)} onChange={(event) => this.updateEndDateTime(`${event.target.value}T${endDateTime.slice(11, 16) || "00:00"}`)} disabled={disabled} /><input type="time" value={endDateTime.slice(11, 16)} onChange={(event) => this.updateEndDateTime(`${endDateTime.slice(0, 10)}T${event.target.value}`, true)} disabled={disabled} /></div></label>
+                    <label className="dtrp-field"><span>Inicio</span><div><input type="date" value={startDateTime.slice(0, 10)} onChange={(event) => this.updateStartDateTime(`${event.target.value}T${startDateTime.slice(11, 16) || "00:00"}`)} disabled={disabled} /><span className="dtrp-time-picker"><span className="dtrp-clock-icon" aria-hidden="true" /><select value={startDateTime.slice(11, 16)} onChange={(event) => this.updateStartDateTime(`${startDateTime.slice(0, 10)}T${event.target.value}`, true)} disabled={disabled} aria-label="Hora de inicio">{timeOptions.map((time) => <option key={time} value={time}>{formatTimeOption(time, timeFormat)}</option>)}</select></span></div></label>
+                    <label className="dtrp-field"><span>Fin</span><div><input type="date" value={endDateTime.slice(0, 10)} onChange={(event) => this.updateEndDateTime(`${event.target.value}T${endDateTime.slice(11, 16) || "00:00"}`)} disabled={disabled} /><span className="dtrp-time-picker"><span className="dtrp-clock-icon" aria-hidden="true" /><select value={endDateTime.slice(11, 16)} onChange={(event) => this.updateEndDateTime(`${endDateTime.slice(0, 10)}T${event.target.value}`, true)} disabled={disabled} aria-label="Hora de fin">{timeOptions.map((time) => <option key={time} value={time}>{formatTimeOption(time, timeFormat)}</option>)}</select></span></div></label>
                 </div>
                 <div className="dtrp-summary"><div><small>INICIO</small><strong>{formatDateTime(startDateTime, dateFormat, timeFormat)}</strong></div><div><small>FIN</small><strong>{formatDateTime(endDateTime, dateFormat, timeFormat)}</strong></div></div>
             </section>
