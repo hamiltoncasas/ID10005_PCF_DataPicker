@@ -1,0 +1,13 @@
+en el on start de la app:
+
+Set(varResetPicker, false);
+Set(varResetFechaHora, false);
+
+en la propiedad resetkey
+varResetFechaHora
+o
+varResetFechaHora
+
+en el botón 
+Set(varResetFecha, !varResetFecha);
+Set(varResetFechaHora, !varResetFechaHora)
