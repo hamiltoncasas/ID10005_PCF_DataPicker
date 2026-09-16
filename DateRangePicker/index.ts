@@ -11,6 +11,9 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
     private notifyOutputChanged: () => void;
     private startDate = "";
     private endDate = "";
+    private lastInputStart = "";
+    private lastInputEnd = "";
+    private lastResetKey = false;
 
     /**
      * Empty constructor.
@@ -44,13 +47,19 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
         const inputEnd = context.parameters.initialEndDate?.raw ?? "";
         const dateFormat = String(context.parameters.format.raw ?? "YYYY-MM-DD");
         const zIndex = context.parameters.zIndex.raw ?? 2147483647;
+        const resetKey = context.parameters.resetKey?.raw ?? false;
 
-        if (inputStart === "" && inputEnd === "") {
+        if (resetKey !== this.lastResetKey) {
             this.startDate = "";
             this.endDate = "";
-        } else if (this.startDate !== inputStart || this.endDate !== inputEnd) {
+            this.lastInputStart = inputStart;
+            this.lastInputEnd = inputEnd;
+            this.lastResetKey = resetKey;
+        } else if (inputStart !== this.lastInputStart || inputEnd !== this.lastInputEnd) {
             this.startDate = inputStart;
             this.endDate = inputEnd;
+            this.lastInputStart = inputStart;
+            this.lastInputEnd = inputEnd;
         }
 
         const props: IDateRangePickerProps = {
