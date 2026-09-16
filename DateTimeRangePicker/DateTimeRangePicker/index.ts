@@ -10,6 +10,9 @@ export class DateTimeRangePicker implements ComponentFramework.ReactControl<IInp
     private notifyOutputChanged: () => void;
     private startDateTime = "";
     private endDateTime = "";
+    private lastInputStart = "";
+    private lastInputEnd = "";
+    private lastResetKey = false;
 
     /**
      * Empty constructor.
@@ -41,13 +44,19 @@ export class DateTimeRangePicker implements ComponentFramework.ReactControl<IInp
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
         const inputStart = context.parameters.initialStartDateTime?.raw ?? "";
         const inputEnd = context.parameters.initialEndDateTime?.raw ?? "";
+        const resetKey = context.parameters.resetKey?.raw ?? false;
 
-        if (inputStart === "" && inputEnd === "") {
+        if (resetKey !== this.lastResetKey) {
             this.startDateTime = "";
             this.endDateTime = "";
-        } else if (this.startDateTime !== inputStart || this.endDateTime !== inputEnd) {
+            this.lastInputStart = inputStart;
+            this.lastInputEnd = inputEnd;
+            this.lastResetKey = resetKey;
+        } else if (inputStart !== this.lastInputStart || inputEnd !== this.lastInputEnd) {
             this.startDateTime = inputStart;
             this.endDateTime = inputEnd;
+            this.lastInputStart = inputStart;
+            this.lastInputEnd = inputEnd;
         }
 
         const props: IDateTimeRangePickerProps = {
