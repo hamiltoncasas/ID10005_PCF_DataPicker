@@ -44,8 +44,15 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
         const inputEnd = context.parameters.initialEndDate?.raw ?? "";
         const dateFormat = String(context.parameters.format.raw ?? "YYYY-MM-DD");
         const zIndex = context.parameters.zIndex.raw ?? 2147483647;
-        if (!this.startDate && inputStart) this.startDate = inputStart;
-        if (!this.endDate && inputEnd) this.endDate = inputEnd;
+
+        if (inputStart === "" && inputEnd === "") {
+            this.startDate = "";
+            this.endDate = "";
+        } else if (this.startDate !== inputStart || this.endDate !== inputEnd) {
+            this.startDate = inputStart;
+            this.endDate = inputEnd;
+        }
+
         const props: IDateRangePickerProps = {
             startDate: this.startDate,
             endDate: this.endDate,
