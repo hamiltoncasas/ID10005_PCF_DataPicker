@@ -118,7 +118,7 @@ export class DateRangePickerView extends React.Component<IDateRangePickerProps, 
         const hasRange = !!start && !!end;
         const summary = startDate && endDate ? `${startDate}  →  ${endDate}` : startDate ? `${startDate}  →  Selecciona una fecha final` : "Selecciona una fecha de inicio";
         if (!this.state.isOpen) {
-            return <section className="drp-root drp-root-compact" aria-label="Selector de rango de fechas"><span className="drp-calendar-icon">▣</span><input ref={this.compactInput} className={hasRange ? "drp-compact-input drp-compact-value" : "drp-compact-input drp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango" /><span className="drp-chevron">⌄</span></section>;
+            return <section className="drp-root drp-root-compact" aria-label="Selector de rango de fechas"><input ref={this.compactInput} className={hasRange ? "drp-compact-input drp-compact-value" : "drp-compact-input drp-compact-placeholder"} type="text" readOnly value={hasRange ? summary : "Selecciona fecha"} onClick={this.openPicker} onFocus={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango" /><button type="button" className="drp-calendar-button" onClick={this.openPicker} disabled={disabled} aria-label="Abrir selector de rango"><span className="drp-calendar-icon" aria-hidden="true" /></button></section>;
         }
         const pickerPanel = (
             <section className="drp-root drp-root-expanded" style={{ ...this.state.overlayPosition, zIndex: Math.max(1, Math.min(this.props.zIndex, 2147483647)) }} aria-label="Selector de rango de fechas">
