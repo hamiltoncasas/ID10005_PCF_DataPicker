@@ -22,6 +22,7 @@ El proyecto versiona dos cosas de forma independiente:
 
 - Nuevo paquete de solución regenerado con las versiones nuevas: `solution/bin/Release/solution.zip` y `solution_managed.zip`.
 - Documentación alineada con las versiones publicadas (índice, referencia de controles y compilación).
+- Commit de la versión: `cccd5cc568` (*Release 1.0.1 of the new controls and solution 1.0.1.0*).
 
 **Compatibilidad:** sin cambios funcionales ni de contrato; los controles existentes mantienen sus nombres, propiedades y salidas. Al reimportar la solución, actualiza el componente en la aplicación de lienzo para que tome la versión nueva.
 
