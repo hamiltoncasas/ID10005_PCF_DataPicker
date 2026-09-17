@@ -113,7 +113,7 @@ Compilación correcta. 0 Advertencia(s) 0 Errores
 | `solution/bin/Release/solution.zip` | Solución no administrada + administrada (`Managed = 2`) |
 | `solution/bin/Release/solution_managed.zip` | Solución administrada para producción |
 
-El paquete incluye los cinco componentes (`Controls/id5_ID10005.<Control>/`), el manifiesto de solución (`ID0005_DataPickers`, versión 1.0.2.0, publicador `ID0005`, prefijo `id5`) y los recursos `Other/Solution.xml`, `Other/Customizations.xml` y `Other/Relationships.xml`.
+El paquete incluye los cinco componentes (`Controls/id5_ID10005.<Control>/`), el manifiesto de solución (`ID0005_DataPickers`, versión 1.0.3.0, publicador `ID0005`, prefijo `id5`) y los recursos `Other/Solution.xml`, `Other/Customizations.xml` y `Other/Relationships.xml`.
 
 ## Recetas para actualizar
 

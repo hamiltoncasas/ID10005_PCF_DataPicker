@@ -21,6 +21,7 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
     private selectedValues: string[] = [];
     private lastDefaultValue = "";
     private lastResetKey = false;
+    private lastRefreshKey = false;
     private pendingDefaultValue = "";
     private pageRequests = 0;
     private pageSizeRequested = false;
@@ -78,6 +79,12 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
             this.applyDefaultValue(pendingDefaultValue, selectMultiple);
         }
 
+        const refreshKey = context.parameters.refreshKey?.raw ?? false;
+        if (refreshKey !== this.lastRefreshKey) {
+            this.lastRefreshKey = refreshKey;
+            this.refreshDataset(dataset);
+        }
+
         const props: ISearchableComboBoxProps = {
             options: this.options,
             selectedValues: this.selectedValues,
@@ -88,6 +95,7 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
             zIndex: context.parameters.zIndex.raw ?? 2147483647,
             disabled: context.mode.isControlDisabled,
             morePagesAvailable: this.morePagesAvailable,
+            onRefresh: () => this.refreshDataset(dataset),
             onChange: (values) => {
                 this.selectedValues = selectMultiple ? values : values.slice(0, 1);
                 this.notifyOutputChanged();
@@ -249,5 +257,21 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
     private labelOf(value: string): string {
         const option = this.options.find((item) => item.value === value);
         return option ? option.label : value;
+    }
+
+    /**
+     * Vuelve a consultar la tabla o coleccion enlazada en Items y reinicia los
+     * contadores de paginacion. La data nueva llega en un ciclo posterior de
+     * updateView.
+     */
+    private refreshDataset(dataset: ComponentFramework.PropertyTypes.DataSet): void {
+        if (!dataset) return;
+        this.pageRequests = 0;
+        this.pageSizeRequested = false;
+        try {
+            dataset.refresh();
+        } catch {
+            // El host puede no admitir el refresco del conjunto de datos.
+        }
     }
 }

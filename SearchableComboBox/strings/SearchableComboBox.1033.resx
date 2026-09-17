@@ -30,6 +30,8 @@
   <data name="Load_All_Records_Desc" xml:space="preserve"><value>Si está activo, el control solicita las páginas restantes del conjunto de datos (hasta 10 páginas de 5000 registros) para filtrar sobre todos los registros. Desactivado (predeterminado) el paginador de Power Apps sigue funcionando y el filtro trabaja sobre los registros cargados.</value></data>
   <data name="Reset_Key" xml:space="preserve"><value>Reiniciar selección</value></data>
   <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la selección.</value></data>
+  <data name="Refresh_Key" xml:space="preserve"><value>Actualizar la fuente de datos</value></data>
+  <data name="Refresh_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control vuelve a consultar la tabla o colección enlazada en Items. La nueva data llega en el siguiente ciclo de actualización.</value></data>
   <data name="Z_Index" xml:space="preserve"><value>Prioridad visual de la lista</value></data>
   <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index de la lista desplegable. Predeterminado 2147483647.</value></data>
   <data name="Selected_Value" xml:space="preserve"><value>Valor seleccionado</value></data>

@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | Compilación de los 5 controles | `npm run build` | Succeeded, 5 bundles generados en `out/controls` |
 | Calidad de código | `npm run lint` | Succeeded, 0 errores |
-| Lógica de fechas, contiene y selección | ver sección 3 | 54 de 54 verificaciones correctas |
+| Lógica de fechas, contiene y selección | ver sección 3 | 61 de 61 verificaciones correctas |
 | Empaquetado de la solución | `dotnet build solution.cdsproj -c Release` | Compilación correcta, 0 advertencias, 0 errores |
 | Contenido del paquete | Inspección de `solution.zip` | 5 componentes: DatePicker, DateTimePicker, DateRangePicker, DateTimeRangePicker y SearchableComboBox |
 
@@ -39,7 +39,7 @@ node tools/verificar-controles.js
 Salida esperada (resumen final):
 
 ```
-54 de 54 verificaciones correctas
+61 de 61 verificaciones correctas
 ```
 
 Si alguna comprobación falla, el script termina con código de salida 1 y muestra `FAIL <nombre> -> <valor obtenido> esperado <valor esperado>`.
@@ -52,6 +52,8 @@ Si alguna comprobación falla, el script termina con código de salida 1 y muest
 | `DateTimePicker` | Hora inicial tomada del valor, cambio de hora publica `YYYY-MM-DDTHH:mm` y conserva el estado, cambio de fecha conserva la hora, selección de día cierra el panel, hora por defecto alineada a 15 minutos, sin fecha no publica, limpiar publica vacío, valor inválido no rompe |
 | Búsqueda | `normalizeForSearch` (acentos y mayúsculas), contiene en el medio del texto, contiene en una columna distinta a la etiqueta, sin coincidencias, sin texto devuelve todo, sin registros no activa ninguna opción |
 | Selección | Selección única publica el valor, `isSelected`, selección múltiple agrega y quita, quitar etiqueta, navegación con teclado con ciclado al final y vuelta al inicio |
+| Botón Actualizar | `refreshData` avisa al adaptador para refrescar `Items` y se puede repetir |
+| Botón Limpiar filtros | Quita el texto de búsqueda, reinicia la opción activa y limpia la selección (única y múltiple); sin registros no activa ninguna opción |
 | Resaltado | Cálculo del fragmento coincidente con texto parcial |
 
 ### Limitaciones del arnés
@@ -104,6 +106,10 @@ Ejecútalo después de importar la solución en el entorno y agregar los control
 | 11 | Enlazar una etiqueta muy larga | Cerrado: el texto se recorta con puntos suspensivos. Abierto: la lista se superpone y muestra todo el texto |
 | 12 | Desplazar la página con la lista abierta | La lista acompaña al control sin desalinearse |
 | 13 | Poner `defaultValue` con dos valores separados por `;` | Se precargan al iniciar la aplicación |
+| 14 | Pulsar **Actualizar** (⟳) en el encabezado del panel | La lista se vuelve a consultar: aparecen los registros nuevos o editados de `Items` |
+| 15 | Escribir un texto y pulsar **Limpiar filtros** | Se borra el texto, vuelven todos los registros y se quita la selección |
+| 16 | Cambiar `refreshKey` desde un botón de la app | La fuente de datos se vuelve a consultar igual que con el botón **Actualizar** |
+| 17 | Con el paginador de Power Apps, avanzar a la página 2 | El combobox muestra los registros de esa página (con `loadAllRecords = No`) |
 
 ## 5. Rutina de regresión antes de publicar
 
@@ -115,5 +121,5 @@ node tools/verificar-controles.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptación: lint sin errores, build correcto, `54 de 54` verificaciones correctas y paquete de solución generado con los 5 componentes.
+Criterios de aceptación: lint sin errores, build correcto, `61 de 61` verificaciones correctas y paquete de solución generado con los 5 componentes.
 

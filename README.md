@@ -133,5 +133,5 @@ Los formatos cubren los usos habituales de Power Platform y Dataverse (`YYYY-MM-
 | [docs/instalacion.md](docs/instalacion.md) | Importación en Dataverse y uso en aplicaciones de lienzo |
 | [docs/pruebas.md](docs/pruebas.md) | Verificaciones automáticas, arnés de lógica y checklist manual |
 | [docs/changelog.md](docs/changelog.md) | Historial de cambios por fecha y versión |
-| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnés que comprueba fechas, filtro contiene y selección (54 comprobaciones) |
+| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnés que comprueba fechas, filtro contiene, botones y selección (61 comprobaciones) |
 
