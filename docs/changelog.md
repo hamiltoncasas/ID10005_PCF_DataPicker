@@ -20,6 +20,7 @@ El proyecto versiona dos cosas de forma independiente:
 - La lista muestra un aviso al pie cuando hay páginas sin cargar.
 - `SearchableComboBox` 1.0.1 → **1.0.2**; solución → **1.0.2.0**.
 - Paquete de solución regenerado.
+- Commit de la versión: `5ab27b6707` (*Fix dataset pager conflict in SearchableComboBox and release 1.0.2*).
 
 **Compatibilidad:** cambia el comportamiento predeterminado del combobox (ahora filtra los registros de la página cargada). Para buscar en todos los registros, activa `loadAllRecords`.
 
