@@ -8,6 +8,14 @@ El proyecto versiona dos cosas de forma independiente:
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
 - **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.0.9`).
 
+## 2026-09-17 · Nueva compilación del paquete: solución 1.0.1.1
+
+**Cambios:**
+
+- Se sube **solo** la versión de la solución `ID0005_DataPickers` de 1.0.1.0 a **1.0.1.1**, para poder importarla como actualización (Dataverse rechaza versiones menores a la instalada).
+- Los controles no cambian: `SearchableComboBox` 1.0.1, `DatePicker` 1.0.1, `DateTimePicker` 1.0.1, `DateRangePicker` 1.0.9 y `DateTimeRangePicker` 1.0.9.
+- Paquete regenerado: `solution/bin/Release/solution.zip` y `solution_managed.zip`.
+
 ## 2026-09-16 · Versión 1.0.1 de los controles nuevos y solución 1.0.1.0
 
 **Subida de versiones:**

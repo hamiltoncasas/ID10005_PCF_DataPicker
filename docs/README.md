@@ -40,7 +40,7 @@ Todos comparten el mismo lenguaje visual: modo compacto cerrado (32 px, borde gr
 | Rama de trabajo | `fix/remove-unsupported-fluent` |
 | Compilación y calidad | `npm run build` y `npm run lint` correctos; arnés 54 de 54 |
 | Paquete de solución | `solution/bin/Release/solution.zip` y `solution_managed.zip` con los 5 controles |
-| Versión de la solución | `ID0005_DataPickers` 1.0.1.0, publicador `ID0005`, prefijo `id5` |
+| Versión de la solución | `ID0005_DataPickers` 1.0.1.1, publicador `ID0005`, prefijo `id5` |
 | Versiones de los controles | `DatePicker` 1.0.1 · `DateTimePicker` 1.0.1 · `SearchableComboBox` 1.0.1 · `DateRangePicker` 1.0.9 · `DateTimeRangePicker` 1.0.9 |
 
 ## Inicio rápido
