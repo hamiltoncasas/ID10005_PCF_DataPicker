@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="DateTimePicker" xml:space="preserve"><value>Selector de fecha y hora</value></data>
+  <data name="DateTimePicker description" xml:space="preserve"><value>Selecciona una fecha y una hora. La salida dateTime usa el formato tecnico YYYY-MM-DDTHH:mm.</value></data>
+  <data name="Initial_DateTime" xml:space="preserve"><value>Fecha y hora precargada</value></data>
+  <data name="Initial_DateTime_Desc" xml:space="preserve"><value>Valor opcional con formato YYYY-MM-DDTHH:mm, por ejemplo 2026-09-16T08:30.</value></data>
+  <data name="Reset_Key" xml:space="preserve"><value>Reiniciar selección</value></data>
+  <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la fecha y la hora seleccionadas.</value></data>
+  <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
+  <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Time_Format" xml:space="preserve"><value>Formato de hora</value></data>
+  <data name="Time_Format_Desc" xml:space="preserve"><value>Use 24, 12, 24:00:00 o 12:00:00 para mostrar la hora con o sin segundos.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del selector</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel abierto. Predeterminado 2147483647. Use un valor mayor que el de los elementos superpuestos.</value></data>
+  <data name="DateTime" xml:space="preserve"><value>Fecha y hora seleccionada</value></data>
+  <data name="DateTime_Desc" xml:space="preserve"><value>Salida en formato tecnico YYYY-MM-DDTHH:mm. Use DateTimeValue(DateTimePicker1.dateTime) para obtener una fecha y hora nativa.</value></data>
+  <data name="Date" xml:space="preserve"><value>Solo fecha</value></data>
+  <data name="Date_Desc" xml:space="preserve"><value>Salida con la parte de fecha en formato YYYY-MM-DD.</value></data>
+  <data name="Time" xml:space="preserve"><value>Solo hora</value></data>
+  <data name="Time_Desc" xml:space="preserve"><value>Salida con la parte de hora en formato HH:mm.</value></data>
+</root>

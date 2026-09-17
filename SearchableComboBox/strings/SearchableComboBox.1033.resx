@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="SearchableComboBox" xml:space="preserve"><value>Combobox con búsqueda</value></data>
+  <data name="SearchableComboBox description" xml:space="preserve"><value>Combobox de Power Apps con filtro tipo contiene sobre todos los registros, resaltado de coincidencias y texto largo visible al abrir la lista.</value></data>
+  <data name="Items" xml:space="preserve"><value>Elementos (tabla o colección)</value></data>
+  <data name="Items_Desc" xml:space="preserve"><value>Registros que se muestran como opciones del combobox.</value></data>
+  <data name="Value" xml:space="preserve"><value>Valor</value></data>
+  <data name="Value_Desc" xml:space="preserve"><value>Columna con el valor único que se publica en las salidas.</value></data>
+  <data name="Label" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="Label_Desc" xml:space="preserve"><value>Columna con el texto visible de cada opción.</value></data>
+  <data name="Description" xml:space="preserve"><value>Descripción</value></data>
+  <data name="Description_Desc" xml:space="preserve"><value>Columna opcional con un texto secundario por opción.</value></data>
+  <data name="Default_Value" xml:space="preserve"><value>Selección inicial</value></data>
+  <data name="Default_Value_Desc" xml:space="preserve"><value>Valor o valores precargados separados por punto y coma. Se admiten valores o etiquetas.</value></data>
+  <data name="Select_Multiple" xml:space="preserve"><value>Permitir selección múltiple</value></data>
+  <data name="Select_Multiple_Desc" xml:space="preserve"><value>Si está activo se pueden elegir varias opciones y se muestran como etiquetas removibles.</value></data>
+  <data name="Is_Searchable" xml:space="preserve"><value>Permitir búsqueda</value></data>
+  <data name="Is_Searchable_Desc" xml:space="preserve"><value>Si está activo aparece el cuadro de búsqueda y el filtro contiene al escribir.</value></data>
+  <data name="Search_Fields" xml:space="preserve"><value>Campos de búsqueda</value></data>
+  <data name="Search_Fields_Desc" xml:space="preserve"><value>Nombres de columna separados por coma donde se busca. Si se deja vacío se buscan todas las columnas.</value></data>
+  <data name="No_Selection_Text" xml:space="preserve"><value>Texto sin selección</value></data>
+  <data name="No_Selection_Text_Desc" xml:space="preserve"><value>Texto que se muestra cuando no hay ninguna opción seleccionada. Predeterminado ---.</value></data>
+  <data name="Placeholder_Text" xml:space="preserve"><value>Texto de búsqueda</value></data>
+  <data name="Placeholder_Text_Desc" xml:space="preserve"><value>Texto guía del cuadro de búsqueda. Predeterminado Buscar...</value></data>
+  <data name="Reset_Key" xml:space="preserve"><value>Reiniciar selección</value></data>
+  <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la selección.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual de la lista</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index de la lista desplegable. Predeterminado 2147483647.</value></data>
+  <data name="Selected_Value" xml:space="preserve"><value>Valor seleccionado</value></data>
+  <data name="Selected_Value_Desc" xml:space="preserve"><value>Salida con el valor de la primera opción seleccionada.</value></data>
+  <data name="Selected_Label" xml:space="preserve"><value>Etiqueta seleccionada</value></data>
+  <data name="Selected_Label_Desc" xml:space="preserve"><value>Salida con la etiqueta de la primera opción seleccionada.</value></data>
+  <data name="Selected_Values" xml:space="preserve"><value>Valores seleccionados</value></data>
+  <data name="Selected_Values_Desc" xml:space="preserve"><value>Salida con todos los valores seleccionados separados por punto y coma.</value></data>
+  <data name="Selected_Labels" xml:space="preserve"><value>Etiquetas seleccionadas</value></data>
+  <data name="Selected_Labels_Desc" xml:space="preserve"><value>Salida con todas las etiquetas seleccionadas separadas por punto y coma.</value></data>
+  <data name="Selected_Count" xml:space="preserve"><value>Cantidad seleccionada</value></data>
+  <data name="Selected_Count_Desc" xml:space="preserve"><value>Salida con el número de opciones seleccionadas.</value></data>
+</root>

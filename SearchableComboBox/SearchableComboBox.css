@@ -1,0 +1,59 @@
+/*
+ * Fecha: 2026-09-16
+ * Descripcion: Estilos del combobox con busqueda, alineados al diseno de los
+ * selectores de fecha: modo compacto, lista expandible y etiquetas removibles.
+ */
+.scb-root { box-sizing: border-box; width: 100%; font-family: 'Segoe UI', sans-serif; }
+.scb-root-compact { display: flex; align-items: stretch; min-width: 0; height: 32px; padding: 0; border: 1px solid #8a8a8a; border-radius: 2px; background: #fff; }
+.scb-root-compact:focus-within, .scb-root-compact.is-open { border-color: #2f5da8; box-shadow: 0 0 0 1px #2f5da8; }
+.scb-root-compact.is-disabled { background: #f5f5f5; }
+.scb-compact-input { flex: 1; min-width: 0; padding: 0 8px; border: 0; outline: 0; color: #333; background: transparent; font: 13px 'Segoe UI', sans-serif; }
+.scb-compact-input:disabled { color: #777; }
+.scb-compact-value { overflow: hidden; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.scb-compact-search { cursor: text; }
+.scb-compact-placeholder { color: #666; cursor: pointer; }
+.scb-compact-placeholder::placeholder { color: #999; }
+.scb-chevron-button { display: grid; flex: 0 0 31px; place-items: center; padding: 0; border: 0; border-left: 1px solid #244b8b; border-radius: 0 1px 1px 0; background: #2f5da8; cursor: pointer; }
+.scb-chevron-button:hover:not(:disabled), .scb-chevron-button:focus-visible { background: #244b8b; }
+.scb-chevron-button:disabled { background: #a8a8a8; cursor: default; }
+.scb-chevron { width: 0; height: 0; border-top: 5px solid #fff; border-right: 5px solid transparent; border-left: 5px solid transparent; transition: transform .15s ease; }
+.scb-chevron.is-open { transform: rotate(180deg); }
+.scb-tags { display: flex; flex: 1; align-items: center; gap: 4px; min-width: 0; padding: 0 5px; overflow: hidden; }
+.scb-tag { display: inline-flex; align-items: center; gap: 4px; max-width: 160px; padding: 2px 6px; border: 1px solid #e7ded0; border-radius: 12px; color: #80684e; background: #f3eadc; font-size: 12px; }
+.scb-tag-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scb-tag-close { flex: 0 0 auto; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 14px; line-height: 14px; cursor: pointer; }
+.scb-tag-close:hover { color: #fff; background: #b86e49; }
+/* La lista se dibuja como superposicion: crece con el contenido para mostrar el
+   texto completo sin recortarlo y se limita al ancho util de la ventana. */
+.scb-panel { position: fixed; z-index: 2147483647; box-sizing: border-box; width: max-content; max-width: min(92vw, 720px); padding: 14px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 12px 28px rgba(77, 63, 43, .18); font-family: 'Segoe UI', sans-serif; }
+.scb-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 2px 2px 12px; }
+.scb-header-text { min-width: 0; }
+.scb-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.scb-summary { margin-top: 6px; max-width: 480px; max-height: 72px; overflow-y: auto; color: #35464b; font-size: 13px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.scb-header-actions { display: flex; align-items: center; gap: 8px; }
+.scb-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.scb-status.is-complete { color: #286b58; background: #dcefe6; }
+.scb-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
+.scb-close:hover { color: #fff; background: #b86e49; }
+.scb-list-block { padding: 6px; background: #f7f1e8; border-radius: 12px; }
+.scb-list { max-height: 288px; margin: 0; padding: 0; overflow: auto; list-style: none; }
+.scb-option { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; color: #384b4d; font-size: 13px; cursor: pointer; }
+.scb-option + .scb-option { margin-top: 2px; }
+.scb-option.is-active { color: #fff; background: #8baba0; }
+.scb-option.is-selected { color: #fff; background: #b86e49; font-weight: 700; }
+.scb-option.is-selected.is-active { background: #a15e3d; }
+.scb-option-body { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.scb-option-text { white-space: nowrap; }
+.scb-option-description { color: #8a7767; font-size: 11px; white-space: nowrap; }
+.scb-option.is-active .scb-option-description, .scb-option.is-selected .scb-option-description { color: rgba(255, 255, 255, .85); }
+.scb-match { padding: 0 1px; border-radius: 2px; color: #ad6b45; background: #f3eadc; font-weight: 700; }
+.scb-option.is-active .scb-match, .scb-option.is-selected .scb-match { color: #b86e49; background: #fff; }
+.scb-check { position: relative; flex: 0 0 16px; width: 16px; height: 16px; border: 1px solid #cbbcaa; border-radius: 3px; background: #fffdf8; }
+.scb-option.is-active .scb-check { border-color: #fff; background: rgba(255, 255, 255, .25); }
+.scb-check.is-on { border-color: #2f5da8; background: #2f5da8; }
+.scb-check.is-on::after { position: absolute; top: 1px; left: 4px; width: 4px; height: 8px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; content: ""; transform: rotate(45deg); }
+.scb-option.is-selected .scb-check.is-on { border-color: #fff; background: #fff; }
+.scb-option.is-selected .scb-check.is-on::after { border-color: #b86e49; }
+.scb-empty { padding: 14px 10px; color: #8a7767; font-size: 12px; text-align: center; }
+.scb-footer { display: flex; align-items: center; gap: 7px; padding: 12px 2px 0; color: #8a7767; font-size: 11px; }
+.scb-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }

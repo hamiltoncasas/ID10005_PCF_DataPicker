@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="DatePicker" xml:space="preserve"><value>Selector de fecha</value></data>
+  <data name="DatePicker description" xml:space="preserve"><value>Selecciona una sola fecha en el calendario. La salida date usa el formato configurado.</value></data>
+  <data name="Initial_Date" xml:space="preserve"><value>Fecha precargada</value></data>
+  <data name="Initial_Date_Desc" xml:space="preserve"><value>Fecha opcional usando uno de los formatos admitidos.</value></data>
+  <data name="Reset_Key" xml:space="preserve"><value>Reiniciar selección</value></data>
+  <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la fecha seleccionada.</value></data>
+  <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
+  <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del selector</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel abierto. Predeterminado 2147483647. Use un valor mayor que el de los elementos superpuestos.</value></data>
+  <data name="Date" xml:space="preserve"><value>Fecha seleccionada</value></data>
+  <data name="Date_Desc" xml:space="preserve"><value>Salida con la fecha seleccionada en el formato configurado. Use DateValue(DatePicker1.date) para obtener una fecha nativa.</value></data>
+</root>
