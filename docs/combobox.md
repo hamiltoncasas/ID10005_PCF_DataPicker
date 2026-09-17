@@ -30,6 +30,7 @@ Si el host no reporta columnas, el control intenta leer `value`, `label` y `desc
 | `searchFields` | Texto | Columnas donde buscar, separadas por coma. Vacio = todas |
 | `noSelectionText` | Texto | Texto cuando no hay seleccion. Predeterminado: `---` |
 | `placeholderText` | Texto | Texto guia del cuadro de busqueda. Predeterminado: `Buscar...` |
+| `loadAllRecords` | Si/No | Solicita las paginas restantes del conjunto de datos para filtrar sobre **todos** los registros (hasta 10 paginas de 5000). Desactivado, el paginador de Power Apps del control sigue funcionando. Predeterminado: No |
 | `resetKey` | Si/No | Al cambiar de valor limpia la seleccion |
 | `zIndex` | Numero | Prioridad visual de la lista. Predeterminado: `2147483647` |
 
@@ -60,7 +61,24 @@ Con `selectedCount = 0` no hay seleccion y `selectedValue` queda vacio.
 - **Abierto**: la lista se dibuja como superposicion sobre el contenido, crece con el texto (`max-content`, limitado al 92% del ancho de la ventana y 720 px) y muestra el texto completo sin recortarlo. Si el texto supera ese limite, la lista permite desplazamiento horizontal.
 - El encabezado del panel muestra el texto completo de la seleccion con salto de linea y desplazamiento vertical, para que nunca se pierda informacion.
 
-## Teclado
+## Paginación y el paginador de Power Apps
+
+En Power Apps, un control con conjunto de datos muestra un **paginador al pie del control**: es el que permite pasar a la siguiente página de registros. Ese paginador usa el mismo objeto `paging` del conjunto de datos que el control recibe en `context.parameters.items`.
+
+`SearchableComboBox` **no toca ese paginador por omisión**:
+
+- Con `loadAllRecords = No` (predeterminado) el control solo filtra los registros cargados de la página actual y el paginador del pie sigue funcionando normalmente (puedes avanzar de página y el control muestra los registros de esa página).
+- Con `loadAllRecords = Sí` el control llama a `setPageSize(5000)` y a `loadNextPage()` hasta 10 veces para traer todas las páginas, de modo que la búsqueda alcance todos los registros. Como consecuencia, el paginador queda con una sola página (todo está cargado).
+
+Cuando hay páginas sin cargar y `loadAllRecords` está desactivado, la lista muestra un aviso al pie: *«Hay más registros sin cargar: usa el paginador de Power Apps del control o activa Cargar todos los registros para buscarlos todos.»*
+
+| Necesidad | Configuración recomendada |
+| --- | --- |
+| Recorrer los datos con el paginador del control | `loadAllRecords = No` |
+| Buscar en una tabla pequeña o filtrada (hasta la primera página) | `loadAllRecords = No` |
+| Buscar en todos los registros de una tabla mediana (hasta 50 000) | `loadAllRecords = Sí` |
+| Tablas muy grandes | Encadena `Items` con `Filter()` o `Search()` en Power Fx y deja `loadAllRecords = No` |
+
 
 | Tecla | Accion |
 | --- | --- |

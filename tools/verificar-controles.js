@@ -114,7 +114,7 @@ const options = [
 ];
 
 let comboChanges = [];
-const combo = mount(new SearchableComboBoxView({ options, selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, onChange: (values) => comboChanges.push(values) }));
+const combo = mount(new SearchableComboBoxView({ options, selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 combo.state.searchText = "ota";
 check("combobox contiene en medio del texto sin acentos", combo.getFilteredOptions().map((option) => option.value), ["BOG"]);
 combo.state.searchText = "ZONA 2";
@@ -128,7 +128,7 @@ check("combobox seleccion unica publica el valor", comboChanges.pop(), ["CAL"]);
 check("combobox isSelected", combo.isSelected("CAL"), false);
 check("combobox resaltado con texto parcial", highlightSample("Cali Sur", "sur"), ["Cali ", "Sur"]);
 
-const comboMulti = mount(new SearchableComboBoxView({ options, selectedValues: ["MED"], selectMultiple: true, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, onChange: (values) => comboChanges.push(values) }));
+const comboMulti = mount(new SearchableComboBoxView({ options, selectedValues: ["MED"], selectMultiple: true, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 comboMulti.toggleOption("CAL");
 check("combobox seleccion multiple agrega", comboChanges.pop(), ["MED", "CAL"]);
 check("combobox isSelected multi", comboMulti.isSelected("MED"), true);
@@ -142,7 +142,7 @@ check("combobox activo cicla al final", comboMulti.state.activeIndex, 2);
 comboMulti.moveActive(1);
 check("combobox activo vuelve al inicio", comboMulti.state.activeIndex, 0);
 
-const comboEmpty = mount(new SearchableComboBoxView({ options: [], selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, onChange: (values) => comboChanges.push(values) }));
+const comboEmpty = mount(new SearchableComboBoxView({ options: [], selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 comboEmpty.state.searchText = "x";
 check("combobox sin registros", comboEmpty.getFilteredOptions().length, 0);
 comboEmpty.moveActive(1);

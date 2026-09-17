@@ -24,6 +24,7 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
     private pendingDefaultValue = "";
     private pageRequests = 0;
     private pageSizeRequested = false;
+    private morePagesAvailable = false;
 
     /**
      * Empty constructor.
@@ -56,7 +57,9 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
         this.context = context;
         const dataset = context.parameters.items;
         const selectMultiple = context.parameters.selectMultiple?.raw ?? false;
-        this.options = dataset ? this.buildOptions(dataset) : [];
+        const loadAllRecords = context.parameters.loadAllRecords?.raw ?? false;
+        this.options = dataset ? this.buildOptions(dataset, loadAllRecords) : [];
+        this.morePagesAvailable = !!dataset && !loadAllRecords && !!dataset.paging && dataset.paging.hasNextPage;
 
         const defaultValue = String(context.parameters.defaultValue?.raw ?? "");
         const resetKey = context.parameters.resetKey?.raw ?? false;
@@ -84,6 +87,7 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
             placeholderText: String(context.parameters.placeholderText?.raw ?? "Buscar..."),
             zIndex: context.parameters.zIndex.raw ?? 2147483647,
             disabled: context.mode.isControlDisabled,
+            morePagesAvailable: this.morePagesAvailable,
             onChange: (values) => {
                 this.selectedValues = selectMultiple ? values : values.slice(0, 1);
                 this.notifyOutputChanged();
@@ -121,10 +125,10 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
      * Convierte los registros de Items en opciones del combobox. Usa las columnas
      * value, label y description cuando existen; si no, toma la primera columna.
      */
-    private buildOptions(dataset: ComponentFramework.PropertyTypes.DataSet): ISearchableComboBoxOption[] {
+    private buildOptions(dataset: ComponentFramework.PropertyTypes.DataSet, loadAllRecords: boolean): ISearchableComboBoxOption[] {
         const columns = this.getColumns(dataset);
         if (columns.length === 0) return [];
-        this.ensureAllRecordsLoaded(dataset);
+        if (loadAllRecords) this.loadRemainingPages(dataset);
         const valueColumn = this.findColumn(columns, VALUE_COLUMN);
         const labelColumn = this.findColumn(columns, LABEL_COLUMN);
         const descriptionColumn = this.findColumn(columns, DESCRIPTION_COLUMN);
@@ -193,10 +197,12 @@ export class SearchableComboBox implements ComponentFramework.ReactControl<IInpu
     }
 
     /**
-     * Solicita el resto de paginas para que el filtro trabaje sobre todos los
-     * registros existentes y no solo sobre la primera pagina cargada.
+     * Solicita las paginas restantes solo cuando la propiedad loadAllRecords esta
+     * activa. Por omision el control no toca el paginador: asi el paginador de
+     * Power Apps del control sigue funcionando y el filtro trabaja sobre los
+     * registros cargados de la pagina actual.
      */
-    private ensureAllRecordsLoaded(dataset: ComponentFramework.PropertyTypes.DataSet): void {
+    private loadRemainingPages(dataset: ComponentFramework.PropertyTypes.DataSet): void {
         const paging = dataset.paging;
         if (!paging) return;
         if (!this.pageSizeRequested && paging.pageSize > 0 && paging.pageSize < MAX_RECORDS) {

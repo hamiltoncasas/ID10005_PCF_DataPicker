@@ -56,4 +56,6 @@
 .scb-option.is-selected .scb-check.is-on::after { border-color: #b86e49; }
 .scb-empty { padding: 14px 10px; color: #8a7767; font-size: 12px; text-align: center; }
 .scb-footer { display: flex; align-items: center; gap: 7px; padding: 12px 2px 0; color: #8a7767; font-size: 11px; }
+.scb-hint { margin-top: 8px; padding: 8px 10px; border: 1px solid #e7ded0; border-radius: 8px; color: #ad6b45; background: #f3eadc; font-size: 11px; line-height: 1.4; }
+.scb-hint strong { color: #80684e; }
 .scb-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }

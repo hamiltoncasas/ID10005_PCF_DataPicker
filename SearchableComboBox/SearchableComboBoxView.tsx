@@ -24,6 +24,7 @@ export interface ISearchableComboBoxProps {
     placeholderText: string;
     zIndex: number;
     disabled: boolean;
+    morePagesAvailable: boolean;
     onChange: (values: string[]) => void;
 }
 
@@ -252,7 +253,7 @@ export class SearchableComboBoxView extends React.Component<ISearchableComboBoxP
     };
 
     public render(): React.ReactNode {
-        const { options, selectedValues, selectMultiple, isSearchable, noSelectionText, placeholderText, disabled } = this.props;
+        const { options, selectedValues, selectMultiple, isSearchable, noSelectionText, placeholderText, disabled, morePagesAvailable } = this.props;
         const { isOpen, searchText, activeIndex } = this.state;
         const selectedOptions = selectedValues.map((value) => options.find((option) => option.value === value)).filter((option): option is ISearchableComboBoxOption => !!option);
         const selectedLabels = selectedOptions.map((option) => option.label);
@@ -301,6 +302,7 @@ export class SearchableComboBoxView extends React.Component<ISearchableComboBoxP
                     )}
                 </div>
                 <div className="scb-footer"><span className="scb-dot" /> {filtered.length} de {options.length} registros · coincidencias en cualquier parte del texto</div>
+                {morePagesAvailable ? <div className="scb-hint">Hay más registros sin cargar: usa el paginador de Power Apps del control o activa <strong>Cargar todos los registros</strong> para buscarlos todos.</div> : null}
             </div>
         );
         return <React.Fragment>{control}{ReactDOM.createPortal(panel, document.body)}</React.Fragment>;
