@@ -3,6 +3,8 @@
 > Fecha: 2026-09-16  
 > Descripcion: Propiedades, comportamiento y ejemplos del combobox con busqueda incremental para Power Apps Canvas.
 
+> Indice de documentacion: [README.md](README.md) · Referencia general: [controles.md](controles.md)
+
 `SearchableComboBox` replica el combobox clasico de Power Apps de lienzo y agrega el filtro tipo **contiene**: al escribir, la lista muestra todos los registros que contienen el texto en cualquier posicion, sin distinguir mayusculas ni acentos, y resalta la coincidencia.
 
 ## Enlazar los elementos

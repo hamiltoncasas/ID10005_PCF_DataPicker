@@ -3,6 +3,8 @@
 > Fecha: 2026-09-16  
 > Descripcion: Catalogo de formatos aceptados por `DatePicker`, `DateTimePicker`, `DateRangePicker` y `DateTimeRangePicker`.
 
+> Indice de documentacion: [README.md](README.md) · Referencia general: [controles.md](controles.md)
+
 ## Formatos de fecha
 
 Configura la propiedad `format` con uno de estos valores exactos:

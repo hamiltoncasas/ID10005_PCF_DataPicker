@@ -121,5 +121,17 @@ Los formatos cubren los usos habituales de Power Platform y Dataverse (`YYYY-MM-
 
 ## Documentación
 
-- [docs/formatos.md](docs/formatos.md): catálogo de formatos de fecha y hora que aceptan los selectores.
-- [docs/combobox.md](docs/combobox.md): propiedades, comportamiento de búsqueda y ejemplos de `SearchableComboBox`.
+Índice completo en [docs/README.md](docs/README.md).
+
+| Documento | Contenido |
+| --- | --- |
+| [docs/controles.md](docs/controles.md) | Referencia de propiedades, salidas y comportamiento de los 5 controles |
+| [docs/formatos.md](docs/formatos.md) | Catálogo de formatos de fecha y hora que aceptan los selectores |
+| [docs/combobox.md](docs/combobox.md) | Detalle del combobox con búsqueda tipo contiene |
+| [docs/arquitectura.md](docs/arquitectura.md) | Estructura del repositorio, ciclo de vida PCF, diseño visual y decisiones |
+| [docs/compilacion.md](docs/compilacion.md) | Requisitos, comandos de compilación y empaquetado de la solución |
+| [docs/instalacion.md](docs/instalacion.md) | Importación en Dataverse y uso en aplicaciones de lienzo |
+| [docs/pruebas.md](docs/pruebas.md) | Verificaciones automáticas, arnés de lógica y checklist manual |
+| [docs/changelog.md](docs/changelog.md) | Historial de cambios por fecha y versión |
+| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnés que comprueba fechas, filtro contiene y selección (54 comprobaciones) |
+
