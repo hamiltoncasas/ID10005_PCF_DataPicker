@@ -25,7 +25,6 @@ export interface ISearchableComboBoxProps {
     zIndex: number;
     disabled: boolean;
     morePagesAvailable: boolean;
-    onRefresh: () => void;
     onChange: (values: string[]) => void;
 }
 
@@ -196,20 +195,6 @@ export class SearchableComboBoxView extends React.Component<ISearchableComboBoxP
         this.props.onChange(this.props.selectedValues.filter((item) => item !== value));
     };
 
-    /** Vuelve a consultar la fuente de datos enlazada en Items. */
-    private refreshData = (): void => {
-        this.props.onRefresh();
-    };
-
-    /**
-     * Quita todo lo que el usuario agrego al control: el texto de busqueda y la
-     * seleccion. El editor de busqueda queda listo para volver a filtrar.
-     */
-    private clearFilters = (): void => {
-        this.setState({ searchText: "", activeIndex: this.props.options.length > 0 ? 0 : -1 });
-        if (this.props.selectedValues.length > 0) this.props.onChange([]);
-    };
-
     private scrollActiveIntoView = (): void => {
         const list = this.listRef.current;
         if (!list) return;
@@ -298,7 +283,7 @@ export class SearchableComboBoxView extends React.Component<ISearchableComboBoxP
             <div ref={this.panelRef} className="scb-panel" style={{ top: this.state.overlayPosition.top, left: this.state.overlayPosition.left, minWidth: this.state.overlayPosition.minWidth, zIndex: Math.max(1, Math.min(this.props.zIndex, 2147483647)) }} role="dialog" aria-label="Lista de opciones">
                 <div className="scb-header">
                     <div className="scb-header-text"><span className="scb-kicker">REGISTROS</span><div className="scb-summary" title={summary}>{summary}</div></div>
-                    <div className="scb-header-actions"><div className={`scb-status ${selectedLabels.length > 0 ? "is-complete" : ""}`}>{statusText}</div><button type="button" className="scb-refresh" onClick={this.refreshData} disabled={disabled} title="Actualizar la fuente de datos" aria-label="Actualizar la fuente de datos"><span className="scb-refresh-icon" aria-hidden="true" /></button><button type="button" className="scb-close" onClick={this.closePanel} aria-label="Contraer lista">×</button></div>
+                    <div className="scb-header-actions"><div className={`scb-status ${selectedLabels.length > 0 ? "is-complete" : ""}`}>{statusText}</div><button type="button" className="scb-close" onClick={this.closePanel} aria-label="Contraer lista">×</button></div>
                 </div>
                 <div className="scb-list-block">
                     {filtered.length === 0 ? <div className="scb-empty">{emptyMessage}</div> : (
@@ -316,7 +301,7 @@ export class SearchableComboBoxView extends React.Component<ISearchableComboBoxP
                         </ul>
                     )}
                 </div>
-                <div className="scb-footer"><span className="scb-dot" /> {filtered.length} de {options.length} registros · coincidencias en cualquier parte del texto{searchText || selectedValues.length > 0 ? <button type="button" className="scb-clear" onClick={this.clearFilters} disabled={disabled} title="Quita el texto de búsqueda y la selección">Limpiar filtros</button> : null}</div>
+                <div className="scb-footer"><span className="scb-dot" /> {filtered.length} de {options.length} registros · coincidencias en cualquier parte del texto</div>
                 {morePagesAvailable ? <div className="scb-hint">Hay más registros sin cargar: usa el paginador de Power Apps del control o activa <strong>Cargar todos los registros</strong> para buscarlos todos.</div> : null}
             </div>
         );

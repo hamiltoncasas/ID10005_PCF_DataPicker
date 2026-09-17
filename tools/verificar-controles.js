@@ -8,7 +8,7 @@
  *   npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
  *   node tools/verificar-controles.js
  *
- * Salida esperada: "61 de 61 verificaciones correctas" y codigo de salida 0.
+ * Salida esperada: "54 de 54 verificaciones correctas" y codigo de salida 0.
  */
 const path = require("path");
 
@@ -114,11 +114,7 @@ const options = [
 ];
 
 let comboChanges = [];
-let refreshCalls = 0;
-const onRefresh = () => {
-    refreshCalls += 1;
-};
-const combo = mount(new SearchableComboBoxView({ options, selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onRefresh, onChange: (values) => comboChanges.push(values) }));
+const combo = mount(new SearchableComboBoxView({ options, selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 combo.state.searchText = "ota";
 check("combobox contiene en medio del texto sin acentos", combo.getFilteredOptions().map((option) => option.value), ["BOG"]);
 combo.state.searchText = "ZONA 2";
@@ -132,7 +128,7 @@ check("combobox seleccion unica publica el valor", comboChanges.pop(), ["CAL"]);
 check("combobox isSelected", combo.isSelected("CAL"), false);
 check("combobox resaltado con texto parcial", highlightSample("Cali Sur", "sur"), ["Cali ", "Sur"]);
 
-const comboMulti = mount(new SearchableComboBoxView({ options, selectedValues: ["MED"], selectMultiple: true, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onRefresh, onChange: (values) => comboChanges.push(values) }));
+const comboMulti = mount(new SearchableComboBoxView({ options, selectedValues: ["MED"], selectMultiple: true, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 comboMulti.toggleOption("CAL");
 check("combobox seleccion multiple agrega", comboChanges.pop(), ["MED", "CAL"]);
 check("combobox isSelected multi", comboMulti.isSelected("MED"), true);
@@ -146,30 +142,11 @@ check("combobox activo cicla al final", comboMulti.state.activeIndex, 2);
 comboMulti.moveActive(1);
 check("combobox activo vuelve al inicio", comboMulti.state.activeIndex, 0);
 
-const comboEmpty = mount(new SearchableComboBoxView({ options: [], selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onRefresh, onChange: (values) => comboChanges.push(values) }));
+const comboEmpty = mount(new SearchableComboBoxView({ options: [], selectedValues: [], selectMultiple: false, isSearchable: true, noSelectionText: "---", placeholderText: "Buscar...", zIndex: 1, disabled: false, morePagesAvailable: false, onChange: (values) => comboChanges.push(values) }));
 comboEmpty.state.searchText = "x";
 check("combobox sin registros", comboEmpty.getFilteredOptions().length, 0);
 comboEmpty.moveActive(1);
 check("combobox sin registros no activa", comboEmpty.state.activeIndex, -1);
-
-/* Boton Actualizar: debe avisar al adaptador para refrescar la fuente de datos. */
-combo.refreshData();
-check("combobox actualizar pide refrescar la fuente de datos", refreshCalls, 1);
-combo.refreshData();
-check("combobox actualizar se puede repetir", refreshCalls, 2);
-
-/* Boton Limpiar filtros: quita el texto de busqueda y la seleccion. */
-combo.state.searchText = "bog";
-combo.state.activeIndex = 2;
-combo.clearFilters();
-check("combobox limpiar filtros quita el texto de busqueda", combo.state.searchText, "");
-check("combobox limpiar filtros reinicia la opcion activa", combo.state.activeIndex, 0);
-comboMulti.state.searchText = "med";
-comboMulti.clearFilters();
-check("combobox limpiar filtros reinicia la busqueda multiple", comboMulti.state.searchText, "");
-check("combobox limpiar filtros quita la seleccion", comboChanges.pop(), []);
-comboEmpty.clearFilters();
-check("combobox limpiar filtros sin registros no activa ninguna opcion", comboEmpty.state.activeIndex, -1);
 
 console.log(`\n${total - failures} de ${total} verificaciones correctas`);
 if (failures > 0) process.exitCode = 1;

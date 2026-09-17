@@ -32,7 +32,6 @@ Si el host no reporta columnas, el control intenta leer `value`, `label` y `desc
 | `placeholderText` | Texto | Texto guia del cuadro de busqueda. Predeterminado: `Buscar...` |
 | `loadAllRecords` | Si/No | Solicita las paginas restantes del conjunto de datos para filtrar sobre **todos** los registros (hasta 10 paginas de 5000). Desactivado, el paginador de Power Apps del control sigue funcionando. Predeterminado: No |
 | `resetKey` | Si/No | Al cambiar de valor limpia la seleccion |
-| `refreshKey` | Si/No | Al cambiar de valor vuelve a consultar la tabla o coleccion enlazada en `items`. Equivale al boton **Actualizar** del panel |
 | `zIndex` | Numero | Prioridad visual de la lista. Predeterminado: `2147483647` |
 
 ## Propiedades de salida
@@ -62,27 +61,7 @@ Con `selectedCount = 0` no hay seleccion y `selectedValue` queda vacio.
 - **Abierto**: la lista se dibuja como superposicion sobre el contenido, crece con el texto (`max-content`, limitado al 92% del ancho de la ventana y 720 px) y muestra el texto completo sin recortarlo. Si el texto supera ese limite, la lista permite desplazamiento horizontal.
 - El encabezado del panel muestra el texto completo de la seleccion con salto de linea y desplazamiento vertical, para que nunca se pierda informacion.
 
-## Botones del panel
-
-En el encabezado del panel, junto a la píldora de estado y al botón de cierre, hay un botón de **Actualizar** (icono circular con flecha):
-
-- Llama a `refresh()` del conjunto de datos, es decir, **vuelve a consultar la tabla o colección enlazada en `Items`**. La data nueva llega en el siguiente ciclo de actualización y la lista se redibuja con los registros nuevos, editados o eliminados.
-- Reinicia los contadores internos de paginación, de modo que con `loadAllRecords = Sí` se vuelven a pedir las páginas.
-- Mantiene el texto de búsqueda que el usuario haya escrito.
-
-El mismo refresco se puede disparar desde la aplicación con la propiedad `refreshKey`: cada vez que su valor cambia, el control vuelve a consultar `Items`.
-
-```powerfx
-// Boton "Actualizar" de la app
-UpdateContext({ actualizarDatos: !actualizarDatos });   // con refreshKey = actualizarDatos
-```
-
-En el pie del panel, junto al contador de registros, aparece el botón **Limpiar filtros** cuando el usuario escribió una búsqueda o tiene selección:
-
-- Borra el texto de búsqueda y deja la lista completa de nuevo.
-- Quita la selección (valores y etiquetas), dejando `selectedCount` en `0`.
-- Solo se muestra cuando hay algo que limpiar.
-
+## Paginación y el paginador de Power Apps
 
 En Power Apps, un control con conjunto de datos muestra un **paginador al pie del control**: es el que permite pasar a la siguiente página de registros. Ese paginador usa el mismo objeto `paging` del conjunto de datos que el control recibe en `context.parameters.items`.
 

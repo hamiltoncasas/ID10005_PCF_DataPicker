@@ -35,13 +35,6 @@
 .scb-status.is-complete { color: #286b58; background: #dcefe6; }
 .scb-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
 .scb-close:hover { color: #fff; background: #b86e49; }
-.scb-refresh { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
-.scb-refresh:hover:not(:disabled) { background: #8baba0; }
-.scb-refresh:disabled { opacity: .5; cursor: default; }
-.scb-refresh-icon { position: relative; display: block; width: 13px; height: 13px; margin: 0 auto; border: 2px solid #80684e; border-top-color: transparent; border-radius: 50%; box-sizing: border-box; }
-.scb-refresh-icon::after { position: absolute; top: -3px; right: -2px; width: 0; height: 0; border-top: 4px solid #80684e; border-right: 3px solid transparent; border-left: 3px solid transparent; content: ""; transform: rotate(45deg); }
-.scb-refresh:hover:not(:disabled) .scb-refresh-icon { border-color: #fff; border-top-color: transparent; }
-.scb-refresh:hover:not(:disabled) .scb-refresh-icon::after { border-top-color: #fff; }
 .scb-list-block { padding: 6px; background: #f7f1e8; border-radius: 12px; }
 .scb-list { max-height: 288px; margin: 0; padding: 0; overflow: auto; list-style: none; }
 .scb-option { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; color: #384b4d; font-size: 13px; cursor: pointer; }
@@ -65,7 +58,4 @@
 .scb-footer { display: flex; align-items: center; gap: 7px; padding: 12px 2px 0; color: #8a7767; font-size: 11px; }
 .scb-hint { margin-top: 8px; padding: 8px 10px; border: 1px solid #e7ded0; border-radius: 8px; color: #ad6b45; background: #f3eadc; font-size: 11px; line-height: 1.4; }
 .scb-hint strong { color: #80684e; }
-.scb-clear { margin-left: auto; padding: 4px 11px; border: 1px solid #e7ded0; border-radius: 20px; color: #80684e; background: #f3eadc; font: 700 11px 'Segoe UI', sans-serif; cursor: pointer; }
-.scb-clear:hover:not(:disabled) { color: #fff; background: #b86e49; }
-.scb-clear:disabled { opacity: .6; cursor: default; }
 .scb-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }

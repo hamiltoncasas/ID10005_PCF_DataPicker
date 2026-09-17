@@ -162,7 +162,7 @@ Selecciona **un rango de fecha y hora**. Version 1.0.9. Vivía en un proyecto an
 
 ## SearchableComboBox
 
-Combobox con **búsqueda tipo contiene** sobre una tabla o colección enlazada. Version 1.0.3. El detalle completo esta en [combobox.md](combobox.md).
+Combobox con **búsqueda tipo contiene** sobre una tabla o colección enlazada. Version 1.0.2. El detalle completo esta en [combobox.md](combobox.md).
 
 ### Entradas
 
@@ -177,7 +177,6 @@ Combobox con **búsqueda tipo contiene** sobre una tabla o colección enlazada. 
 | `placeholderText` | Texto | No | `Buscar...` | Texto guía del cuadro de búsqueda |
 | `loadAllRecords` | Si/No | No | No | Solicita las páginas restantes del conjunto de datos para filtrar sobre **todos** los registros (hasta 10 páginas de 5000). Desactivado, el paginador de Power Apps del control sigue funcionando |
 | `resetKey` | Si/No | No | No | Al cambiar de valor limpia la selección |
-| `refreshKey` | Si/No | No | No | Al cambiar de valor vuelve a consultar la tabla o colección enlazada en `items` |
 | `zIndex` | Número | No | `2147483647` | Prioridad visual de la lista |
 
 ### Salidas

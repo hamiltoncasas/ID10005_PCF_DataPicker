@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Fecha: 2026-09-16. Descripcion: Contrato del combobox con busqueda incremental (contiene) para Power Apps. -->
 <manifest>
-  <control namespace="ID10005" constructor="SearchableComboBox" version="1.0.3" display-name-key="SearchableComboBox" description-key="SearchableComboBox description" control-type="virtual" >
+  <control namespace="ID10005" constructor="SearchableComboBox" version="1.0.2" display-name-key="SearchableComboBox" description-key="SearchableComboBox description" control-type="virtual" >
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     Example1:
@@ -33,7 +33,6 @@
     <property name="placeholderText" display-name-key="Placeholder_Text" description-key="Placeholder_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="loadAllRecords" display-name-key="Load_All_Records" description-key="Load_All_Records_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
-    <property name="refreshKey" display-name-key="Refresh_Key" description-key="Refresh_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="zIndex" display-name-key="Z_Index" description-key="Z_Index_Desc" of-type="Whole.None" usage="input" required="false" />
     <property name="selectedValue" display-name-key="Selected_Value" description-key="Selected_Value_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="selectedLabel" display-name-key="Selected_Label" description-key="Selected_Label_Desc" of-type="SingleLine.Text" usage="output" required="false" />

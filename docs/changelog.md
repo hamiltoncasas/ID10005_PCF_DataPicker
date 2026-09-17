@@ -8,18 +8,6 @@ El proyecto versiona dos cosas de forma independiente:
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
 - **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.0.9`).
 
-## 2026-09-16 · Botón Actualizar y botón Limpiar filtros en el combobox (1.0.3)
-
-**Cambios:**
-
-- Nuevo botón **Actualizar** (icono circular con flecha) en el encabezado del panel: llama a `refresh()` del conjunto de datos, es decir, **vuelve a consultar la tabla o colección enlazada en `Items`** (registros nuevos, editados o eliminados) y reinicia los contadores internos de paginación. Mantiene el texto de búsqueda.
-- Nueva propiedad de entrada `refreshKey` (`Si/No`): al cambiar de valor dispara ese mismo refresco desde Power Fx, para el botón *Actualizar* de la aplicación.
-- Nuevo botón **Limpiar filtros** en el pie del panel: quita el texto de búsqueda y la selección que agregó el usuario, y solo se muestra cuando hay algo que limpiar.
-- `SearchableComboBox` 1.0.2 → **1.0.3**; solución → **1.0.3.0**.
-- Paquete de solución regenerado.
-- Arnés de verificación ampliado de 54 a **61 comprobaciones** (incluye los dos botones nuevos).
-- Commit de la versión: `3beefebd63` (*Add refresh and clear filters buttons to SearchableComboBox and release 1.0.3*).
-
 ## 2026-09-16 · Corrección del paginador del dataset en el combobox (1.0.2)
 
 **Síntoma:** el paginador que Power Apps muestra al pie del control (el que permitía pasar a la siguiente página) dejó de responder.
