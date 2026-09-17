@@ -8,6 +8,23 @@ El proyecto versiona dos cosas de forma independiente:
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
 - **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.0.9`).
 
+## 2026-09-16 · Versión 1.0.1 de los controles nuevos y solución 1.0.1.0
+
+**Subida de versiones:**
+
+- `DatePicker` 1.0.0 → **1.0.1**
+- `DateTimePicker` 1.0.0 → **1.0.1**
+- `SearchableComboBox` 1.0.0 → **1.0.1**
+- `DateRangePicker` y `DateTimeRangePicker` permanecen en **1.0.9** (no se modificaron)
+- Solución `ID0005_DataPickers` 1.0.0.9 → **1.0.1.0**
+
+**Cambios:**
+
+- Nuevo paquete de solución regenerado con las versiones nuevas: `solution/bin/Release/solution.zip` y `solution_managed.zip`.
+- Documentación alineada con las versiones publicadas (índice, referencia de controles y compilación).
+
+**Compatibilidad:** sin cambios funcionales ni de contrato; los controles existentes mantienen sus nombres, propiedades y salidas. Al reimportar la solución, actualiza el componente en la aplicación de lienzo para que tome la versión nueva.
+
 ## 2026-09-16 · Controles de valor único y combobox con búsqueda
 
 Commit `35b5f1e43c` — *Add single date, date-time and searchable combobox controls*

@@ -24,11 +24,11 @@ Este repositorio contiene cinco controles personalizados (PCF) listos para Power
 
 | Control | Versión | Qué resuelve | Salidas |
 | --- | --- | --- | --- |
-| `DatePicker` | 1.0.0 | Seleccionar **una sola fecha** en un calendario | `date` |
-| `DateTimePicker` | 1.0.0 | Seleccionar **una sola fecha y hora** | `dateTime`, `date`, `time` |
+| `DatePicker` | 1.0.1 | Seleccionar **una sola fecha** en un calendario | `date` |
+| `DateTimePicker` | 1.0.1 | Seleccionar **una sola fecha y hora** | `dateTime`, `date`, `time` |
 | `DateRangePicker` | 1.0.9 | Seleccionar **un rango de fechas** | `startDate`, `endDate` |
 | `DateTimeRangePicker` | 1.0.9 | Seleccionar **un rango de fecha y hora** | `startDateTime`, `endDateTime` |
-| `SearchableComboBox` | 1.0.0 | Elegir elementos de una tabla con **búsqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` |
+| `SearchableComboBox` | 1.0.1 | Elegir elementos de una tabla con **búsqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` |
 
 Todos comparten el mismo lenguaje visual: modo compacto cerrado (32 px, borde gris, botón azul a la derecha) y panel expandido en superposición con el mismo juego de colores, tipografía y estados.
 
@@ -37,10 +37,11 @@ Todos comparten el mismo lenguaje visual: modo compacto cerrado (32 px, borde gr
 | Dato | Valor |
 | --- | --- |
 | Fecha de la documentación | 2026-09-16 |
-| Commit de referencia | `35b5f1e43c` (rama `fix/remove-unsupported-fluent`) |
-| Compilación | `npm run build` y `npm run lint` correctos |
+| Rama de trabajo | `fix/remove-unsupported-fluent` |
+| Compilación y calidad | `npm run build` y `npm run lint` correctos; arnés 54 de 54 |
 | Paquete de solución | `solution/bin/Release/solution.zip` y `solution_managed.zip` con los 5 controles |
-| Versión de la solución | `ID0005_DataPickers` 1.0.0.9, publicador `ID0005`, prefijo `id5` |
+| Versión de la solución | `ID0005_DataPickers` 1.0.1.0, publicador `ID0005`, prefijo `id5` |
+| Versiones de los controles | `DatePicker` 1.0.1 · `DateTimePicker` 1.0.1 · `SearchableComboBox` 1.0.1 · `DateRangePicker` 1.0.9 · `DateTimeRangePicker` 1.0.9 |
 
 ## Inicio rápido
 

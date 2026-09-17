@@ -23,7 +23,7 @@ Todos los controles comparten:
 
 ## DatePicker
 
-Selecciona **una sola fecha** en un calendario. Version 1.0.0.
+Selecciona **una sola fecha** en un calendario. Version 1.0.1.
 
 ### Entradas
 
@@ -63,7 +63,7 @@ UpdateContext({ reiniciar: true })   // y en el control: resetKey = reiniciar
 
 ## DateTimePicker
 
-Selecciona **una sola fecha y hora**. Version 1.0.0.
+Selecciona **una sola fecha y hora**. Version 1.0.1.
 
 ### Entradas
 
@@ -162,7 +162,7 @@ Selecciona **un rango de fecha y hora**. Version 1.0.9. Vivía en un proyecto an
 
 ## SearchableComboBox
 
-Combobox con **búsqueda tipo contiene** sobre una tabla o colección enlazada. Version 1.0.0. El detalle completo esta en [combobox.md](combobox.md).
+Combobox con **búsqueda tipo contiene** sobre una tabla o colección enlazada. Version 1.0.1. El detalle completo esta en [combobox.md](combobox.md).
 
 ### Entradas
 
