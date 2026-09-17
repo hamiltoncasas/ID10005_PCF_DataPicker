@@ -1,0 +1,46 @@
+/*
+ * Fecha: 2026-09-16
+ * Descripcion: Estilos del selector de fecha simple, alineados al diseno del
+ * selector de rango: modo compacto, panel expandido, calendario y estados.
+ */
+.dp-root { position: relative; z-index: 1; box-sizing: border-box; width: 100%; min-width: 270px; padding: 18px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 8px 24px rgba(77, 63, 43, .10); font-family: 'Segoe UI', sans-serif; }
+.dp-root-expanded { position: fixed; top: 0; left: 0; z-index: 2147483647; width: 320px; min-width: 320px; }
+.dp-root-compact { display: flex; align-items: stretch; min-width: 0; height: 32px; padding: 0; border: 1px solid #8a8a8a; border-radius: 2px; background: #fff; box-shadow: none; }
+.dp-root-compact:focus-within { border-color: #2f5da8; box-shadow: 0 0 0 1px #2f5da8; }
+.dp-compact-input { flex: 1; min-width: 0; padding: 0 8px; border: 0; outline: 0; color: #333; background: #fff; font: 13px 'Segoe UI', sans-serif; cursor: text; }
+.dp-compact-input:disabled { color: #777; background: #f5f5f5; cursor: default; }
+.dp-compact-value { overflow: hidden; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.dp-compact-placeholder { color: #666; }
+.dp-calendar-button { display: grid; flex: 0 0 31px; place-items: center; padding: 0; border: 0; border-left: 1px solid #244b8b; border-radius: 0 1px 1px 0; background: #2f5da8; cursor: pointer; }
+.dp-calendar-button:hover:not(:disabled), .dp-calendar-button:focus-visible { background: #244b8b; }
+.dp-calendar-button:disabled { background: #a8a8a8; cursor: default; }
+.dp-calendar-icon { position: relative; display: block; width: 13px; height: 12px; border: 1px solid #fff; border-radius: 1px; box-sizing: border-box; }
+.dp-calendar-icon::before { position: absolute; top: 2px; right: 0; left: 0; border-top: 1px solid #fff; content: ""; }
+.dp-calendar-icon::after { position: absolute; top: 5px; left: 2px; width: 2px; height: 2px; background: #fff; box-shadow: 4px 0 #fff, 0 3px #fff, 4px 3px #fff; content: ""; }
+.dp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 2px 2px 16px; }
+.dp-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.dp-summary { margin-top: 6px; min-height: 20px; color: #35464b; font-size: 14px; font-weight: 600; }
+.dp-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.dp-status.is-complete { color: #286b58; background: #dcefe6; }
+.dp-header-actions { display: flex; align-items: center; gap: 8px; }
+.dp-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
+.dp-close:hover { color: #fff; background: #b86e49; }
+.dp-calendar { padding: 14px; background: #f7f1e8; border-radius: 12px; }
+.dp-monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; color: #263d42; }
+.dp-monthbar strong { font-size: 15px; text-transform: capitalize; }
+.dp-monthbar strong span { color: #92745d; font-weight: 400; }
+.dp-nav { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; color: #4f6b6d; background: #fffdf8; font-size: 24px; line-height: 20px; cursor: pointer; }
+.dp-nav:hover:not(:disabled) { color: #fff; background: #587d78; }
+.dp-nav:disabled, .dp-day:disabled { cursor: default; opacity: .5; }
+.dp-weekdays, .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.dp-weekdays { margin-bottom: 5px; color: #927e6e; font-size: 10px; font-weight: 700; }
+.dp-day { position: relative; z-index: 1; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; color: #384b4d; background: transparent; font-size: 13px; cursor: pointer; }
+.dp-day:hover:not(:disabled) { color: #fff; background: #8baba0; }
+.dp-day.is-muted { color: #b9afa4; }
+.dp-day.is-today { box-shadow: inset 0 0 0 1px #b86e49; }
+.dp-day.is-selected { color: #fff; background: #b86e49; box-shadow: none; font-weight: 700; }
+.dp-footer { display: flex; align-items: center; gap: 7px; padding: 14px 2px 0; color: #8a7767; font-size: 11px; }
+.dp-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }
+.dp-clear { margin-left: auto; padding: 4px 11px; border: 1px solid #e7ded0; border-radius: 20px; color: #80684e; background: #f3eadc; font: 700 11px 'Segoe UI', sans-serif; cursor: pointer; }
+.dp-clear:hover:not(:disabled) { color: #fff; background: #b86e49; }
+.dp-clear:disabled { opacity: .6; cursor: default; }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Fecha: 2026-09-16. Descripcion: Contrato del combobox con busqueda incremental (contiene) para Power Apps. -->
+<manifest>
+  <control namespace="ID10005" constructor="SearchableComboBox" version="1.0.0" display-name-key="SearchableComboBox" description-key="SearchableComboBox description" control-type="virtual" >
+    <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
+    If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
+    Example1:
+      <external-service-usage enabled="true">
+        <domain>www.Microsoft.com</domain>
+      </external-service-usage>
+    Example2:
+      <external-service-usage enabled="false">
+      </external-service-usage>
+    -->
+    <external-service-usage enabled="false">
+      <!--UNCOMMENT TO ADD EXTERNAL DOMAINS
+      <domain></domain>
+      <domain></domain>
+      -->
+    </external-service-usage>
+    <!-- data-set node declares the bound records used as Items del combobox -->
+    <data-set name="items" display-name-key="Items" description-key="Items_Desc">
+      <property-set name="value" display-name-key="Value" description-key="Value_Desc" of-type="SingleLine.Text" usage="input" required="true" />
+      <property-set name="label" display-name-key="Label" description-key="Label_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+      <property-set name="description" display-name-key="Description" description-key="Description_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    </data-set>
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="defaultValue" display-name-key="Default_Value" description-key="Default_Value_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="selectMultiple" display-name-key="Select_Multiple" description-key="Select_Multiple_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="isSearchable" display-name-key="Is_Searchable" description-key="Is_Searchable_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="searchFields" display-name-key="Search_Fields" description-key="Search_Fields_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="noSelectionText" display-name-key="No_Selection_Text" description-key="No_Selection_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="placeholderText" display-name-key="Placeholder_Text" description-key="Placeholder_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="zIndex" display-name-key="Z_Index" description-key="Z_Index_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="selectedValue" display-name-key="Selected_Value" description-key="Selected_Value_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedLabel" display-name-key="Selected_Label" description-key="Selected_Label_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedValues" display-name-key="Selected_Values" description-key="Selected_Values_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedLabels" display-name-key="Selected_Labels" description-key="Selected_Labels_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedCount" display-name-key="Selected_Count" description-key="Selected_Count_Desc" of-type="Whole.None" usage="output" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="SearchableComboBox.css" order="1" />
+      <platform-library name="React" version="16.14.0" />
+      <resx path="strings/SearchableComboBox.1033.resx" version="1.0.0" />
+    </resources>
+    <!-- UNCOMMENT TO ENABLE THE SPECIFIED API
+    <feature-usage>
+      <uses-feature name="Utility" required="true" />
+      <uses-feature name="WebAPI" required="true" />
+    </feature-usage>
+    -->
+  </control>
+</manifest>

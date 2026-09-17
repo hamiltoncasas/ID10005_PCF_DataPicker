@@ -1,7 +1,7 @@
 # Formatos de fecha y hora
 
-> Fecha: 2026-09-12  
-> Descripcion: Catalogo de formatos aceptados por `DateRangePicker` y `DateTimeRangePicker`.
+> Fecha: 2026-09-16  
+> Descripcion: Catalogo de formatos aceptados por `DatePicker`, `DateTimePicker`, `DateRangePicker` y `DateTimeRangePicker`.
 
 ## Formatos de fecha
 
