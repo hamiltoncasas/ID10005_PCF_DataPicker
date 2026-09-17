@@ -74,8 +74,7 @@ UpdateContext({ reiniciar: true });   // con resetKey = reiniciar
 | El control no aparece en **Obtener más componentes** | Que la característica de canvas esté activa en el entorno y que la solución esté importada y publicada |
 | El panel se ve detrás de otro elemento | Aumenta el valor de `zIndex` del control |
 | El combobox muestra "Sin registros" | Que `Items` esté enlazado y que las columnas seleccionadas incluyan `value` |
-| No se ven todos los registros | El control filtra los registros de la página cargada. Activa `loadAllRecords` para buscar en todas las páginas o encadena `Items` con `Filter()` |
-| El paginador del pie del control queda en una sola página | Tienes `loadAllRecords` activo: al cargar todas las páginas no queda nada que paginar. Desactívalo para recuperar el paginador |
+| No se ven todos los registros | El control solicita páginas adicionales hasta 5000 registros por página y 10 páginas; con conjuntos mayores filtra antes con `Filter()` |
 | Se ve la versión anterior del control | Reconstruye la solución, reimporta y actualiza el componente; considera subir la versión del manifiesto |
 | El valor no se reinicia | Usa `resetKey`: el control limpia la selección cuando ese valor cambia |
 

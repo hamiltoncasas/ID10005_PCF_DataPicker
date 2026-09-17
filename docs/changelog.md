@@ -8,22 +8,6 @@ El proyecto versiona dos cosas de forma independiente:
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
 - **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.0.9`).
 
-## 2026-09-16 · Corrección del paginador del dataset en el combobox (1.0.2)
-
-**Síntoma:** el paginador que Power Apps muestra al pie del control (el que permitía pasar a la siguiente página) dejó de responder.
-
-**Causa:** el control llamaba siempre a `paging.setPageSize(5000)` y a `paging.loadNextPage()` mientras hubiera páginas. Esas llamadas usan el mismo objeto de paginación que alimenta el paginador del control, así que al precargar todo el conjunto el paginador quedaba con una sola página y sin nada que avanzar. Además, los contadores internos no se reiniciaban nunca, de modo que después de esas solicitudes el control dejaba de pedir datos.
-
-**Corrección:**
-
-- Nueva propiedad de entrada `loadAllRecords` (`Si/No`, predeterminado **No**). Solo cuando está activa el control solicita las páginas restantes; con el valor predeterminado ya no toca el paginador y este funciona como antes.
-- La lista muestra un aviso al pie cuando hay páginas sin cargar.
-- `SearchableComboBox` 1.0.1 → **1.0.2**; solución → **1.0.2.0**.
-- Paquete de solución regenerado.
-- Commit de la versión: `5ab27b6707` (*Fix dataset pager conflict in SearchableComboBox and release 1.0.2*).
-
-**Compatibilidad:** cambia el comportamiento predeterminado del combobox (ahora filtra los registros de la página cargada). Para buscar en todos los registros, activa `loadAllRecords`.
-
 ## 2026-09-16 · Versión 1.0.1 de los controles nuevos y solución 1.0.1.0
 
 **Subida de versiones:**
