@@ -16,6 +16,7 @@ import {
     IReportOptions,
     IReportPlan,
     IReportTable,
+    applyReportFilters,
     buildFileName,
     buildPlan,
     collectDeclaredFields,
@@ -33,6 +34,10 @@ interface IReportEntry {
     definition: IReportDefinition;
     plan: IReportPlan;
     row: IReportRow;
+    /** Filas que pasan los filtros declarados en el informe. */
+    rows: IDatasetRow[];
+    /** Descripcion de los filtros aplicados, para el resumen del libro. */
+    applied: string[];
 }
 
 function emptyOptions(): IReportOptions {
@@ -124,16 +129,18 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
         this.definitionErrors = definitions.errors.slice();
         this.entries = definitions.reports.map((definition) => {
             const plan = buildPlan(this.table, definition, this.options);
+            const filtered = applyReportFilters(this.table, plan, this.options);
+            const warnings = plan.warnings.concat(filtered.warnings);
             const row: IReportRow = {
                 key: definition.key,
                 name: definition.name,
                 description: definition.description,
                 fileName: buildFileName(definition, this.options, new Date()),
                 columnCount: plan.columns.length,
-                errors: this.strictFilters ? plan.warnings : [],
-                warnings: plan.warnings,
+                errors: this.strictFilters ? warnings : [],
+                warnings,
             };
-            return { definition, plan, row };
+            return { definition, plan, row, rows: filtered.rows, applied: filtered.applied };
         });
     }
 
@@ -182,7 +189,7 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
         return {
             reports: this.entries.map((entry) => entry.row),
             columns,
-            rowCount: this.table.rows.length,
+            rowCount: this.selectedEntry()?.rows.length ?? this.table.rows.length,
             globalErrors,
             selectedKey: this.selectedKey,
             texts,
@@ -225,10 +232,15 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
     }
 
     /** Tabla de trabajo respetando el limite de filas configurado. */
-    private limitedTable(): IReportTable {
+    private limitRows(rows: IDatasetRow[]): IDatasetRow[] {
         const limit = this.options.maxRows;
-        if (limit <= 0 || limit >= this.table.rows.length) return this.table;
-        return { columns: this.table.columns, rows: this.table.rows.slice(0, limit) };
+        if (limit <= 0 || limit >= rows.length) return rows;
+        return rows.slice(0, limit);
+    }
+
+    /** Entrada del informe seleccionado en el panel. */
+    private selectedEntry(): IReportEntry | undefined {
+        return this.entries.find((entry) => entry.definition.key === this.selectedKey);
     }
 
     /** Lee el conjunto de datos enlazado en Items (tabla o coleccion filtrada). */
@@ -337,22 +349,20 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
         if (!entry) {
             return this.fail(`El informe "${key}" no esta definido en la propiedad de definicion de informes.`);
         }
-        const table = this.limitedTable();
-        const plan = buildPlan(table, entry.definition, this.options);
-        const messages = plan.warnings.slice();
-        if (plan.errors.length > 0) return this.fail(plan.errors.join(" "), messages);
-        if (this.strictFilters && plan.warnings.length > 0) {
+        const messages = entry.row.warnings.slice();
+        if (entry.plan.errors.length > 0) return this.fail(entry.plan.errors.join(" "), messages);
+        if (this.strictFilters && entry.row.warnings.length > 0) {
             return this.fail("El control esta en modo de validacion estricta y el informe tiene avisos de configuracion.", messages);
         }
-        if (table.rows.length === 0) {
-            messages.push("Items no tiene registros con los filtros actuales; el archivo se genera solo con el encabezado.");
+        const rows = sortRows(this.limitRows(entry.rows), entry.plan, this.options);
+        if (rows.length === 0) {
+            messages.push("Items no tiene registros que cumplan los filtros del informe; el archivo se genera solo con el encabezado.");
         }
-        const rows = sortRows(table.rows, plan, this.options);
         const now = new Date();
         const fileName = buildFileName(entry.definition, this.options, now);
         const workbook = buildReportWorkbook(
             rows,
-            plan,
+            entry.plan,
             this.options,
             {
                 includeHeaderRow: this.booleanValue(this.context.parameters.includeHeaderRow?.raw, true),
@@ -361,7 +371,7 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
                 autoFilter: this.booleanValue(this.context.parameters.autoFilter?.raw, true),
                 autoColumnWidth: this.booleanValue(this.context.parameters.autoColumnWidth?.raw, true),
             },
-            [],
+            entry.applied,
             now
         );
         let ok = true;
