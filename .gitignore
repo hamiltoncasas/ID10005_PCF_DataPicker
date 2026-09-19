@@ -40,5 +40,15 @@ coverage/
 .env.*
 !.env.example
 
+# Datos de clientes: los extractos, exportaciones y volcados nunca se versionan
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.accdb
+*.mdb
+# La unica excepcion son los ejemplos inventados que documenta el repositorio
+!docs/ejemplos/*.json
+
 # macos
 .DS_Store

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="ExcelReportPicker" xml:space="preserve"><value>Exportador de informes a Excel</value></data>
+  <data name="ExcelReportPicker description" xml:space="preserve"><value>Boton unico que despliega los informes configurados y descarga cada informe en Excel con los registros que recibe en Items, los tipos de dato detectados y formatos nativos de Excel.</value></data>
+  <data name="Items" xml:space="preserve"><value>Items (tabla o coleccion filtrada)</value></data>
+  <data name="Items_Desc" xml:space="preserve"><value>Registros que se exportan. Aplica los filtros en esta propiedad con Power Fx, como en una galeria. Las columnas del informe se nombran igual que los campos del registro.</value></data>
+
+  <data name="Reports_Json" xml:space="preserve"><value>Definicion de informes (JSON)</value></data>
+  <data name="Reports_Json_Desc" xml:space="preserve"><value>Objeto JSON de informes. Admite nombre, descripcion, columnas, titulos, tipos, formatos, archivo, hoja, filtros, ordenarPor y ordenDescendente.</value></data>
+  <data name="Strict_Filters" xml:space="preserve"><value>Validacion estricta</value></data>
+  <data name="Strict_Filters_Desc" xml:space="preserve"><value>Si esta activo, la descarga se bloquea cuando una columna o un tipo declarado en el informe no se pueden resolver, en lugar de mostrar solo un aviso.</value></data>
+  <data name="Date_Format" xml:space="preserve"><value>Formato de fecha Excel</value></data>
+  <data name="Date_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de fecha. Predeterminado dd/mm/yyyy. Tambien define el orden de dia y mes al interpretar textos de fecha.</value></data>
+  <data name="Date_Time_Format" xml:space="preserve"><value>Formato de fecha y hora Excel</value></data>
+  <data name="Date_Time_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de fecha y hora. Predeterminado dd/mm/yyyy hh:mm.</value></data>
+  <data name="Time_Format" xml:space="preserve"><value>Formato de hora Excel</value></data>
+  <data name="Time_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de hora. Predeterminado hh:mm.</value></data>
+  <data name="Integer_Format" xml:space="preserve"><value>Formato de entero Excel</value></data>
+  <data name="Integer_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de numeros enteros. Predeterminado #,##0.</value></data>
+  <data name="Number_Format" xml:space="preserve"><value>Formato de numero Excel</value></data>
+  <data name="Number_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas decimales. Predeterminado #,##0.00.</value></data>
+  <data name="Currency_Format" xml:space="preserve"><value>Formato de moneda Excel</value></data>
+  <data name="Currency_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de moneda. Si se deja vacio se usa el codigo de moneda o el simbolo $.</value></data>
+  <data name="Currency_Code" xml:space="preserve"><value>Codigo de moneda</value></data>
+  <data name="Currency_Code_Desc" xml:space="preserve"><value>Codigo ISO que se agrega al formato de moneda, por ejemplo COP, USD o EUR.</value></data>
+  <data name="Percent_Format" xml:space="preserve"><value>Formato de porcentaje Excel</value></data>
+  <data name="Percent_Format_Desc" xml:space="preserve"><value>Formato nativo de Excel para columnas de porcentaje. Predeterminado 0.00%.</value></data>
+  <data name="Boolean_True_Text" xml:space="preserve"><value>Texto para verdadero</value></data>
+  <data name="Boolean_True_Text_Desc" xml:space="preserve"><value>Texto que se escribe en Excel para los valores verdaderos. Predeterminado Si.</value></data>
+  <data name="Boolean_False_Text" xml:space="preserve"><value>Texto para falso</value></data>
+  <data name="Boolean_False_Text_Desc" xml:space="preserve"><value>Texto que se escribe en Excel para los valores falsos. Predeterminado No.</value></data>
+  <data name="Max_Rows" xml:space="preserve"><value>Limite de filas</value></data>
+  <data name="Max_Rows_Desc" xml:space="preserve"><value>Numero maximo de registros que se exportan. Cero o vacio exporta todos los registros cargados.</value></data>
+  <data name="Include_Header_Row" xml:space="preserve"><value>Incluir encabezado</value></data>
+  <data name="Include_Header_Row_Desc" xml:space="preserve"><value>Si esta activo se escribe la fila de titulos de las columnas.</value></data>
+  <data name="Include_Title" xml:space="preserve"><value>Incluir titulo del informe</value></data>
+  <data name="Include_Title_Desc" xml:space="preserve"><value>Si esta activo se escribe el nombre del informe en la primera fila de la hoja.</value></data>
+  <data name="Include_Filter_Summary" xml:space="preserve"><value>Incluir resumen de filtros</value></data>
+  <data name="Include_Filter_Summary_Desc" xml:space="preserve"><value>Si esta activo se escribe una fila con la fecha de generacion, la cantidad de registros y los filtros aplicados.</value></data>
+  <data name="Auto_Filter" xml:space="preserve"><value>Autofiltro de Excel</value></data>
+  <data name="Auto_Filter_Desc" xml:space="preserve"><value>Si esta activo el encabezado queda con el autofiltro de Excel habilitado.</value></data>
+  <data name="Auto_Column_Width" xml:space="preserve"><value>Ajustar ancho de columnas</value></data>
+  <data name="Auto_Column_Width_Desc" xml:space="preserve"><value>Si esta activo el ancho de cada columna se calcula con el titulo y el contenido exportado.</value></data>
+  <data name="Default_Report" xml:space="preserve"><value>Informe preseleccionado</value></data>
+  <data name="Default_Report_Desc" xml:space="preserve"><value>Clave del informe que aparece seleccionado al iniciar, por ejemplo ventas.</value></data>
+  <data name="Reset_Key" xml:space="preserve"><value>Reiniciar seleccion</value></data>
+  <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la seleccion y el ultimo resultado de exportacion.</value></data>
+  <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del panel</value></data>
+  <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel de informes. Predeterminado 2147483647.</value></data>
+  <data name="Button_Text" xml:space="preserve"><value>Texto del boton</value></data>
+  <data name="Button_Text_Desc" xml:space="preserve"><value>Texto del control cerrado. Predeterminado Informes.</value></data>
+  <data name="Panel_Title_Text" xml:space="preserve"><value>Titulo del panel</value></data>
+  <data name="Panel_Title_Text_Desc" xml:space="preserve"><value>Titulo que se muestra al abrir el panel. Predeterminado Exportar a Excel.</value></data>
+  <data name="Panel_Hint_Text" xml:space="preserve"><value>Texto guia del panel</value></data>
+  <data name="Panel_Hint_Text_Desc" xml:space="preserve"><value>Texto de ayuda que aparece bajo el titulo del panel.</value></data>
+  <data name="Download_Text" xml:space="preserve"><value>Texto del boton de descarga</value></data>
+  <data name="Download_Text_Desc" xml:space="preserve"><value>Texto del boton que genera y descarga el Excel. Predeterminado Descargar Excel.</value></data>
+  <data name="Exporting_Text" xml:space="preserve"><value>Texto mientras genera</value></data>
+  <data name="Exporting_Text_Desc" xml:space="preserve"><value>Texto que reemplaza al boton de descarga mientras se genera el archivo. Predeterminado Generando Excel...</value></data>
+  <data name="Success_Text" xml:space="preserve"><value>Texto de exito</value></data>
+  <data name="Success_Text_Desc" xml:space="preserve"><value>Texto del mensaje que confirma la descarga. Predeterminado Excel generado.</value></data>
+  <data name="No_Reports_Text" xml:space="preserve"><value>Texto sin informes</value></data>
+  <data name="No_Reports_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra cuando la definicion JSON no contiene informes.</value></data>
+  <data name="Empty_Data_Text" xml:space="preserve"><value>Texto sin registros</value></data>
+  <data name="Empty_Data_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra cuando no hay registros que cumplan los filtros.</value></data>
+  <data name="Error_Title_Text" xml:space="preserve"><value>Titulo de error</value></data>
+  <data name="Error_Title_Text_Desc" xml:space="preserve"><value>Titulo del bloque de errores de configuracion del informe.</value></data>
+  <data name="Selected_Report" xml:space="preserve"><value>Informe seleccionado</value></data>
+  <data name="Selected_Report_Desc" xml:space="preserve"><value>Salida con la clave del informe seleccionado en el panel.</value></data>
+  <data name="Last_Report" xml:space="preserve"><value>Ultimo informe exportado</value></data>
+  <data name="Last_Report_Desc" xml:space="preserve"><value>Salida con la clave del ultimo informe exportado.</value></data>
+  <data name="Last_Report_Name" xml:space="preserve"><value>Nombre del ultimo informe</value></data>
+  <data name="Last_Report_Name_Desc" xml:space="preserve"><value>Salida con el nombre del ultimo informe exportado.</value></data>
+  <data name="Last_File" xml:space="preserve"><value>Ultimo archivo generado</value></data>
+  <data name="Last_File_Desc" xml:space="preserve"><value>Salida con el nombre del archivo Excel descargado.</value></data>
+  <data name="Last_Rows" xml:space="preserve"><value>Filas del ultimo informe</value></data>
+  <data name="Last_Rows_Desc" xml:space="preserve"><value>Salida con la cantidad de filas escritas en el ultimo archivo generado.</value></data>
+  <data name="Last_Status" xml:space="preserve"><value>Estado del ultimo intento</value></data>
+  <data name="Last_Status_Desc" xml:space="preserve"><value>Salida con el estado del ultimo intento: listo, exportado o error.</value></data>
+  <data name="Error_Message" xml:space="preserve"><value>Mensaje de error</value></data>
+  <data name="Error_Message_Desc" xml:space="preserve"><value>Salida con el detalle del ultimo error de exportacion.</value></data>
+  <data name="Has_Error" xml:space="preserve"><value>Hubo error</value></data>
+  <data name="Has_Error_Desc" xml:space="preserve"><value>Salida verdadera cuando el ultimo intento de exportacion fallo.</value></data>
+  <data name="Columns_Detected" xml:space="preserve"><value>Cantidad de columnas detectadas</value></data>
+  <data name="Columns_Detected_Desc" xml:space="preserve"><value>Salida con la cantidad de columnas del origen de datos enlazado.</value></data>
+  <data name="Available_Columns_Json" xml:space="preserve"><value>Columnas detectadas (JSON)</value></data>
+  <data name="Available_Columns_Json_Desc" xml:space="preserve"><value>Salida con nombre, nombre visible, tipo detectado y formato Excel de cada columna. Util para escribir la definicion JSON.</value></data>
+</root>
+
+
+
