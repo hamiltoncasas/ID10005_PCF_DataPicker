@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Fecha: 2026-09-18. Descripcion: Contrato del exportador de informes a Excel para Power Apps Canvas. -->
+<manifest>
+  <control namespace="ID10005" constructor="ExcelReportPicker" version="1.2.0" display-name-key="ExcelReportPicker" description-key="ExcelReportPicker description" control-type="virtual" >
+    <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
+    If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
+    -->
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <!-- data-set node declares the bound records used as the source of the reports.
+         Se enlaza una tabla o coleccion como a una galeria: los filtros se aplican
+         en la propia propiedad Items y no hay columnas que mapear. -->
+    <data-set name="items" display-name-key="Items" description-key="Items_Desc"></data-set>
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="reportsJson" display-name-key="Reports_Json" description-key="Reports_Json_Desc" of-type="Multiple" usage="input" required="false" />
+    <property name="strictFilters" display-name-key="Strict_Filters" description-key="Strict_Filters_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="dateFormat" display-name-key="Date_Format" description-key="Date_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="dateTimeFormat" display-name-key="Date_Time_Format" description-key="Date_Time_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="timeFormat" display-name-key="Time_Format" description-key="Time_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="integerFormat" display-name-key="Integer_Format" description-key="Integer_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="numberFormat" display-name-key="Number_Format" description-key="Number_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="currencyFormat" display-name-key="Currency_Format" description-key="Currency_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="currencyCode" display-name-key="Currency_Code" description-key="Currency_Code_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="percentFormat" display-name-key="Percent_Format" description-key="Percent_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="booleanTrueText" display-name-key="Boolean_True_Text" description-key="Boolean_True_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="booleanFalseText" display-name-key="Boolean_False_Text" description-key="Boolean_False_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="maxRows" display-name-key="Max_Rows" description-key="Max_Rows_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="includeHeaderRow" display-name-key="Include_Header_Row" description-key="Include_Header_Row_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="includeTitle" display-name-key="Include_Title" description-key="Include_Title_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="includeFilterSummary" display-name-key="Include_Filter_Summary" description-key="Include_Filter_Summary_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="autoFilter" display-name-key="Auto_Filter" description-key="Auto_Filter_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="autoColumnWidth" display-name-key="Auto_Column_Width" description-key="Auto_Column_Width_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="defaultReport" display-name-key="Default_Report" description-key="Default_Report_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="zIndex" display-name-key="Z_Index" description-key="Z_Index_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="buttonText" display-name-key="Button_Text" description-key="Button_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="panelTitleText" display-name-key="Panel_Title_Text" description-key="Panel_Title_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="panelHintText" display-name-key="Panel_Hint_Text" description-key="Panel_Hint_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="downloadText" display-name-key="Download_Text" description-key="Download_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="exportingText" display-name-key="Exporting_Text" description-key="Exporting_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="successText" display-name-key="Success_Text" description-key="Success_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="noReportsText" display-name-key="No_Reports_Text" description-key="No_Reports_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="emptyDataText" display-name-key="Empty_Data_Text" description-key="Empty_Data_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="errorTitleText" display-name-key="Error_Title_Text" description-key="Error_Title_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="selectedReport" display-name-key="Selected_Report" description-key="Selected_Report_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastReport" display-name-key="Last_Report" description-key="Last_Report_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastReportName" display-name-key="Last_Report_Name" description-key="Last_Report_Name_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastFile" display-name-key="Last_File" description-key="Last_File_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastRows" display-name-key="Last_Rows" description-key="Last_Rows_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="lastStatus" display-name-key="Last_Status" description-key="Last_Status_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="errorMessage" display-name-key="Error_Message" description-key="Error_Message_Desc" of-type="Multiple" usage="output" required="false" />
+    <property name="hasError" display-name-key="Has_Error" description-key="Has_Error_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="columnsDetected" display-name-key="Columns_Detected" description-key="Columns_Detected_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="availableColumnsJson" display-name-key="Available_Columns_Json" description-key="Available_Columns_Json_Desc" of-type="Multiple" usage="output" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="ExcelReportPicker.css" order="1" />
+      <platform-library name="React" version="16.14.0" />
+      <resx path="strings/ExcelReportPicker.1033.resx" version="1.0.0" />
+    </resources>
+  </control>
+</manifest>
+
+

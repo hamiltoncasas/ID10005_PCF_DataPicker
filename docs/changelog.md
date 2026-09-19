@@ -6,7 +6,17 @@
 El proyecto versiona dos cosas de forma independiente:
 
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
-- **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.0.9`).
+- **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.2.2`).
+
+## 2026-09-18 · ExcelReportPicker 1.2.0: un solo conjunto de datos (`Items`) y endurecimiento
+
+**Cambios:**
+
+- `ExcelReportPicker` sube de 1.1.0 a **1.2.0**: los registros llegan en la propiedad `items` (conjunto de datos enlazado, como una galería) y los filtros se escriben en esa propiedad con Power Fx. Se eliminan `dataJson` y `filtersJson`; se mantiene `reportsJson`.
+- El informe declara sus columnas por nombre real de campo y `columnas` admite la cadena separada por comas que produce `JSON({...})`; la clave `filtros` queda ignorada.
+- **Seguridad:** los valores se escriben siempre como texto (el libro no contiene fórmulas ni hipervínculos, aunque el dato empiece por `=`), se limpian los caracteres inválidos y se recorta cada celda a 32767 caracteres, se sanean los nombres de archivo y de hoja, y las lecturas de `titulos`, `tipos` y `formatos` no recorren el prototipo. El control no usa servicios externos, red, `eval` ni almacenamiento del navegador.
+- `.gitignore` bloquea extractos y exportaciones de clientes (`*.csv`, `*.tsv`, `*.xlsx`, `*.xls`, `*.accdb`, `*.mdb`).
+- Solución `ID0005_DataPickers` de 1.0.2.1 a **1.0.2.2**; paquete regenerado en `solution/bin/Release`.
 
 ## 2026-09-17 · Nueva compilación del paquete: solución 1.0.1.1
 

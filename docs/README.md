@@ -13,6 +13,7 @@ Este repositorio contiene cinco controles personalizados (PCF) listos para Power
 | [controles.md](controles.md) | Referencia completa de propiedades, salidas y comportamiento de los 5 controles |
 | [formatos.md](formatos.md) | Catálogo de formatos de fecha y hora aceptados |
 | [combobox.md](combobox.md) | Detalle del combobox con búsqueda incremental (contiene) |
+| [informes.md](informes.md) | Manual de uso del exportador de informes a Excel (`ExcelReportPicker`) |
 | [arquitectura.md](arquitectura.md) | Estructura del repositorio, ciclo de vida PCF, diseño visual y decisiones técnicas |
 | [compilacion.md](compilacion.md) | Requisitos, comandos de compilación y empaquetado de la solución |
 | [instalacion.md](instalacion.md) | Importación en Dataverse y uso en aplicaciones de lienzo |

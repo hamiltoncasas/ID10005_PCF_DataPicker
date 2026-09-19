@@ -1,0 +1,76 @@
+/*
+ * Fecha: 2026-09-18
+ * Descripcion: Estilos del exportador de informes a Excel, alineados al diseno
+ * de los demas controles: modo compacto cerrado con boton azul a la derecha y
+ * panel expandido en superposicion con la misma paleta y tipografia.
+ */
+.erp-root { box-sizing: border-box; width: 100%; font-family: 'Segoe UI', sans-serif; }
+.erp-root-compact { display: flex; align-items: stretch; min-width: 0; height: 32px; padding: 0; border: 1px solid #8a8a8a; border-radius: 2px; background: #fff; }
+.erp-root-compact:focus-within, .erp-root-compact.is-open { border-color: #2f5da8; box-shadow: 0 0 0 1px #2f5da8; }
+.erp-root-compact.is-disabled { background: #f5f5f5; }
+.erp-trigger { display: flex; flex: 1; align-items: center; gap: 7px; min-width: 0; padding: 0 8px; border: 0; outline: 0; color: #333; background: transparent; font: 13px 'Segoe UI', sans-serif; text-align: left; cursor: pointer; }
+.erp-trigger:disabled { color: #777; cursor: default; }
+.erp-trigger-text { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.erp-icon { position: relative; flex: 0 0 16px; width: 16px; height: 16px; border-radius: 3px; background: linear-gradient(135deg, #2f8a5b, #1f6b45); }
+.erp-icon::before, .erp-icon::after { position: absolute; top: 4px; left: 7px; width: 2px; height: 8px; background: #fff; content: ''; }
+.erp-icon::before { transform: rotate(45deg); }
+.erp-icon::after { transform: rotate(-45deg); }
+.erp-chevron-button { display: grid; flex: 0 0 31px; place-items: center; padding: 0; border: 0; border-left: 1px solid #244b8b; border-radius: 0 1px 1px 0; background: #2f5da8; cursor: pointer; }
+.erp-chevron-button:hover:not(:disabled), .erp-chevron-button:focus-visible { background: #244b8b; }
+.erp-chevron-button:disabled { background: #a8a8a8; cursor: default; }
+.erp-chevron { width: 0; height: 0; border-top: 5px solid #fff; border-right: 5px solid transparent; border-left: 5px solid transparent; transition: transform .15s ease; }
+.erp-chevron.is-open { transform: rotate(180deg); }
+/* El panel se dibuja como superposicion para que ningun contenedor del lienzo lo recorte. */
+.erp-panel { position: fixed; z-index: 2147483647; box-sizing: border-box; width: max-content; max-width: min(94vw, 780px); padding: 14px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 12px 28px rgba(77, 63, 43, .18); font-family: 'Segoe UI', sans-serif; }
+.erp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 2px 2px 12px; }
+.erp-header-text { min-width: 0; }
+.erp-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.erp-title { margin-top: 4px; color: #35464b; font-size: 14px; font-weight: 700; }
+.erp-subtitle { margin-top: 4px; max-width: 460px; color: #6c7a7d; font-size: 11px; line-height: 1.35; }
+.erp-header-actions { display: flex; align-items: center; gap: 8px; }
+.erp-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.erp-close { width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #80684e; background: transparent; font-size: 21px; line-height: 20px; cursor: pointer; }
+.erp-close:hover { color: #fff; background: #b86e49; }
+/* Barra de accion del informe elegido: siempre al frente del panel. */
+.erp-action-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding: 10px 12px; border: 1px solid #e7ded0; border-radius: 12px; background: #f7f1e8; }
+.erp-action-info { min-width: 0; }
+.erp-action-name { color: #35464b; font-size: 13px; font-weight: 700; }
+.erp-action-file { margin-top: 2px; overflow: hidden; max-width: 420px; color: #8a7767; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.erp-download { flex: 0 0 auto; padding: 9px 14px; border: 0; border-radius: 8px; color: #fff; background: #b86e49; font: 700 12px 'Segoe UI', sans-serif; letter-spacing: .3px; cursor: pointer; }
+.erp-download:hover:not(:disabled), .erp-download:focus-visible { background: #a15e3d; }
+.erp-download:disabled { background: #cbbcaa; cursor: default; }
+.erp-list-block { padding: 6px; background: #f7f1e8; border-radius: 12px; }
+.erp-list { max-height: 240px; margin: 0; padding: 0; overflow: auto; list-style: none; }
+.erp-option { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 8px; color: #384b4d; font-size: 13px; cursor: pointer; }
+.erp-option + .erp-option { margin-top: 2px; }
+.erp-option.is-active { color: #fff; background: #8baba0; }
+.erp-option.is-selected { color: #fff; background: #b86e49; font-weight: 700; }
+.erp-option.is-selected.is-active { background: #a15e3d; }
+.erp-option-body { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.erp-option-name { white-space: nowrap; }
+.erp-option-description { color: #8a7767; font-size: 11px; white-space: nowrap; }
+.erp-option.is-active .erp-option-description, .erp-option.is-selected .erp-option-description { color: rgba(255, 255, 255, .85); }
+.erp-badge { flex: 0 0 auto; padding: 3px 8px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.erp-option.is-selected .erp-badge, .erp-option.is-active .erp-badge { color: #b86e49; background: #fff; }
+.erp-badge.is-warning { color: #8a3d28; background: #f6dcd2; }
+.erp-alert { margin-top: 10px; padding: 10px 12px; border: 1px solid #e7ded0; border-radius: 10px; font-size: 12px; }
+.erp-alert.is-ok { color: #286b58; border-color: #cbe3d8; background: #dcefe6; }
+.erp-alert.is-error { color: #8a3d28; border-color: #eccfc4; background: #f7e6e0; }
+.erp-alert-title { font-weight: 700; }
+.erp-alert-list { margin: 6px 0 0; padding-left: 18px; line-height: 1.4; }
+.erp-hint { margin-bottom: 10px; padding: 8px 10px; border-radius: 8px; color: #8a7767; background: #f7f1e8; font-size: 11px; }
+.erp-columns { margin-top: 10px; border-top: 1px solid #efe7db; padding-top: 8px; }
+.erp-columns-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.erp-link { padding: 2px 0; border: 0; color: #2f5da8; background: transparent; font: 700 11px 'Segoe UI', sans-serif; cursor: pointer; }
+.erp-link:hover:not(:disabled) { text-decoration: underline; }
+.erp-link:disabled { color: #a8a8a8; cursor: default; }
+.erp-columns-list { max-height: 180px; margin: 8px 0 0; padding: 0; overflow: auto; list-style: none; }
+.erp-column-item { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; color: #384b4d; font-size: 11px; }
+.erp-column-item:nth-child(odd) { background: #f7f1e8; }
+.erp-column-name { flex: 0 0 76px; color: #2f5da8; font-weight: 700; }
+.erp-column-display { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.erp-column-type { flex: 0 0 auto; padding: 1px 7px; border-radius: 10px; color: #80684e; background: #f3eadc; font-size: 10px; font-weight: 700; }
+.erp-column-format { flex: 0 0 auto; color: #8a7767; font-family: Consolas, 'Courier New', monospace; font-size: 10px; }
+.erp-footer { display: flex; align-items: center; gap: 7px; padding: 12px 2px 0; color: #8a7767; font-size: 11px; }
+.erp-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }
+
