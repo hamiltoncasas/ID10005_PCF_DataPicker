@@ -10,7 +10,7 @@
   <data name="Items_Desc" xml:space="preserve"><value>Registros que se exportan. Aplica los filtros en esta propiedad con Power Fx, como en una galeria. Las columnas del informe se nombran igual que los campos del registro.</value></data>
 
   <data name="Reports_Json" xml:space="preserve"><value>Definicion de informes (JSON)</value></data>
-  <data name="Reports_Json_Desc" xml:space="preserve"><value>Objeto JSON de informes. Admite nombre, descripcion, columnas, titulos, tipos, formatos, archivo, hoja, filtros, ordenarPor y ordenDescendente.</value></data>
+  <data name="Reports_Json_Desc" xml:space="preserve"><value>Objeto JSON de informes. Admite nombre, descripcion, columnas, titulos, tipos, formatos, filtros, ordenarPor y ordenDescendente. Los filtros se escriben con simbolos: =, &lt;&gt;, &gt;, &gt;=, &lt;, &lt;=, %texto% (contiene), texto% (empieza), %texto (termina), ! para negar, [a, b] para listas, a..b para rangos y = "" para columnas vacias. Varias reglas se separan con punto y coma.</value></data>
   <data name="Strict_Filters" xml:space="preserve"><value>Validacion estricta</value></data>
   <data name="Strict_Filters_Desc" xml:space="preserve"><value>Si esta activo, la descarga se bloquea cuando una columna o un tipo declarado en el informe no se pueden resolver, en lugar de mostrar solo un aviso.</value></data>
   <data name="Date_Format" xml:space="preserve"><value>Formato de fecha Excel</value></data>

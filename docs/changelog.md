@@ -6,7 +6,16 @@
 El proyecto versiona dos cosas de forma independiente:
 
 - **Controles:** atributo `version` en cada `ControlManifest.Input.xml`.
-- **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.2.2`).
+- **Solución:** etiqueta `<Version>` en `solution/src/Other/Solution.xml` (actualmente `1.0.2.3`).
+
+## 2026-09-19 · ExcelReportPicker 1.3.0: filtros por informe con símbolos
+
+**Cambios:**
+
+- La definición de informes (`reportsJson`) admite la clave `filtros` con **valores literales** y notación de símbolos: `=`, `<>`, `>`, `>=`, `<`, `<=`, `%texto%` (contiene), `texto%` (empieza), `%texto` (termina), `!` para negar, `[a, b]` para listas, `a..b` para rangos y `= ""` para columnas vacías. Varias reglas se separan con `;` y se combinan con AND.
+- Los filtros se aplican **por informe** sobre las filas que llegan en `Items`, antes del orden y del límite de filas; el panel muestra los registros ya filtrados y el resumen del libro escribe las condiciones aplicadas.
+- Con **Validación estricta** activa, un filtro que no resuelve la columna o cuyo valor no cuadra con el tipo bloquea la descarga; si no, se avisa en el panel.
+- Solución `ID0005_DataPickers` de 1.0.2.2 a **1.0.2.3**; paquete regenerado en `solution/bin/Release`.
 
 ## 2026-09-18 · ExcelReportPicker 1.2.0: un solo conjunto de datos (`Items`) y endurecimiento
 

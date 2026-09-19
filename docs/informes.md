@@ -17,7 +17,7 @@ No hay datos reales de ningun cliente en este manual: todos los ejemplos usan da
 6. Detecta el tipo de dato de cada columna (fecha, fecha y hora, hora, entero, decimal, moneda, porcentaje, booleano, texto) y escribe la celda con el **formato nativo de Excel**.
 7. Muestra los errores y avisos de configuracion en el propio panel y los publica en sus salidas.
 
-Identificador del componente: `id5_ID10005.ExcelReportPicker`. Version 1.2.0.
+Identificador del componente: `id5_ID10005.ExcelReportPicker`. Version 1.3.0.
 
 ## 2. Requisitos previos
 
@@ -89,6 +89,7 @@ Es un objeto con **un informe por clave**:
     "formatos": { "Total": "\"$\" #,##0.00" },
     "archivo": "nombre_{fecha}.xlsx",
     "hoja": "Nombre de la hoja",
+    "filtros": "Estado <> Cancelada",
     "ordenarPor": "Pedido",
     "ordenDescendente": false
   }
@@ -107,7 +108,7 @@ Asi se escribe en la propiedad con `JSON({...})`, que tambien acepta la forma eq
 | `formatos` | Objeto | No | Formato de Excel literal por columna; tiene prioridad sobre `tipos` y sobre las propiedades globales |
 | `archivo` | Texto | No | Nombre del archivo. Marcas: `{informe}`, `{nombre}`, `{fecha}`, `{hora}`. Se agrega `.xlsx` si falta |
 | `hoja` | Texto | No | Nombre de la hoja (maximo 31 caracteres; se quitan los caracteres no validos) |
-| `filtros` | Lista | No | **Ya no se usa**: los filtros se aplican en **Items**. Si se declara, se ignora sin generar errores (se conserva para futuras versiones) |
+| `filtros` | Texto (o lista/objeto) | No | Condiciones propias del informe, con **valores literales** y simbolos (seccion 6.1). Varias reglas se separan con `;` y se combinan con AND |
 | `ordenarPor` | Texto | No | Columna de orden (una sola) |
 | `ordenDescendente` | Si/No | No | Orden descendente. Predeterminado `false` |
 
@@ -127,6 +128,7 @@ JSON({
         tipos: { Fecha: "fecha", FechaEntrega: "fecha", Cantidad: "entero", Total: "moneda" },
         archivo: "pedidos_{fecha}.xlsx",
         hoja: "Pedidos",
+        filtros: "Estado <> Cancelada; Total > 0",
         ordenarPor: "Pedido"
     },
     por_vendedor: {
@@ -136,12 +138,13 @@ JSON({
         tipos: { Fecha: "fecha", Total: "moneda" },
         archivo: "ventas_por_vendedor_{fecha}.xlsx",
         hoja: "Vendedores",
+        filtros: "Estado = [Entregado, Despachado]",
         ordenarPor: "Vendedor"
     }
 })
 ```
 
-El periodo de ambos informes lo define el `Filter()` que escribas en **Items**.
+El periodo de ambos informes lo define el `Filter()` que escribas en **Items**, y cada informe acota ademas con sus `filtros`.
 
 ## 6. Filtrado en Items
 
@@ -157,22 +160,44 @@ El control **no filtra**: exporta exactamente los registros que recibe en **Item
 
 Puntos clave:
 
-- **Todos los informes comparten** el resultado de `Items`: si necesitas periodos distintos, usa dos controles del PCF o cambia el `Filter()` con una variable.
+- **Todos los informes comparten** el resultado de `Items`: para condiciones propias de un informe (cliente, estado, rango fijo) usa `filtros` (6.1); para periodos distintos necesitas dos controles del PCF.
 - El panel muestra cuantos registros llegan en **Items** y el Excel escribe esa cantidad en la fila de resumen.
 - Si `Items` queda vacio, el informe se genera solo con el encabezado y el panel avisa.
 - **Limite de filas** corta la exportacion despues del filtro.
 
-### 6.1 Reglas por informe (uso futuro)
+### 6.1 Reglas por informe (`filtros`)
 
-La definicion del informe todavia admite la clave `filtros` (reglas por informe con valores), pero **sin una propiedad de valores de filtros no se aplica nada**: se puede dejar u omitir. Se conserva para una version futura en la que cada informe tenga su propio rango. Formas admitidas:
+Cada informe puede acotar sus registros con la clave `filtros`, escrita con **simbolos** y valores literales. Varias reglas se separan con `;` y se combinan con **AND**:
 
-| Forma | Ejemplo |
-| --- | --- |
-| Token simple | `"vendedor"` (el operador se deduce del nombre: `inicio`/`desde` -> `>=`, `fin`/`hasta` -> `<=`, sin sufijo -> `=`) |
-| Texto con operador | `"Total > 1000"`, `"Cliente contiene textoCliente"`, `"Fecha entre fechaInicio y fechaFin"` |
-| Objeto | `{ "columna": "Fecha", "operador": "entre", "desde": "fechaInicio", "hasta": "fechaFin" }` |
+```powerfx
+filtros: "Estado <> Cancelada; Activo = Verdadero"
+```
 
-Operadores: `=`, `<>`, `>`, `>=`, `<`, `<=`, `contiene`, `empieza`, `termina`, `entre`.
+| Necesidad | Simbolo | Ejemplo |
+| --- | --- | --- |
+| Igual a | `=` | `EstadoCliente = ACTIVO` |
+| Distinto de | `<>` o `!=` | `Estado <> Cancelada` |
+| Mayor / menor | `>` `<` | `Codigo > 20000` |
+| Mayor o igual / menor o igual | `>=` `<=` | `Fecha >= 2026-09-01` |
+| Uno de varios (OR) | `= [a, b, c]` | `Estado = [Pendiente, Programada]` |
+| Ninguno de varios | `<> [a, b]` | `Estado <> [Cancelada, Despachada]` |
+| Contiene | `%texto%` | `Ciudad %BOGOTA%` |
+| Empieza por | `texto%` | `Ruta A0%` |
+| Termina en | `%texto` | `Grupo %0903` |
+| Niega los tres anteriores | `!` delante | `Notas !%PRUEBA%` |
+| Columna vacia | `= ""` | `FechaEntrega = ""` |
+| Columna con valor | `<> ""` o solo el nombre | `Vendedor` |
+| Rango inclusivo | `valor..valor` | `Fecha 2026-09-01..2026-09-19` |
+
+Detalles del comportamiento:
+
+- **Texto**: la comparacion ignora mayusculas y acentos, asi que `%bogota%` encuentra `BOGOTÁ, D.C.`.
+- **Fechas**: sin hora se compara por dia (`2026-09-19`); con hora (`2026-09-19T23:59:59`) se compara al minuto. El rango `a..b` incluye los dos extremos.
+- **Numeros**: admite `1234.50` y `1.234,50`.
+- **Booleanos**: `Verdadero`, `True`, `Sí`, `Si`, `1` / `False`, `No`, `0`.
+- Se evaluan **en el navegador** sobre lo que ya llego en `Items`: no consultan el origen, asi que `Items` define el universo y su delegacion.
+- Si una regla no resuelve la columna o el valor no cuadra con el tipo, aparece un **aviso** en el panel y el resumen del libro; con **Validacion estricta = true** la descarga se bloquea.
+- Tambien se acepta la forma de objeto: `filtros: { columna: "Cliente"; operador: "="; valor: "CLIENTE DE EJEMPLO" }`.
 
 ### 6.2 Comparaciones por tipo (referencia)
 
@@ -333,8 +358,9 @@ En el archivo, *Cantidad* es un numero (se puede sumar) y *Total* es un numero c
 | La definicion de informes debe ser un objeto con un informe por clave | El valor no es un objeto con informes | Usa `{ "clave": { ... } }` |
 | El informe "X" pide la columna "Y", que no esta enlazada | El nombre de `columnas` no coincide con ningun campo de **Items** | Revisa *Columnas detectadas* y corrige el nombre (respeta mayusculas) |
 | El informe "X" no tiene columnas validas para exportar | Ninguna columna de `columnas` existe en el origen | Corrige los nombres o quita `columnas` para exportar todo |
-| El valor "X" del filtro no corresponde al tipo de dato | Solo si declaras `filtros` en el informe (uso futuro) | Los filtros se aplican en **Items**; omite la clave `filtros` |
-| Items no tiene registros con los filtros actuales | El `Filter()` de Items no deja filas | El archivo se genera solo con el encabezado; ajusta el filtro |
+| La columna "X" del filtro no esta enlazada en el conjunto de datos | El nombre de la columna en `filtros` no coincide con ningun campo de **Items** | Corrige el nombre usando *Columnas detectadas* |
+| El valor "X" del filtro no corresponde al tipo de dato de la columna "Y" | El valor no encaja con el tipo (texto en una fecha, letras en un numero) | Escribe el valor en el formato del tipo: `2026-09-19`, `1.234,50`, `Verdadero` |
+| Items no tiene registros que cumplan los filtros del informe | El `Filter()` de Items o los `filtros` del informe no dejan filas | El archivo se genera solo con el encabezado; ajusta los filtros |
 | Modo de validacion estricta... | La propiedad *Validacion estricta* esta activa y hay avisos | Corrige los avisos o desactiva la propiedad |
 
 ## 11. Empaquetado e importacion

@@ -31,19 +31,44 @@ export const REPORT_COLUMN_TYPES: ReportColumnType[] = [
     "booleano",
 ];
 
-/** Operadores admitidos en las reglas de filtro de cada informe. */
-export type FilterOperator = "=" | "<>" | ">" | ">=" | "<" | "<=" | "contiene" | "empieza" | "termina" | "entre";
+/**
+ * Operadores admitidos en las reglas de filtro de cada informe. La notacion es
+ * con simbolos:
+ *   =, <>, >, >=, <, <=      comparaciones
+ *   %texto%, texto%, %texto  comodines de texto (delante de la regla, ! los niega)
+ *   = [a, b, c]              lista de valores (uno de varios)
+ *   a..b                     rango inclusivo
+ *   = ""                     columna vacia
+ */
+export type FilterOperator =
+    | "="
+    | "<>"
+    | ">"
+    | ">="
+    | "<"
+    | "<="
+    | "contiene"
+    | "noContiene"
+    | "empieza"
+    | "noEmpieza"
+    | "termina"
+    | "noTermina"
+    | "entre"
+    | "en"
+    | "noEn"
+    | "vacio"
+    | "noVacio";
 
 const OPERATOR_ALIASES: Record<string, FilterOperator> = {
     "=": "=",
     "==": "=",
-    igual: "=",
     eq: "=",
+    igual: "=",
     "<>": "<>",
     "!=": "<>",
+    ne: "<>",
     distinto: "<>",
     dif: "<>",
-    ne: "<>",
     ">": ">",
     mayor: ">",
     ">=": ">=",
@@ -64,6 +89,17 @@ const OPERATOR_ALIASES: Record<string, FilterOperator> = {
     between: "entre",
 };
 
+/** Operador que niega a otro, para las reglas escritas con "!". */
+const NEGATED_OPERATORS: Partial<Record<FilterOperator, FilterOperator>> = {
+    contiene: "noContiene",
+    empieza: "noEmpieza",
+    termina: "noTermina",
+    "=": "<>",
+    "<>": "=",
+    en: "noEn",
+    noEn: "en",
+};
+
 const OPERATOR_TEXT: Record<FilterOperator, string> = {
     "=": "igual a",
     "<>": "distinto de",
@@ -72,9 +108,16 @@ const OPERATOR_TEXT: Record<FilterOperator, string> = {
     "<": "menor que",
     "<=": "menor o igual que",
     contiene: "contiene",
+    noContiene: "no contiene",
     empieza: "empieza con",
+    noEmpieza: "no empieza con",
     termina: "termina con",
+    noTermina: "no termina con",
     entre: "entre",
+    en: "es uno de",
+    noEn: "no es ninguno de",
+    vacio: "esta vacio",
+    noVacio: "tiene valor",
 };
 
 /** Pistas en el nombre del filtro que definen el operador cuando no se indica. */
@@ -89,17 +132,15 @@ export const TEXT_FORMAT = "@";
 export interface IReportFilterRule {
     /** Texto original de la regla, se usa en los mensajes al usuario. */
     raw: string;
-    /** Columna solicitada; vacio cuando la regla se resuelve por heuristica. */
+    /** Columna de la regla. */
     column: string;
     operator: FilterOperator;
-    /** Clave del valor en la propiedad de valores de filtros. */
-    valueKey: string;
-    /** Segunda clave para el operador "entre". */
-    valueKey2: string;
-    /** Valor literal indicado en la regla; tiene prioridad sobre la clave. */
+    /** Primer valor de la comparacion. */
     literal: string;
-    /** Segundo valor literal para el operador "entre". */
+    /** Segundo valor para los rangos (".."). */
     literal2: string;
+    /** Valores de las listas ("= [a, b]"). */
+    list: string[];
 }
 
 /** Definicion normalizada de un informe. */
@@ -638,78 +679,172 @@ function readLiteral(token: string): string {
     return "";
 }
 
+/** Lee el operador de una regla a partir de su simbolo o palabra. */
+function readOperator(token: string): FilterOperator | null {
+    const key = normalizeText(token).replace(/[^<>=!a-z]/g, "");
+    return Object.prototype.hasOwnProperty.call(OPERATOR_ALIASES, key) ? OPERATOR_ALIASES[key] : null;
+}
+
+/** Quita las comillas exteriores de un valor. */
+function stripQuotes(token: string): string {
+    const quoted = /^["'](.*)["']$/.exec(token.trim());
+    return quoted ? quoted[1].trim() : token.trim();
+}
+
+/**
+ * Interpreta un valor con comodines de texto: "%texto%" contiene, "texto%"
+ * empieza, "%texto" termina; el "!" delante niega la comparacion.
+ */
+function readTextMatchOperator(token: string): { operator: FilterOperator; value: string } | null {
+    const negated = token.startsWith("!");
+    const body = negated ? token.slice(1) : token;
+    const starts = body.startsWith("%");
+    const ends = body.endsWith("%");
+    if (!starts && !ends) return null;
+    const value = stripQuotes(body.replace(/^%+/, "").replace(/%+$/, ""));
+    if (!value) return null;
+    const base: FilterOperator = starts && ends ? "contiene" : starts ? "termina" : "empieza";
+    return { operator: negated ? NEGATED_OPERATORS[base] ?? base : base, value };
+}
+
+/** Lee la lista de valores de la forma [a, b, c]. */
+function readListValues(token: string): string[] | null {
+    const match = /^\[(.*)\]$/.exec(token.trim());
+    if (!match) return null;
+    return match[1]
+        .split(/[,;]/)
+        .map((item) => stripQuotes(item))
+        .filter((item) => !!item);
+}
+
+/** Lee el rango inclusivo de la forma valor..valor. */
+function readRangeValues(token: string): { literal: string; literal2: string } | null {
+    const match = /^(.+?)\.\.(.+)$/.exec(token.trim());
+    if (!match) return null;
+    const literal = stripQuotes(match[1]);
+    const literal2 = stripQuotes(match[2]);
+    if (!literal || !literal2) return null;
+    return { literal, literal2 };
+}
+
+/**
+ * Interpreta el valor de una regla: lista, rango, comodines de texto, columna
+ * vacia o comparacion normal. Todos los valores son literales, porque el
+ * control ya no tiene una propiedad de valores de filtros.
+ */
+function readRuleValue(
+    token: string,
+    operator: FilterOperator
+): { operator: FilterOperator; literal: string; literal2: string; list: string[] } {
+    const text = token.trim();
+    const quoted = /^["'](.*)["']$/.exec(text);
+    if (quoted) {
+        const inner = quoted[1].trim();
+        return inner
+            ? { operator, literal: inner, literal2: "", list: [] }
+            : { operator: operator === "<>" ? "noVacio" : "vacio", literal: "", literal2: "", list: [] };
+    }
+    const list = readListValues(text);
+    if (list && list.length > 0) {
+        return { operator: operator === "<>" ? "noEn" : "en", literal: "", literal2: "", list };
+    }
+    const match = readTextMatchOperator(text);
+    if (match) return { operator: match.operator, literal: match.value, literal2: "", list: [] };
+    const range = readRangeValues(text);
+    if (range) return { operator: "entre", literal: range.literal, literal2: range.literal2, list: [] };
+    return { operator, literal: readLiteral(text) || stripQuotes(text), literal2: "", list: [] };
+}
+
+/**
+ * Convierte el texto de una regla en una regla normalizada:
+ *   "Estado <> Cancelada"                comparacion
+ *   "Fecha >= 2026-09-01"                comparacion con fecha
+ *   "Estado = [Pendiente, Programada]"   uno de varios
+ *   "Ciudad %BOGOTA%"                    contiene
+ *   "Ruta A0%" / "Grupo %0903"           empieza / termina
+ *   "Notas !%PRUEBA%"                    no contiene
+ *   "Fecha 2026-09-01..2026-09-19"       rango
+ *   "FechaEntrega = \"\""                columna vacia
+ *   "Vendedor"                           la columna tiene valor
+ */
 function parseFilterRuleText(text: string, reportKey: string, errors: string[]): IReportFilterRule | null {
     const trimmed = text.trim();
     if (!trimmed) return null;
-    const tokens = trimmed.split(/\s+/);
-    if (tokens.length === 1) {
-        return { raw: trimmed, column: "", operator: "=", valueKey: tokens[0], valueKey2: "", literal: "", literal2: "" };
+    const separator = trimmed.search(/\s/);
+    if (separator < 0) {
+        return { raw: trimmed, column: trimmed, operator: "noVacio", literal: "", literal2: "", list: [] };
     }
-    const operator = OPERATOR_ALIASES[normalizeText(tokens[1]).replace(/[^<>=!a-z]/g, "")];
-    if (!operator) {
-        errors.push(
-            `La regla de filtro "${trimmed}" del informe "${reportKey}" no usa un operador valido. Ejemplos: "fecha >= fechaInicio", "cliente contiene textoCliente", "fecha entre fechaInicio y fechaFin".`
-        );
-        return null;
-    }
-    const valueToken = tokens[2] ?? "";
-    if (!valueToken) {
+    const column = trimmed.slice(0, separator);
+    const rest = trimmed.slice(separator).trim();
+    const tokens = rest.split(/\s+/);
+    const alias = tokens.length > 1 ? readOperator(tokens[0]) : null;
+    const operator = alias ?? "=";
+    const valueText = alias ? rest.slice(tokens[0].length).trim() : rest;
+    if (!valueText) {
         errors.push(`La regla de filtro "${trimmed}" del informe "${reportKey}" no indica el valor que se va a comparar.`);
         return null;
     }
-    const literal = readLiteral(valueToken);
-    const rule: IReportFilterRule = {
+    const parsed = readRuleValue(valueText, operator);
+    return {
         raw: trimmed,
-        column: tokens[0],
-        operator,
-        valueKey: literal ? "" : valueToken,
-        valueKey2: "",
-        literal,
-        literal2: "",
+        column,
+        operator: parsed.operator,
+        literal: parsed.literal,
+        literal2: parsed.literal2,
+        list: parsed.list,
     };
-    if (operator === "entre") {
-        const connector = tokens[3] ?? "";
-        const second = normalizeText(connector) === "y" ? tokens[4] : tokens[3];
-        if (!second) {
-            errors.push(`La regla "entre" del informe "${reportKey}" necesita dos valores, por ejemplo "fecha entre fechaInicio y fechaFin".`);
-            return null;
-        }
-        rule.literal2 = readLiteral(second);
-        rule.valueKey2 = rule.literal2 ? "" : second;
-    }
-    return rule;
 }
 
+/** Convierte un objeto de regla en una regla normalizada. */
 function parseFilterRuleObject(source: Record<string, unknown>, reportKey: string, errors: string[]): IReportFilterRule | null {
     const column = readText(source.columna ?? source.column ?? source.campo ?? source.field);
-    const operatorToken = OPERATOR_ALIASES[normalizeText(readText(source.operador ?? source.operator ?? source.op ?? "=")).replace(/[^<>=!a-z]/g, "")];
-    const valueKey = readText(source.valor ?? source.value ?? source.clave ?? source.key ?? source.filtro);
-    const valueKey2 = readText(source.valor2 ?? source.value2);
-    const fromKey = readText(source.desde ?? source.from ?? source.inicio);
-    const toKey = readText(source.hasta ?? source.fin ?? source.to);
-    const operator = operatorToken ?? (fromKey && toKey ? "entre" : "=");
-    const primary = fromKey || valueKey;
-    const secondary = toKey || valueKey2;
     const raw = JSON.stringify(source);
-    if (!primary && !column) {
-        errors.push(
-            `Una regla de filtro del informe "${reportKey}" no indica columna ni valor. Ejemplo: { "columna": "col02", "operador": "entre", "desde": "fechaInicio", "hasta": "fechaFin" }.`
-        );
+    if (!column) {
+        errors.push(`La regla de filtro ${raw} del informe "${reportKey}" no indica la columna.`);
         return null;
     }
+    const operator = readOperator(readText(source.operador ?? source.operator ?? source.op ?? "="));
+    if (!operator) {
+        errors.push(`La regla de filtro ${raw} del informe "${reportKey}" no usa un operador valido: usa =, <>, >, >=, < o <=.`);
+        return null;
+    }
+    const primary = readText(source.valor ?? source.value ?? source.valor1 ?? source.desde ?? source.from ?? source.inicio);
+    const secondary = readText(source.valor2 ?? source.value2 ?? source.hasta ?? source.fin ?? source.to);
     if (!primary) {
-        errors.push(`La regla de filtro ${raw} del informe "${reportKey}" no indica el valor que se va a comparar.`);
-        return null;
+        const empty = readRuleValue('""', operator);
+        return { raw, column, operator: empty.operator, literal: "", literal2: "", list: [] };
     }
-    return { raw, column, operator, valueKey: primary, valueKey2: secondary, literal: "", literal2: "" };
+    const parsed = readRuleValue(primary, operator);
+    const isRange = !!secondary && (parsed.operator === "=" || parsed.operator === "<>");
+    return {
+        raw,
+        column,
+        operator: isRange ? "entre" : parsed.operator,
+        literal: parsed.literal,
+        literal2: isRange ? secondary : "",
+        list: parsed.list,
+    };
 }
 
+/**
+ * Lee las reglas de filtro de un informe. Admite el texto con las reglas
+ * separadas por ";" (filtros: "Estado <> Cancelada; Activo = Verdadero"), una
+ * lista de reglas y un objeto suelto.
+ */
 function parseFilterRules(value: unknown, reportKey: string, errors: string[]): IReportFilterRule[] {
     if (value === null || value === undefined || value === "") return [];
+    if (typeof value === "string") {
+        return value
+            .split(";")
+            .map((item) => parseFilterRuleText(item, reportKey, errors))
+            .filter((item): item is IReportFilterRule => item !== null);
+    }
     if (!Array.isArray(value)) {
-        errors.push(
-            `La propiedad "filtros" del informe "${reportKey}" debe ser una lista. Ejemplo: ["fechaInicio", "fechaFin"] o [{ "columna": "fecha", "operador": "entre", "desde": "fechaInicio", "hasta": "fechaFin" }].`
-        );
+        if (typeof value === "object") {
+            const rule = parseFilterRuleObject(value as Record<string, unknown>, reportKey, errors);
+            return rule ? [rule] : [];
+        }
+        errors.push(`La propiedad "filtros" del informe "${reportKey}" debe ser texto o una lista de reglas.`);
         return [];
     }
     const rules: IReportFilterRule[] = [];
@@ -904,7 +1039,7 @@ export function buildPlan(table: IReportTable, definition: IReportDefinition, op
     const columns: IExportColumn[] = [];
     if (table.columns.length === 0) {
         errors.push(
-            'No hay datos para exportar. Configura la propiedad Datos (JSON) con el resultado de JSON(Tabla) o JSON(Filter(Tabla, ...)).'
+            "Sin datos para exportar. Enlaza una tabla o coleccion en la propiedad Items del control."
         );
         return { definition, columns, errors, warnings };
     }
@@ -947,6 +1082,7 @@ interface IResolvedFilter {
     operator: FilterOperator;
     value1: string;
     value2: string;
+    list: string[];
     description: string;
 }
 
@@ -966,74 +1102,72 @@ function filterValueValid(value: string, type: ReportColumnType, options: IRepor
     }
 }
 
+/** Texto del filtro para el resumen del libro y para los avisos. */
 function describeFilter(filter: IResolvedFilter): string {
     const text = OPERATOR_TEXT[filter.operator];
-    return filter.operator === "entre"
-        ? `${filter.title} ${text} ${filter.value1} y ${filter.value2}`
-        : `${filter.title} ${text} ${filter.value1}`;
+    switch (filter.operator) {
+        case "entre":
+            return `${filter.title} ${text} ${filter.value1} y ${filter.value2}`;
+        case "en":
+        case "noEn":
+            return `${filter.title} ${text} [${filter.list.join(", ")}]`;
+        case "vacio":
+        case "noVacio":
+            return `${filter.title} ${text}`;
+        default:
+            return `${filter.title} ${text} ${filter.value1}`;
+    }
 }
 
 /**
- * Asocia una regla de filtro con una columna del informe. Si la regla no indica
- * columna se resuelve por el nombre del filtro y, como ultimo recurso, por el
- * tipo del valor (fechas de inicio y fin sobre la primera columna de fecha).
+ * Asocia una regla de filtro con una columna del informe y valida su valor.
+ * Todos los valores son literales escritos en la definicion del informe.
  */
 function resolveFilterRule(
     rule: IReportFilterRule,
     plan: IReportPlan,
     table: IReportTable,
-    values: Record<string, string>,
     options: IReportOptions,
     warnings: string[]
 ): IResolvedFilter | null {
-    const literal = rule.literal;
-    const keyed = rule.valueKey !== "" ? readOwnValue(values, rule.valueKey) ?? "" : "";
-    const literal2 = rule.literal2;
-    const keyed2 = rule.valueKey2 !== "" ? readOwnValue(values, rule.valueKey2) ?? "" : "";
-    const value1 = literal !== "" ? literal : keyed;
-    const value2 = literal2 !== "" ? literal2 : keyed2;
-    if (!value1) return null;
-    if (rule.operator === "entre" && !value2) return null;
-    let columnName = rule.column ? resolveColumnName(rule.column, table, plan.definition) : "";
-    let operator = rule.operator;
-    if (rule.column && !columnName) {
+    const columnName = rule.column ? resolveColumnName(rule.column, table, plan.definition) : "";
+    if (!columnName) {
         warnings.push(`La columna "${rule.column}" del filtro "${rule.raw}" no esta enlazada en el conjunto de datos.`);
         return null;
-    }
-    if (!columnName) {
-        const base = filterNameBase(rule.valueKey);
-        const byToken = resolveColumnName(rule.valueKey, table, plan.definition);
-        columnName = byToken !== "" ? byToken : base ? resolveColumnName(base, table, plan.definition) : "";
-        if (columnName && operator === "=") {
-            const direction = filterDirection(rule.valueKey);
-            operator = direction === "from" ? ">=" : direction === "to" ? "<=" : "=";
-        }
-        if (!columnName) {
-            const direction = filterDirection(rule.valueKey);
-            const dateColumns = plan.columns.filter((column) => column.type === "fecha" || column.type === "fechaHora");
-            if (direction && dateColumns.length > 0 && parseDateValue(value1, options.dateFormat) !== null) {
-                columnName = dateColumns[0].name;
-                operator = direction === "from" ? ">=" : "<=";
-            } else {
-                warnings.push(
-                    `No se pudo asociar el filtro "${rule.raw}" a una columna del informe. Nombra el filtro igual que la columna o usa la forma "columna operador valor".`
-                );
-                return null;
-            }
-        }
     }
     const planned = plan.columns.find((column) => column.name === columnName);
     const type = planned ? planned.type : columnTypeOf(columnName, table);
     const title = planned ? planned.title : columnName;
-    if (!filterValueValid(value1, type, options) || (operator === "entre" && !filterValueValid(value2, type, options))) {
+    const invalid = invalidFilterValue(rule, type, options);
+    if (invalid !== "") {
         warnings.push(
-            `El valor "${value1}" del filtro "${rule.raw}" no corresponde al tipo de dato de la columna "${title}" (${type}). El filtro no se aplica.`
+            `El valor "${invalid}" del filtro "${rule.raw}" no corresponde al tipo de dato de la columna "${title}" (${type}). El filtro no se aplica.`
         );
         return null;
     }
-    const resolved: IResolvedFilter = { column: columnName, title, type, operator, value1, value2, description: "" };
+    const resolved: IResolvedFilter = {
+        column: columnName,
+        title,
+        type,
+        operator: rule.operator,
+        value1: rule.literal,
+        value2: rule.literal2,
+        list: rule.list,
+        description: "",
+    };
     resolved.description = describeFilter(resolved);
     return resolved;
+}
+
+/** Devuelve el primer valor de la regla que no encaja con el tipo de columna. */
+function invalidFilterValue(rule: IReportFilterRule, type: ReportColumnType, options: IReportOptions): string {
+    if (rule.operator === "vacio" || rule.operator === "noVacio") return "";
+    if (rule.operator === "en" || rule.operator === "noEn") {
+        return rule.list.find((item) => !filterValueValid(item, type, options)) ?? "";
+    }
+    if (!filterValueValid(rule.literal, type, options)) return rule.literal;
+    if (rule.operator === "entre" && !filterValueValid(rule.literal2, type, options)) return rule.literal2;
+    return "";
 }
 
 function daySerial(date: Date): number {
@@ -1065,10 +1199,16 @@ function compareValues(value: number | string, filter: IResolvedFilter, first: n
             return value <= first;
         case "contiene":
             return typeof value === "string" && typeof first === "string" && value.includes(first);
+        case "noContiene":
+            return !(typeof value === "string" && typeof first === "string" && value.includes(first));
         case "empieza":
             return typeof value === "string" && typeof first === "string" && value.startsWith(first);
+        case "noEmpieza":
+            return !(typeof value === "string" && typeof first === "string" && value.startsWith(first));
         case "termina":
             return typeof value === "string" && typeof first === "string" && value.endsWith(first);
+        case "noTermina":
+            return !(typeof value === "string" && typeof first === "string" && value.endsWith(first));
         case "entre":
             return value >= first && value <= second;
         default:
@@ -1076,9 +1216,75 @@ function compareValues(value: number | string, filter: IResolvedFilter, first: n
     }
 }
 
-function rowMatches(row: IDatasetRow, filter: IResolvedFilter, options: IReportOptions): boolean {
+/** Indica si la celda esta vacia. */
+function rowIsEmpty(row: IDatasetRow, column: string): boolean {
+    const raw = row.raw[column];
+    if (raw === null || raw === undefined) return true;
+    if (typeof raw === "string") return raw.trim() === "";
+    if (typeof raw === "number" || typeof raw === "boolean") return false;
+    return textOf(raw).trim() === "";
+}
+
+/** Interpreta un valor como booleano (Verdadero/True/Si/1 y False/No/0). */
+function parseBooleanToken(value: unknown): boolean | null {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    const text = normalizeText(textOf(value));
+    if (!text) return null;
+    if (["true", "verdadero", "si", "yes", "1"].includes(text)) return true;
+    if (["false", "falso", "no", "0"].includes(text)) return false;
+    return null;
+}
+
+/** Texto de la celda: valor nativo si es texto, o el formateado por el host. */
+function cellText(row: IDatasetRow, column: string): string {
+    const raw = row.raw[column];
+    const formatted = row.formatted[column] ?? "";
+    return typeof raw === "string" && raw ? raw : formatted || textOf(raw);
+}
+
+/** Compara la celda con un valor literal de una lista ("= [a, b]"). */
+function rowValueEquals(row: IDatasetRow, filter: IResolvedFilter, item: string, options: IReportOptions): boolean {
     const raw = row.raw[filter.column];
     const formatted = row.formatted[filter.column] ?? "";
+    if (filter.type === "fecha" || filter.type === "fechaHora" || filter.type === "hora") {
+        const value = parseDateValue(raw, options.dateFormat) ?? parseDateValue(formatted, options.dateFormat);
+        const target = parseDateValue(item, options.dateFormat);
+        if (!value || !target) return false;
+        if (filter.type === "hora") {
+            return Math.floor((dateToExcelSerial(value) % 1) * 1440) === Math.floor((dateToExcelSerial(target) % 1) * 1440);
+        }
+        const withTime = filter.type === "fechaHora" && hasTimePart(target);
+        return withTime ? minuteSerial(value) === minuteSerial(target) : daySerial(value) === daySerial(target);
+    }
+    if (filter.type === "entero" || filter.type === "numero" || filter.type === "moneda" || filter.type === "porcentaje") {
+        const value = parseNumber(raw) ?? parseNumber(formatted);
+        const target = parseNumber(item);
+        return value !== null && target !== null && value === target;
+    }
+    if (filter.type === "booleano") {
+        const value = parseBooleanToken(raw) ?? parseBooleanToken(formatted);
+        const target = parseBooleanToken(item);
+        return value !== null && target !== null && value === target;
+    }
+    return normalizeText(cellText(row, filter.column)) === normalizeText(item);
+}
+
+function rowMatches(row: IDatasetRow, filter: IResolvedFilter, options: IReportOptions): boolean {
+    if (filter.operator === "vacio") return rowIsEmpty(row, filter.column);
+    if (filter.operator === "noVacio") return !rowIsEmpty(row, filter.column);
+    if (filter.operator === "en" || filter.operator === "noEn") {
+        const found = filter.list.some((item) => rowValueEquals(row, filter, item, options));
+        return filter.operator === "en" ? found : !found;
+    }
+    const raw = row.raw[filter.column];
+    const formatted = row.formatted[filter.column] ?? "";
+    if (filter.type === "booleano") {
+        const value = parseBooleanToken(raw) ?? parseBooleanToken(formatted);
+        const target = parseBooleanToken(filter.value1);
+        if (value === null || target === null) return false;
+        return compareValues(value ? 1 : 0, filter, target ? 1 : 0, 0);
+    }
     if (filter.type === "fecha" || filter.type === "fechaHora" || filter.type === "hora") {
         const value = parseDateValue(raw, options.dateFormat) ?? parseDateValue(formatted, options.dateFormat);
         const from = parseDateValue(filter.value1, options.dateFormat);
@@ -1101,22 +1307,16 @@ function rowMatches(row: IDatasetRow, filter: IResolvedFilter, options: IReportO
         if (value === null || from === null) return false;
         return compareValues(value, filter, from, to ?? 0);
     }
-    const text = typeof raw === "string" && raw ? raw : formatted || textOf(raw);
-    return compareValues(normalizeText(text), filter, normalizeText(filter.value1), normalizeText(filter.value2));
+    return compareValues(normalizeText(cellText(row, filter.column)), filter, normalizeText(filter.value1), normalizeText(filter.value2));
 }
 
-/** Aplica los filtros dinamicos del informe sobre las filas del conjunto de datos. */
-export function applyReportFilters(
-    table: IReportTable,
-    plan: IReportPlan,
-    values: Record<string, string>,
-    options: IReportOptions
-): IFilterResult {
+/** Aplica los filtros declarados en el informe sobre las filas del conjunto de datos. */
+export function applyReportFilters(table: IReportTable, plan: IReportPlan, options: IReportOptions): IFilterResult {
     const warnings: string[] = [];
     const applied: string[] = [];
     const filters: IResolvedFilter[] = [];
     plan.definition.filters.forEach((rule) => {
-        const resolved = resolveFilterRule(rule, plan, table, values, options, warnings);
+        const resolved = resolveFilterRule(rule, plan, table, options, warnings);
         if (resolved) {
             filters.push(resolved);
             applied.push(resolved.description);
@@ -1355,7 +1555,7 @@ export function parseDataTable(text: string): { table: IReportTable; errors: str
         rows.push({ recordId: String(index + 1), raw, formatted });
     });
     if (rows.length === 0) {
-        errors.push("La propiedad Datos (JSON) no tiene registros validos.");
+        errors.push("Los datos en texto no tienen registros validos.");
         return { table: empty, errors };
     }
     const columns: IDatasetColumn[] = names.map((name) => ({ name, displayName: name, dataType: "", alias: "" }));
