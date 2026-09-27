@@ -12,8 +12,62 @@
   <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la fecha seleccionada.</value></data>
   <data name="Date_Format" xml:space="preserve"><value>Formato de fecha</value></data>
   <data name="Date_Format_Desc" xml:space="preserve"><value>Use YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD, YYYYMMDD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, DD.MM.YYYY, MM.DD.YYYY, DDMMYYYY o MMDDYYYY.</value></data>
+  <data name="Placeholder_Text" xml:space="preserve"><value>Texto de ayuda del campo</value></data>
+  <data name="Placeholder_Text_Desc" xml:space="preserve"><value>Texto que se muestra mientras no hay fecha seleccionada. Predeterminado: Selecciona fecha.</value></data>
+  <data name="Is_Editable" xml:space="preserve"><value>Permitir escribir la fecha</value></data>
+  <data name="Is_Editable_Desc" xml:space="preserve"><value>Si esta activo, la fecha se puede escribir en el campo (con el formato configurado); si no, solo se puede elegir en el calendario.</value></data>
+  <data name="Start_Year" xml:space="preserve"><value>Año inicial del calendario</value></data>
+  <data name="Start_Year_Desc" xml:space="preserve"><value>Primer año al que se puede navegar. 0 o vacio = sin limite.</value></data>
+  <data name="End_Year" xml:space="preserve"><value>Año final del calendario</value></data>
+  <data name="End_Year_Desc" xml:space="preserve"><value>Último año al que se puede navegar. 0 o vacio = sin limite.</value></data>
+  <data name="Start_Of_Week" xml:space="preserve"><value>Primer día de la semana</value></data>
+  <data name="Start_Of_Week_Desc" xml:space="preserve"><value>Día de la primera columna del calendario: Dom, Lun, Mar, Mié, Jue, Vie o Sáb; tambien se acepta 0 (domingo) a 6 (sábado). Predeterminado: Lun.</value></data>
+  <data name="Min_Date" xml:space="preserve"><value>Fecha mínima</value></data>
+  <data name="Min_Date_Desc" xml:space="preserve"><value>Fecha más antigua que se puede elegir, en el formato configurado. Vacío = sin limite.</value></data>
+  <data name="Max_Date" xml:space="preserve"><value>Fecha máxima</value></data>
+  <data name="Max_Date_Desc" xml:space="preserve"><value>Fecha más reciente que se puede elegir, en el formato configurado. Vacío = sin limite.</value></data>
+  <data name="Accessible_Label" xml:space="preserve"><value>Etiqueta accesible</value></data>
+  <data name="Accessible_Label_Desc" xml:space="preserve"><value>Texto que anuncian los lectores de pantalla para describir el control.</value></data>
   <data name="Z_Index" xml:space="preserve"><value>Prioridad visual del selector</value></data>
   <data name="Z_Index_Desc" xml:space="preserve"><value>Numero z-index del panel abierto. Predeterminado 2147483647. Use un valor mayor que el de los elementos superpuestos.</value></data>
   <data name="Date" xml:space="preserve"><value>Fecha seleccionada</value></data>
   <data name="Date_Desc" xml:space="preserve"><value>Salida con la fecha seleccionada en el formato configurado. Use DateValue(DatePicker1.date) para obtener una fecha nativa.</value></data>
+  <data name="Default_Date" xml:space="preserve"><value>Fecha precargada por omision</value></data>
+  <data name="Default_Date_Desc" xml:space="preserve"><value>Fecha inicial que muestra el control antes de que el usuario elija, escrita con el formato configurado o en formato tecnico. Si se indica, tiene prioridad sobre Fecha precargada.</value></data>
+  <data name="Selected_Date" xml:space="preserve"><value>Valor seleccionado</value></data>
+  <data name="Selected_Date_Desc" xml:space="preserve"><value>Salida con el mismo valor que la salida date; se expone con el nombre nativo SelectedDate.</value></data>
+  <data name="Date_Time_Zone" xml:space="preserve"><value>Zona horaria de los valores</value></data>
+  <data name="Date_Time_Zone_Desc" xml:space="preserve"><value>Local (predeterminado) lee las fechas tal como estan escritas. Utc convierte los valores con desplazamiento horario (Z, +hh:mm) a UTC y publica la fecha como instante UTC, por ejemplo 2026-09-16T00:00:00Z.</value></data>
+  <data name="Language" xml:space="preserve"><value>Idioma del calendario</value></data>
+  <data name="Language_Desc" xml:space="preserve"><value>Codigo de idioma para los nombres de los meses y de los dias, por ejemplo es-ES, en-US o pt-BR. Vacio = nombres predeterminados en espanol.</value></data>
+  <data name="Chevron_Background" xml:space="preserve"><value>Fondo de las flechas del calendario</value></data>
+  <data name="Chevron_Background_Desc" xml:space="preserve"><value>Color de fondo de las flechas de mes anterior y siguiente. Acepta #RRGGBB, rgb(), nombres CSS y Color.Azul de Power Apps.</value></data>
+  <data name="Chevron_Fill" xml:space="preserve"><value>Color de las flechas del calendario</value></data>
+  <data name="Chevron_Fill_Desc" xml:space="preserve"><value>Color del simbolo de las flechas de mes anterior y siguiente.</value></data>
+  <data name="Icon_Background" xml:space="preserve"><value>Fondo del icono del calendario</value></data>
+  <data name="Icon_Background_Desc" xml:space="preserve"><value>Color de fondo del boton con el icono del calendario.</value></data>
+  <data name="Icon_Fill" xml:space="preserve"><value>Color del icono del calendario</value></data>
+  <data name="Icon_Fill_Desc" xml:space="preserve"><value>Color del dibujo del icono del calendario dentro del campo de texto.</value></data>
+  <data name="Border_Color" xml:space="preserve"><value>Color del borde</value></data>
+  <data name="Border_Color_Desc" xml:space="preserve"><value>Color del borde del campo de texto. Vacio = color predeterminado.</value></data>
+  <data name="Border_Style" xml:space="preserve"><value>Estilo del borde</value></data>
+  <data name="Border_Style_Desc" xml:space="preserve"><value>Solid, Dashed, Dotted, Double o None. Tambien se acepta BorderStyle.None. Vacio = Solid.</value></data>
+  <data name="Border_Thickness" xml:space="preserve"><value>Grosor del borde</value></data>
+  <data name="Border_Thickness_Desc" xml:space="preserve"><value>Grosor del borde en pixeles. 0 quita el borde. Vacio = 1.</value></data>
+  <data name="Color" xml:space="preserve"><value>Color del texto</value></data>
+  <data name="Color_Desc" xml:space="preserve"><value>Color del texto del campo. Acepta #RRGGBB, rgb(), nombres CSS y Color.X de Power Apps.</value></data>
+  <data name="Fill" xml:space="preserve"><value>Color de fondo del campo</value></data>
+  <data name="Fill_Desc" xml:space="preserve"><value>Color de fondo del campo de texto principal.</value></data>
+  <data name="Font" xml:space="preserve"><value>Fuente del texto</value></data>
+  <data name="Font_Desc" xml:space="preserve"><value>Familia tipografica del texto, por ejemplo Segoe UI o Arial. Vacio = fuente predeterminada.</value></data>
+  <data name="Size" xml:space="preserve"><value>Tamaño de la fuente</value></data>
+  <data name="Size_Desc" xml:space="preserve"><value>Tamaño del texto en pixeles. Vacio o 0 = tamaño predeterminado.</value></data>
+  <data name="Font_Weight" xml:space="preserve"><value>Grosor de la fuente</value></data>
+  <data name="Font_Weight_Desc" xml:space="preserve"><value>Bold, Semibold, Normal, Lighter o un numero de 100 a 900. Tambien se acepta FontWeight.Bold.</value></data>
+  <data name="Italic" xml:space="preserve"><value>Texto en cursiva</value></data>
+  <data name="Italic_Desc" xml:space="preserve"><value>Si esta activo, el texto del campo se muestra en cursiva.</value></data>
+  <data name="Strikethrough" xml:space="preserve"><value>Texto tachado</value></data>
+  <data name="Strikethrough_Desc" xml:space="preserve"><value>Si esta activo, el texto del campo se muestra tachado.</value></data>
+  <data name="Underline" xml:space="preserve"><value>Texto subrayado</value></data>
+  <data name="Underline_Desc" xml:space="preserve"><value>Si esta activo, el texto del campo se muestra subrayado.</value></data>
 </root>

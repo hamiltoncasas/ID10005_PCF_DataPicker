@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Fecha: 2026-09-18. Descripcion: Contrato del exportador de informes a Excel para Power Apps Canvas. -->
+<!-- Fecha: 2026-09-21. Descripcion: Contrato del exportador de informes a Excel para Power Apps Canvas,
+     con aviso del estado de carga del conjunto de datos enlazado. -->
 <manifest>
-  <control namespace="ID10005" constructor="ExcelReportPicker" version="1.3.0" display-name-key="ExcelReportPicker" description-key="ExcelReportPicker description" control-type="virtual" >
+  <control namespace="ID10005" constructor="ExcelReportPicker" version="1.4.1" display-name-key="ExcelReportPicker" description-key="ExcelReportPicker description" control-type="virtual" >
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     -->
@@ -42,6 +43,11 @@
     <property name="noReportsText" display-name-key="No_Reports_Text" description-key="No_Reports_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="emptyDataText" display-name-key="Empty_Data_Text" description-key="Empty_Data_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="errorTitleText" display-name-key="Error_Title_Text" description-key="Error_Title_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <!-- Aviso del estado de carga del conjunto de datos: mientras llega y cuando termina. -->
+    <property name="showDataStatus" display-name-key="Show_Data_Status" description-key="Show_Data_Status_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="loadingText" display-name-key="Loading_Text" description-key="Loading_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="readyText" display-name-key="Ready_Text" description-key="Ready_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="readyNoticeMs" display-name-key="Ready_Notice_Ms" description-key="Ready_Notice_Ms_Desc" of-type="Whole.None" usage="input" required="false" />
     <property name="selectedReport" display-name-key="Selected_Report" description-key="Selected_Report_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="lastReport" display-name-key="Last_Report" description-key="Last_Report_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="lastReportName" display-name-key="Last_Report_Name" description-key="Last_Report_Name_Desc" of-type="SingleLine.Text" usage="output" required="false" />
@@ -52,6 +58,8 @@
     <property name="hasError" display-name-key="Has_Error" description-key="Has_Error_Desc" of-type="TwoOptions" usage="output" required="false" />
     <property name="columnsDetected" display-name-key="Columns_Detected" description-key="Columns_Detected_Desc" of-type="Whole.None" usage="output" required="false" />
     <property name="availableColumnsJson" display-name-key="Available_Columns_Json" description-key="Available_Columns_Json_Desc" of-type="Multiple" usage="output" required="false" />
+    <property name="isLoading" display-name-key="Is_Loading" description-key="Is_Loading_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="dataStatus" display-name-key="Data_Status" description-key="Data_Status_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <resources>
       <code path="index.ts" order="1"/>
       <css path="ExcelReportPicker.css" order="1" />

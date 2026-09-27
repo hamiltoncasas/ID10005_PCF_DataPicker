@@ -6,7 +6,7 @@
  * archivo Excel con formatos nativos, publicando el resultado en las salidas.
  */
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { ExcelReportPickerView, IColumnRow, IExcelReportPickerProps, IExportResultView, IReportRow, IViewTexts } from "./ExcelReportPickerView";
+import { DATA_LOAD_TIMEOUT_MS, ExcelReportPickerView, IColumnRow, IExcelReportPickerProps, IExportResultView, IReportRow, IViewTexts } from "./ExcelReportPickerView";
 import { buildReportWorkbook, EXCEL_FILE_MIME_TYPE } from "./excelWriter";
 import {
     IColumnInfo,
@@ -20,6 +20,7 @@ import {
     buildFileName,
     buildPlan,
     collectDeclaredFields,
+    columnValueKeys,
     describeColumns,
     parseReportsDefinition,
     sortRows,
@@ -29,6 +30,11 @@ import * as React from "react";
 const MAX_RECORDS = 5000;
 const MAX_PAGE_REQUESTS = 10;
 const DEFAULT_Z_INDEX = 2147483647;
+/** Tiempo que se mantiene el mensaje de "datos cargados" antes de volver al boton. */
+const DEFAULT_READY_NOTICE_MS = 4000;
+/** Estados publicados en la salida de texto del aviso de carga. */
+const DATA_STATUS_LOADING = "cargando";
+const DATA_STATUS_READY = "listo";
 
 interface IReportEntry {
     definition: IReportDefinition;
@@ -57,6 +63,12 @@ function emptyOptions(): IReportOptions {
     };
 }
 
+/** Indica si la celda leida del registro trae algun dato. */
+function cellHasValue(raw: unknown, formatted: string): boolean {
+    if (formatted !== "") return true;
+    return raw !== null && raw !== undefined && raw !== "";
+}
+
 export class ExcelReportPicker implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
     private context: ComponentFramework.Context<IInputs>;
@@ -78,6 +90,11 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
     private outputStatus = "listo";
     private outputError = "";
     private columnsJson = "[]";
+    /** Verdadero mientras el conjunto de datos enlazado todavia se esta cargando. */
+    private dataLoading = true;
+    /** Se activa cuando el host no termina de cargar dentro de DATA_LOAD_TIMEOUT_MS. */
+    private loadTimedOut = false;
+    private loadTimeoutId = 0;
 
     /**
      * Empty constructor.
@@ -113,6 +130,7 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
         const dataset = context.parameters.items;
         this.dataset = dataset;
         this.ensureAllRecordsLoaded(dataset);
+        this.updateDataLoading(dataset);
         this.table = this.readItems(dataset, declared);
         this.rebuildEntries(context);
         this.applySelectionState(context);
@@ -181,6 +199,8 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
             ),
             emptyData: this.textValue(this.context.parameters.emptyDataText?.raw, "Sin registros para exportar con los filtros actuales."),
             errorTitle: this.textValue(this.context.parameters.errorTitleText?.raw, "Revisa la configuracion del informe"),
+            loading: this.textValue(this.context.parameters.loadingText?.raw, "Cargando datos..."),
+            ready: this.textValue(this.context.parameters.readyText?.raw, "Datos cargados"),
         };
         const globalErrors = this.definitionErrors.slice();
         if (columns.length === 0 && globalErrors.length === 0) {
@@ -190,6 +210,11 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
             reports: this.entries.map((entry) => entry.row),
             columns,
             rowCount: this.selectedEntry()?.rows.length ?? this.table.rows.length,
+            dataLoading: this.dataLoading,
+            dataColumns: this.table.columns.length,
+            dataRecords: this.table.rows.length,
+            showDataStatus: this.booleanValue(this.context.parameters.showDataStatus?.raw, true),
+            readyNoticeMs: this.context.parameters.readyNoticeMs?.raw ?? DEFAULT_READY_NOTICE_MS,
             globalErrors,
             selectedKey: this.selectedKey,
             texts,
@@ -284,8 +309,9 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
             const raw: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
             const formatted: Record<string, string> = Object.create(null) as Record<string, string>;
             columns.forEach((column) => {
-                raw[column.name] = this.readRawValue(record, column.name);
-                formatted[column.name] = this.readFormattedValue(record, column.name);
+                const value = this.readColumnValue(record, column);
+                raw[column.name] = value.raw;
+                formatted[column.name] = value.formatted;
             });
             rows.push({ recordId, raw, formatted });
         });
@@ -311,12 +337,41 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
     }
 
     /**
+     * Lee la celda de una columna. La columna se **reconoce** por su **nombre
+     * visible** (FieldDisplayName), pero el valor se **pide** por su **nombre
+     * logico** (FieldName), que es la clave unica del conjunto de datos; solo si
+     * esa clave no devuelve dato se prueba el nombre visible, el alias y, por
+     * ultimo, la forma codificada de SharePoint, para que la celda no quede vacia
+     * cuando el origen expone la columna de otra forma.
+     */
+    private readColumnValue(
+        record: ComponentFramework.PropertyHelper.DataSetApi.EntityRecord,
+        column: IDatasetColumn
+    ): { raw: unknown; formatted: string } {
+        for (const key of columnValueKeys(column)) {
+            const raw = this.readRawValue(record, key);
+            const formatted = this.readFormattedValue(record, key);
+            if (cellHasValue(raw, formatted)) return { raw, formatted };
+        }
+        return { raw: null, formatted: "" };
+    }
+
+    /**
      * Solicita el resto de paginas para que el informe incluya todos los
-     * registros disponibles y no solo la primera pagina cargada.
+     * registros disponibles y no solo la primera pagina cargada. El contador de
+     * paginas es **por consulta**: cuando la consulta actual se agota (el host ya
+     * no tiene mas paginas) se rearma, de modo que cada cambio de filtros en la
+     * aplicacion (por ejemplo el rango de fechas) vuelve a pedir todas las filas.
      */
     private ensureAllRecordsLoaded(dataset: ComponentFramework.PropertyTypes.DataSet): void {
         const paging = dataset ? dataset.paging : undefined;
         if (!paging) return;
+        if (!paging.hasNextPage) {
+            // Consulta agotada: la proxima carga vuelve a pedir tamano de pagina y sus paginas.
+            this.pageRequests = 0;
+            this.pageSizeRequested = false;
+            return;
+        }
         if (!this.pageSizeRequested && paging.pageSize > 0 && paging.pageSize < MAX_RECORDS) {
             this.pageSizeRequested = true;
             try {
@@ -325,7 +380,7 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
                 // El host puede no admitir el cambio de tamano de pagina.
             }
         }
-        if (paging.hasNextPage && this.pageRequests < MAX_PAGE_REQUESTS) {
+        if (this.pageRequests < MAX_PAGE_REQUESTS) {
             this.pageRequests += 1;
             try {
                 paging.loadNextPage();
@@ -434,6 +489,8 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
             hasError: this.outputStatus === "error",
             columnsDetected: this.table.columns.length,
             availableColumnsJson: this.columnsJson,
+            isLoading: this.dataLoading,
+            dataStatus: this.dataLoading ? DATA_STATUS_LOADING : DATA_STATUS_READY,
         };
     }
 
@@ -443,6 +500,52 @@ export class ExcelReportPicker implements ComponentFramework.ReactControl<IInput
      */
     public destroy(): void {
         // No hay recursos que liberar: la vista React retira sus propios listeners.
+        this.clearLoadTimeout();
+    }
+
+    /**
+     * Calcula si el conjunto de datos enlazado todavia se esta cargando: hay
+     * paginas pedidas al host que no han llegado o el host no entrego aun ni
+     * columnas ni registros. Si el host no responde en DATA_LOAD_TIMEOUT_MS se
+     * considera terminado para que el aviso no quede girando indefinidamente.
+     */
+    private updateDataLoading(dataset: ComponentFramework.PropertyTypes.DataSet): void {
+        const pending = this.pendingPages(dataset);
+        // Si llego una carga nueva (hay una pagina pedida al host) se rearma el tiempo maximo.
+        if (pending) this.loadTimedOut = false;
+        this.dataLoading = pending || (this.datasetIsEmpty(dataset) && !this.loadTimedOut);
+        if (!this.dataLoading) {
+            this.clearLoadTimeout();
+            return;
+        }
+        if (this.loadTimeoutId !== 0) return;
+        this.loadTimeoutId = window.setTimeout(() => {
+            this.loadTimeoutId = 0;
+            this.loadTimedOut = true;
+            this.dataLoading = false;
+            this.notifyOutputChanged();
+        }, DATA_LOAD_TIMEOUT_MS);
+    }
+
+    private clearLoadTimeout(): void {
+        if (this.loadTimeoutId === 0) return;
+        window.clearTimeout(this.loadTimeoutId);
+        this.loadTimeoutId = 0;
+    }
+
+    /** Hay paginas pedidas al host que todavia no llegaron. */
+    private pendingPages(dataset: ComponentFramework.PropertyTypes.DataSet): boolean {
+        if (!dataset || this.pageRequests >= MAX_PAGE_REQUESTS) return false;
+        const paging = dataset.paging;
+        return !!paging && !!paging.hasNextPage;
+    }
+
+    /** El host todavia no entrego ni columnas ni registros del origen. */
+    private datasetIsEmpty(dataset: ComponentFramework.PropertyTypes.DataSet): boolean {
+        if (!dataset) return true;
+        const records = dataset.sortedRecordIds ? dataset.sortedRecordIds.length : 0;
+        const columns = dataset.columns ? dataset.columns.length : 0;
+        return records === 0 && columns === 0;
     }
 }
 

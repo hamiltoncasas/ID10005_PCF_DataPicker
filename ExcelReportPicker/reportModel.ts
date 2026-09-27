@@ -184,6 +184,74 @@ export interface IDatasetColumn {
     alias: string;
 }
 
+/**
+ * Claves con las que se **reconoce** una columna dentro de un registro, en el
+ * orden en que se intentan. El **nombre visible** (FieldDisplayName) es la clave
+ * principal: es el nombre con el que el usuario identifica el campo en Power
+ * Apps; despues se prueba el nombre logico (FieldName) y el alias, de modo que
+ * la columna se resuelva aunque el informe la declare de cualquiera de las tres
+ * formas. Para **pedir el valor** de la celda use `columnValueKeys`.
+ */
+export function columnLookupKeys(column: IDatasetColumn): string[] {
+    const keys: string[] = [];
+    const add = (value: string): void => {
+        const text = (value ?? "").trim();
+        if (text && !keys.includes(text)) keys.push(text);
+    };
+    add(column.displayName);
+    add(column.name);
+    add(column.alias);
+    return keys;
+}
+
+/**
+ * Claves con las que se **pide el valor** de la celda (`getValue` y
+ * `getFormattedValue`), en el orden en que se intentan. El host identifica la
+ * columna por su **nombre logico** (FieldName), que es la clave unica del
+ * conjunto de datos, asi que se pide primero por ahi; el **nombre visible**
+ * (FieldDisplayName) y el alias quedan como respaldo y, como ultimo recurso, se
+ * prueba la forma codificada que usa SharePoint para los nombres con espacios
+ * (`Importe total` -> `Importe_x0020_total`), de modo que la celda no quede
+ * vacia cuando el origen solo responde a esa variante.
+ */
+export function columnValueKeys(column: IDatasetColumn): string[] {
+    const keys: string[] = [];
+    const add = (value: string): void => {
+        const text = (value ?? "").trim();
+        if (text && !keys.includes(text)) keys.push(text);
+    };
+    add(column.name);
+    add(column.displayName);
+    add(column.alias);
+    add(encodeSharePointKey(column.displayName));
+    return keys;
+}
+
+/** Caracteres que Power Apps y SharePoint escriben codificados en un nombre de campo. */
+const SHAREPOINT_ESCAPED_CHARACTERS = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~-]/;
+
+/**
+ * Forma codificada de un nombre de campo en SharePoint: los espacios y los
+ * signos de puntuacion que no admite un nombre de columna se escriben como
+ * `_xXXXX_` con el codigo del caracter en hexadecimal (por ejemplo
+ * `Importe total` -> `Importe_x0020_total`). Devuelve el texto tal cual cuando no
+ * hay nada que codificar.
+ */
+export function encodeSharePointKey(value: string): string {
+    const text = (value ?? "").trim();
+    if (!text) return "";
+    let encoded = "";
+    for (const character of text) {
+        if (!SHAREPOINT_ESCAPED_CHARACTERS.test(character)) {
+            encoded += character;
+            continue;
+        }
+        const code = character.codePointAt(0) ?? 0;
+        encoded += "_x" + code.toString(16).toUpperCase().padStart(4, "0") + "_";
+    }
+    return encoded;
+}
+
 /** Fila del conjunto de datos con el valor nativo y el formateado por el host. */
 export interface IDatasetRow {
     recordId: string;
@@ -542,9 +610,12 @@ export function toCellValue(
             return token;
         }
         default: {
+            // Prioridad al texto visible que entrega el host: en una columna de
+            // opciones el valor nativo es el codigo y lo que se ve es la etiqueta.
+            if (formatted) return formatted;
             if (typeof raw === "string" && raw) return raw;
             if (typeof raw === "number" || typeof raw === "boolean") return String(raw);
-            return formatted;
+            return "";
         }
     }
 }
@@ -552,8 +623,9 @@ export function toCellValue(
 /** Texto que se usa para estimar el ancho de una columna. */
 export function widthSampleText(raw: unknown, formatted: string, type: ReportColumnType): string {
     if (type === "texto") {
+        if (formatted) return formatted;
         if (typeof raw === "string" && raw) return raw;
-        return formatted || textOf(raw);
+        return textOf(raw);
     }
     return formatted || textOf(raw);
 }
@@ -630,6 +702,21 @@ function readTypeMap(value: unknown, reportKey: string, errors: string[]): Recor
 function readOwnValue<T>(map: Record<string, T>, key: string): T | undefined {
     if (!key) return undefined;
     return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+
+/**
+ * Lee de un mapa declarado por el usuario (`titulos`, `tipos` o `formatos`) el
+ * primer valor que coincida con alguna de las claves de la columna. Se prueban en
+ * orden: lo solicitado en `columnas`, el nombre visible (FieldDisplayName), el
+ * nombre logico (FieldName) y el alias, de modo que la declaracion funcione se
+ * escriba con el nombre que se escriba.
+ */
+function readMapValue<T>(map: Record<string, T>, keys: string[]): T | undefined {
+    for (const key of keys) {
+        const value = readOwnValue(map, key);
+        if (value !== undefined) return value;
+    }
+    return undefined;
 }
 
 /**
@@ -969,19 +1056,27 @@ export interface IReportTable {
     rows: IDatasetRow[];
 }
 
-/** Busca el nombre real de una columna a partir de lo solicitado en el informe. */
+/**
+ * Busca el nombre real de una columna a partir de lo solicitado en el informe.
+ * El **nombre visible** (FieldDisplayName) se busca primero: es la clave con la
+ * que se reconoce el campo; despues el nombre logico (FieldName), el alias y el
+ * titulo declarado en el informe. Para pedir el valor de la celda use
+ * `columnValueKeys`.
+ */
 export function resolveColumnName(requested: string, table: IReportTable, definition: IReportDefinition): string {
     const target = normalizeText(requested);
     if (!target) return "";
-    const direct = table.columns.find((column) => normalizeText(column.name) === target);
-    if (direct) return direct.name;
     const byDisplay = table.columns.find((column) => normalizeText(column.displayName) === target);
     if (byDisplay) return byDisplay.name;
+    const direct = table.columns.find((column) => normalizeText(column.name) === target);
+    if (direct) return direct.name;
     const byAlias = table.columns.find((column) => normalizeText(column.alias) === target);
     if (byAlias) return byAlias.name;
     const titledKey = Object.keys(definition.titles).find((key) => normalizeText(definition.titles[key]) === target);
     if (titledKey) {
-        const byTitle = table.columns.find((column) => normalizeText(column.name) === normalizeText(titledKey));
+        const byTitle = table.columns.find(
+            (column) => normalizeText(column.name) === normalizeText(titledKey) || normalizeText(column.displayName) === normalizeText(titledKey)
+        );
         if (byTitle) return byTitle.name;
     }
     return "";
@@ -1052,13 +1147,24 @@ export function buildPlan(table: IReportTable, definition: IReportDefinition, op
         }
         if (columns.some((column) => column.name === name)) return;
         const meta = table.columns.find((column) => column.name === name);
-        const type = readOwnValue(definition.types, item) ?? readOwnValue(definition.types, name) ?? columnTypeOf(name, table);
-        const format = readOwnValue(definition.formats, item) ?? readOwnValue(definition.formats, name) ?? defaultFormat(type, options);
         const displayName = meta ? meta.displayName : "";
+        // Claves con las que el usuario puede declarar la columna en `titulos`,
+        // `tipos` y `formatos`: lo escrito en `columnas`, el nombre visible
+        // (FieldDisplayName), el nombre logico (FieldName) y el alias.
+        const keys: string[] = [];
+        const addKey = (value: string): void => {
+            if (value && !keys.includes(value)) keys.push(value);
+        };
+        addKey(item);
+        addKey(displayName);
+        addKey(name);
+        addKey(meta ? meta.alias : "");
+        const type = readMapValue(definition.types, keys) ?? columnTypeOf(name, table);
+        const format = readMapValue(definition.formats, keys) ?? defaultFormat(type, options);
         columns.push({
             name,
             requested: item,
-            title: readOwnValue(definition.titles, item) ?? readOwnValue(definition.titles, name) ?? (displayName !== "" ? displayName : name),
+            title: readMapValue(definition.titles, keys) ?? (displayName !== "" ? displayName : name),
             type,
             format,
             width: 0,
@@ -1218,6 +1324,7 @@ function compareValues(value: number | string, filter: IResolvedFilter, first: n
 
 /** Indica si la celda esta vacia. */
 function rowIsEmpty(row: IDatasetRow, column: string): boolean {
+    if ((row.formatted[column] ?? "").trim() !== "") return false;
     const raw = row.raw[column];
     if (raw === null || raw === undefined) return true;
     if (typeof raw === "string") return raw.trim() === "";
@@ -1236,11 +1343,59 @@ function parseBooleanToken(value: unknown): boolean | null {
     return null;
 }
 
-/** Texto de la celda: valor nativo si es texto, o el formateado por el host. */
-function cellText(row: IDatasetRow, column: string): string {
+/**
+ * Textos que representan una celda. El host entrega el valor nativo en raw y el
+ * texto visible en formatted: las reglas de texto comparan las dos formas, de
+ * modo que un filtro escrito con la etiqueta que se ve en la aplicacion
+ * (%Despachada%) tambien encuentra las filas cuyo valor nativo es un codigo.
+ */
+function cellTexts(row: IDatasetRow, column: string): string[] {
     const raw = row.raw[column];
-    const formatted = row.formatted[column] ?? "";
-    return typeof raw === "string" && raw ? raw : formatted || textOf(raw);
+    const texts: string[] = [];
+    const push = (value: string): void => {
+        const text = value.trim();
+        if (text && !texts.includes(text)) texts.push(text);
+    };
+    push(row.formatted[column] ?? "");
+    push(typeof raw === "string" ? raw : textOf(raw));
+    return texts;
+}
+
+/** Textos normalizados de la celda, sin repetidos ni vacios. */
+function normalizedCellTexts(row: IDatasetRow, column: string): string[] {
+    return cellTexts(row, column)
+        .map((text) => normalizeText(text))
+        .filter((text) => text !== "");
+}
+
+/**
+ * Compara una regla de texto con las formas posibles del valor de la celda. Los
+ * operadores de negacion solo se cumplen cuando ninguna forma coincide.
+ */
+function rowTextMatches(row: IDatasetRow, filter: IResolvedFilter): boolean {
+    const texts = normalizedCellTexts(row, filter.column);
+    const target = normalizeText(filter.value1);
+    const second = normalizeText(filter.value2);
+    switch (filter.operator) {
+        case "<>":
+            return !texts.some((text) => text === target);
+        case "noContiene":
+            return !texts.some((text) => text.includes(target));
+        case "noEmpieza":
+            return !texts.some((text) => text.startsWith(target));
+        case "noTermina":
+            return !texts.some((text) => text.endsWith(target));
+        case "contiene":
+            return texts.some((text) => text.includes(target));
+        case "empieza":
+            return texts.some((text) => text.startsWith(target));
+        case "termina":
+            return texts.some((text) => text.endsWith(target));
+        case "entre":
+            return texts.some((text) => text >= target && text <= second);
+        default:
+            return texts.some((text) => text === target);
+    }
 }
 
 /** Compara la celda con un valor literal de una lista ("= [a, b]"). */
@@ -1267,7 +1422,7 @@ function rowValueEquals(row: IDatasetRow, filter: IResolvedFilter, item: string,
         const target = parseBooleanToken(item);
         return value !== null && target !== null && value === target;
     }
-    return normalizeText(cellText(row, filter.column)) === normalizeText(item);
+    return normalizedCellTexts(row, filter.column).some((text) => text === normalizeText(item));
 }
 
 function rowMatches(row: IDatasetRow, filter: IResolvedFilter, options: IReportOptions): boolean {
@@ -1307,7 +1462,7 @@ function rowMatches(row: IDatasetRow, filter: IResolvedFilter, options: IReportO
         if (value === null || from === null) return false;
         return compareValues(value, filter, from, to ?? 0);
     }
-    return compareValues(normalizeText(cellText(row, filter.column)), filter, normalizeText(filter.value1), normalizeText(filter.value2));
+    return rowTextMatches(row, filter);
 }
 
 /** Aplica los filtros declarados en el informe sobre las filas del conjunto de datos. */
