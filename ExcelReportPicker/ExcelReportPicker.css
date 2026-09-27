@@ -20,6 +20,15 @@
 .erp-chevron-button:disabled { background: #a8a8a8; cursor: default; }
 .erp-chevron { width: 0; height: 0; border-top: 5px solid #fff; border-right: 5px solid transparent; border-left: 5px solid transparent; transition: transform .15s ease; }
 .erp-chevron.is-open { transform: rotate(180deg); }
+/* Aviso del estado de la fuente de datos: giro mientras llega y visto bueno al terminar. */
+.erp-root-compact.is-loading { border-color: #c9a67f; background: #fffaf3; }
+.erp-root-compact.is-ready { border-color: #7fae94; background: #f4fbf7; }
+.erp-spinner { flex: 0 0 14px; width: 14px; height: 14px; border: 2px solid #e6d8c6; border-top-color: #b86e49; border-radius: 50%; animation: erp-spin .7s linear infinite; }
+.erp-check { flex: 0 0 14px; color: #2f8a5b; font-size: 13px; font-weight: 700; line-height: 1; text-align: center; }
+.erp-root-compact.is-loading .erp-trigger-text { color: #8a6a4a; }
+.erp-root-compact.is-ready .erp-trigger-text { color: #21624a; }
+@keyframes erp-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .erp-spinner { animation-duration: 2s; } }
 /* El panel se dibuja como superposicion para que ningun contenedor del lienzo lo recorte. */
 .erp-panel { position: fixed; z-index: 2147483647; box-sizing: border-box; width: max-content; max-width: min(94vw, 780px); padding: 14px; color: #243238; background: #fffdf8; border: 1px solid #e7ded0; border-radius: 16px; box-shadow: 0 12px 28px rgba(77, 63, 43, .18); font-family: 'Segoe UI', sans-serif; }
 .erp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 2px 2px 12px; }
@@ -67,8 +76,8 @@
 .erp-columns-list { max-height: 180px; margin: 8px 0 0; padding: 0; overflow: auto; list-style: none; }
 .erp-column-item { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; color: #384b4d; font-size: 11px; }
 .erp-column-item:nth-child(odd) { background: #f7f1e8; }
-.erp-column-name { flex: 0 0 76px; color: #2f5da8; font-weight: 700; }
-.erp-column-display { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.erp-column-primary { flex: 0 0 118px; overflow: hidden; color: #2f5da8; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.erp-column-secondary { flex: 1 1 auto; overflow: hidden; color: #8a7767; text-overflow: ellipsis; white-space: nowrap; }
 .erp-column-type { flex: 0 0 auto; padding: 1px 7px; border-radius: 10px; color: #80684e; background: #f3eadc; font-size: 10px; font-weight: 700; }
 .erp-column-format { flex: 0 0 auto; color: #8a7767; font-family: Consolas, 'Courier New', monospace; font-size: 10px; }
 .erp-footer { display: flex; align-items: center; gap: 7px; padding: 12px 2px 0; color: #8a7767; font-size: 11px; }

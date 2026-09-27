@@ -6,3 +6,7 @@
 
 # MSBuild Binary and Structured Log
 *.binlog
+
+# La solucion se empaqueta solo como no administrada: el paquete administrado deja los
+# controles bloqueados en el entorno y no se puede eliminar por componente.
+solution_managed.zip

@@ -10,9 +10,9 @@
 .dtrp-calendar-button { display: grid; flex: 0 0 31px; place-items: center; padding: 0; border: 0; border-left: 1px solid #244b8b; border-radius: 0 1px 1px 0; background: #2f5da8; cursor: pointer; }
 .dtrp-calendar-button:hover:not(:disabled), .dtrp-calendar-button:focus-visible { background: #244b8b; }
 .dtrp-calendar-button:disabled { background: #a8a8a8; cursor: default; }
-.dtrp-calendar-icon { position: relative; display: block; width: 13px; height: 12px; border: 1px solid #fff; border-radius: 1px; box-sizing: border-box; }
-.dtrp-calendar-icon::before { position: absolute; top: 2px; right: 0; left: 0; border-top: 1px solid #fff; content: ""; }
-.dtrp-calendar-icon::after { position: absolute; top: 5px; left: 2px; width: 2px; height: 2px; background: #fff; box-shadow: 4px 0 #fff, 0 3px #fff, 4px 3px #fff; content: ""; }
+.dtrp-calendar-icon { position: relative; display: block; width: 13px; height: 12px; border: 1px solid var(--pcf-icon-fill, #fff); border-radius: 1px; box-sizing: border-box; }
+.dtrp-calendar-icon::before { position: absolute; top: 2px; right: 0; left: 0; border-top: 1px solid var(--pcf-icon-fill, #fff); content: ""; }
+.dtrp-calendar-icon::after { position: absolute; top: 5px; left: 2px; width: 2px; height: 2px; background: var(--pcf-icon-fill, #fff); box-shadow: 4px 0 var(--pcf-icon-fill, #fff), 0 3px var(--pcf-icon-fill, #fff), 4px 3px var(--pcf-icon-fill, #fff); content: ""; }
 .dtrp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .dtrp-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
 .dtrp-status { padding: 5px 9px; border-radius: 20px; color: #80684e; background: #f3eadc; font-size: 11px; font-weight: 700; }

@@ -43,7 +43,9 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const inputStart = context.parameters.initialStartDate?.raw ?? "";
+        const inputDefault = context.parameters.defaultDate?.raw ?? "";
+        const configuredInitial = context.parameters.initialStartDate?.raw ?? "";
+        const inputStart = inputDefault.trim() ? inputDefault : configuredInitial;
         const inputEnd = context.parameters.initialEndDate?.raw ?? "";
         const dateFormat = String(context.parameters.format.raw ?? "YYYY-MM-DD");
         const zIndex = context.parameters.zIndex.raw ?? 2147483647;
@@ -67,6 +69,31 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
             endDate: this.endDate,
             dateFormat,
             zIndex,
+            accessibleLabel: context.parameters.accessibleLabel?.raw ?? undefined,
+            placeholderText: context.parameters.placeholderText?.raw ?? undefined,
+            isEditable: context.parameters.isEditable?.raw ?? false,
+            startYear: context.parameters.startYear?.raw ?? 0,
+            endYear: context.parameters.endYear?.raw ?? 0,
+            startOfWeek: context.parameters.startOfWeek?.raw ?? undefined,
+            minDate: context.parameters.minDate?.raw ?? undefined,
+            maxDate: context.parameters.maxDate?.raw ?? undefined,
+            dateTimeZone: context.parameters.dateTimeZone?.raw ?? undefined,
+            language: context.parameters.language?.raw ?? undefined,
+            chevronBackground: context.parameters.chevronBackground?.raw ?? undefined,
+            chevronFill: context.parameters.chevronFill?.raw ?? undefined,
+            iconBackground: context.parameters.iconBackground?.raw ?? undefined,
+            iconFill: context.parameters.iconFill?.raw ?? undefined,
+            borderColor: context.parameters.borderColor?.raw ?? undefined,
+            borderStyle: context.parameters.borderStyle?.raw ?? undefined,
+            borderThickness: context.parameters.borderThickness?.raw ?? undefined,
+            color: context.parameters.color?.raw ?? undefined,
+            fill: context.parameters.fill?.raw ?? undefined,
+            font: context.parameters.font?.raw ?? undefined,
+            size: context.parameters.size?.raw ?? undefined,
+            fontWeight: context.parameters.fontWeight?.raw ?? undefined,
+            italic: context.parameters.italic?.raw ?? false,
+            strikethrough: context.parameters.strikethrough?.raw ?? false,
+            underline: context.parameters.underline?.raw ?? false,
             onRangeChange: (startDate, endDate) => {
                 this.startDate = startDate;
                 this.endDate = endDate;
@@ -84,7 +111,7 @@ export class DateRangePicker implements ComponentFramework.ReactControl<IInputs,
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
-        return { startDate: this.startDate, endDate: this.endDate };
+        return { startDate: this.startDate, endDate: this.endDate, selectedDate: this.startDate };
     }
 
     /**

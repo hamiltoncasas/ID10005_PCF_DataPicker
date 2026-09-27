@@ -41,7 +41,9 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const inputDateTime = context.parameters.initialDateTime?.raw ?? "";
+        const inputDefault = context.parameters.defaultDate?.raw ?? "";
+        const configuredInitial = context.parameters.initialDateTime?.raw ?? "";
+        const inputDateTime = inputDefault.trim() ? inputDefault : configuredInitial;
         const resetKey = context.parameters.resetKey?.raw ?? false;
 
         if (resetKey !== this.lastResetKey) {
@@ -59,6 +61,31 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
             timeFormat: String(context.parameters.timeFormat?.raw ?? "24"),
             zIndex: context.parameters.zIndex.raw ?? 2147483647,
             disabled: context.mode.isControlDisabled,
+            accessibleLabel: context.parameters.accessibleLabel?.raw ?? undefined,
+            placeholderText: context.parameters.placeholderText?.raw ?? undefined,
+            isEditable: context.parameters.isEditable?.raw ?? false,
+            startYear: context.parameters.startYear?.raw ?? 0,
+            endYear: context.parameters.endYear?.raw ?? 0,
+            startOfWeek: context.parameters.startOfWeek?.raw ?? undefined,
+            minDate: context.parameters.minDate?.raw ?? undefined,
+            maxDate: context.parameters.maxDate?.raw ?? undefined,
+            dateTimeZone: context.parameters.dateTimeZone?.raw ?? undefined,
+            language: context.parameters.language?.raw ?? undefined,
+            chevronBackground: context.parameters.chevronBackground?.raw ?? undefined,
+            chevronFill: context.parameters.chevronFill?.raw ?? undefined,
+            iconBackground: context.parameters.iconBackground?.raw ?? undefined,
+            iconFill: context.parameters.iconFill?.raw ?? undefined,
+            borderColor: context.parameters.borderColor?.raw ?? undefined,
+            borderStyle: context.parameters.borderStyle?.raw ?? undefined,
+            borderThickness: context.parameters.borderThickness?.raw ?? undefined,
+            color: context.parameters.color?.raw ?? undefined,
+            fill: context.parameters.fill?.raw ?? undefined,
+            font: context.parameters.font?.raw ?? undefined,
+            size: context.parameters.size?.raw ?? undefined,
+            fontWeight: context.parameters.fontWeight?.raw ?? undefined,
+            italic: context.parameters.italic?.raw ?? false,
+            strikethrough: context.parameters.strikethrough?.raw ?? false,
+            underline: context.parameters.underline?.raw ?? false,
             onDateTimeChange: (dateTime) => {
                 this.dateTime = dateTime;
                 this.notifyOutputChanged();
@@ -78,6 +105,7 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
             dateTime: this.dateTime,
             date: this.dateTime ? this.dateTime.slice(0, 10) : "",
             time: this.dateTime ? this.dateTime.slice(11, 16) : "",
+            selectedDate: this.dateTime,
         };
     }
 

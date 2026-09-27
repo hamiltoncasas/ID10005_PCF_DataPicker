@@ -69,6 +69,18 @@
   <data name="Empty_Data_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra cuando no hay registros que cumplan los filtros.</value></data>
   <data name="Error_Title_Text" xml:space="preserve"><value>Titulo de error</value></data>
   <data name="Error_Title_Text_Desc" xml:space="preserve"><value>Titulo del bloque de errores de configuracion del informe.</value></data>
+  <data name="Show_Data_Status" xml:space="preserve"><value>Mostrar aviso de carga</value></data>
+  <data name="Show_Data_Status_Desc" xml:space="preserve"><value>Si esta activo, el control avisa mientras carga la tabla o coleccion enlazada en Items y muestra un mensaje cuando termina.</value></data>
+  <data name="Loading_Text" xml:space="preserve"><value>Texto mientras carga</value></data>
+  <data name="Loading_Text_Desc" xml:space="preserve"><value>Texto que se muestra mientras llegan los registros del origen. Predeterminado Cargando datos....</value></data>
+  <data name="Ready_Text" xml:space="preserve"><value>Texto cuando esta listo</value></data>
+  <data name="Ready_Text_Desc" xml:space="preserve"><value>Mensaje que aparece cuando el origen termina de cargar. Predeterminado Datos cargados.</value></data>
+  <data name="Ready_Notice_Ms" xml:space="preserve"><value>Milisegundos del aviso listo</value></data>
+  <data name="Ready_Notice_Ms_Desc" xml:space="preserve"><value>Cuanto tiempo se mantiene el mensaje de listo antes de volver al texto del boton. Cero lo deja visible hasta el proximo cambio de datos. Predeterminado 4000.</value></data>
+  <data name="Is_Loading" xml:space="preserve"><value>Esta cargando</value></data>
+  <data name="Is_Loading_Desc" xml:space="preserve"><value>Salida verdadera mientras se cargan los registros del conjunto de datos enlazado en Items.</value></data>
+  <data name="Data_Status" xml:space="preserve"><value>Estado de la carga</value></data>
+  <data name="Data_Status_Desc" xml:space="preserve"><value>Salida con el estado de la carga del origen: cargando o listo.</value></data>
   <data name="Selected_Report" xml:space="preserve"><value>Informe seleccionado</value></data>
   <data name="Selected_Report_Desc" xml:space="preserve"><value>Salida con la clave del informe seleccionado en el panel.</value></data>
   <data name="Last_Report" xml:space="preserve"><value>Ultimo informe exportado</value></data>

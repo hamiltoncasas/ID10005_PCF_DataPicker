@@ -8,9 +8,9 @@
       <LocalizedName description="ID0005_DataPickers" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.2.3</Version>
-    <!-- Solution Package Type: Unmanaged(0)/Managed(1)/Both(2)-->
-    <Managed>2</Managed>
+    <Version>1.0.2.6</Version>
+    <!-- Solution Package Type: Unmanaged(0)/Managed(1)/Both(2) -->
+    <Managed>0</Managed>
     <Publisher>
       <!-- Unique Publisher Name of Cds Solution -->
       <UniqueName>ID0005</UniqueName>

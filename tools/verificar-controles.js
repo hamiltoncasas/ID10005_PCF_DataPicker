@@ -8,12 +8,12 @@
  *   npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
  *   node tools/verificar-controles.js
  *
- * Salida esperada: "54 de 54 verificaciones correctas" y codigo de salida 0.
+ * Salida esperada: "70 de 70 verificaciones correctas" y codigo de salida 0.
  */
 const path = require("path");
 
 const checksDir = path.join(__dirname, "..", "obj", "checks");
-const { DatePickerView } = require(path.join(checksDir, "DatePicker", "DatePickerView"));
+const { DatePickerView, monthLabels, visualStyles, weekdayLabels } = require(path.join(checksDir, "DatePicker", "DatePickerView"));
 const { DateTimePickerView } = require(path.join(checksDir, "DateTimePicker", "DateTimePickerView"));
 const { SearchableComboBoxView, normalizeForSearch } = require(path.join(checksDir, "SearchableComboBox", "SearchableComboBoxView"));
 
@@ -147,6 +147,38 @@ comboEmpty.state.searchText = "x";
 check("combobox sin registros", comboEmpty.getFilteredOptions().length, 0);
 comboEmpty.moveActive(1);
 check("combobox sin registros no activa", comboEmpty.state.activeIndex, -1);
+
+/* Propiedades nuevas: zona horaria, idioma y estilos del selector nativo. */
+const zonedSample = "2026-09-16T23:30:00-05:00";
+let zonedChanges = [];
+const utcView = mount(new DatePickerView({ date: zonedSample, dateFormat: "YYYY-MM-DD", dateTimeZone: "Utc", zIndex: 1, disabled: false, onDateChange: (value) => zonedChanges.push(value) }));
+check("DatePicker Utc convierte el dia", ymd(utcView.state.visibleMonth), "2026-09-17");
+utcView.selectDate(new Date(2026, 8, 17));
+check("DatePicker Utc publica el instante UTC", zonedChanges.pop(), "2026-09-17T00:00:00Z");
+
+const localZoneView = mount(new DatePickerView({ date: zonedSample, dateFormat: "YYYY-MM-DD", dateTimeZone: "Local", zIndex: 1, disabled: false, onDateChange: (value) => zonedChanges.push(value) }));
+check("DatePicker Local lee las componentes escritas", ymd(localZoneView.state.visibleMonth), "2026-09-16");
+localZoneView.selectDate(new Date(2026, 8, 16));
+check("DatePicker Local usa el formato configurado", zonedChanges.pop(), "2026-09-16");
+
+const utcDateTimeView = mount(new DateTimePickerView({ dateTime: zonedSample, dateFormat: "YYYY-MM-DD", timeFormat: "24", dateTimeZone: "Utc", zIndex: 1, disabled: false, onDateTimeChange: (value) => dateTimeChanges.push(value) }));
+check("DateTimePicker Utc convierte la hora", utcDateTimeView.state.time, "04:30");
+utcDateTimeView.selectDate(new Date(2026, 8, 17));
+check("DateTimePicker Utc publica el instante UTC", dateTimeChanges.pop(), "2026-09-17T04:30Z");
+
+check("etiquetas de dias sin idioma", weekdayLabels(1), ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]);
+check("etiquetas de dias en ingles", weekdayLabels(1, "en-US"), ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+check("nombres de meses en ingles", monthLabels("en-US")[8], "September");
+check("idioma invalido usa los nombres predeterminados", monthLabels("idioma-inexistente")[0], "enero");
+
+const styles = visualStyles({ fill: "#101010", color: "#ff0000", font: "Arial", size: 15, fontWeight: "Bold", italic: true, strikethrough: true, underline: true, borderColor: "Color.Red", borderStyle: "BorderStyle.Dashed", borderThickness: 2, iconBackground: "#123456", iconFill: "Color.White", chevronBackground: "#abcdef", chevronFill: "Color.Blue" });
+check("estilo de la caja de texto", styles.box, { background: "#101010", borderColor: "#e81123", borderStyle: "dashed", borderWidth: 2 });
+check("estilo del texto", styles.input, { background: "#101010", color: "#ff0000", fontFamily: "Arial", fontSize: 15, fontWeight: 700, fontStyle: "italic", textDecoration: "underline line-through" });
+check("estilo del boton del icono", styles.icon, { background: "#123456" });
+check("estilo del dibujo del icono", styles.iconGlyph, { borderColor: "#ffffff", "--pcf-icon-fill": "#ffffff" });
+check("estilo de las flechas del calendario", styles.chevron, { background: "#abcdef", color: "#0b6cff" });
+const emptyStyles = visualStyles({});
+check("sin propiedades visuales el diseno no cambia", [emptyStyles.box, emptyStyles.input, emptyStyles.icon, emptyStyles.iconGlyph, emptyStyles.chevron], [{}, {}, {}, {}, {}]);
 
 console.log(`\n${total - failures} de ${total} verificaciones correctas`);
 if (failures > 0) process.exitCode = 1;

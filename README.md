@@ -1,137 +1,86 @@
 # ID10005 PCF DataPicker
 
-> Fecha: 2026-09-16  
-> Descripcion: Controles personalizados para Power Apps Canvas: selectores de fecha, fecha y hora, rangos y un combobox con busqueda incremental.
+> Fecha: 2026-09-27
+> Descripcion: Seis controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora y rangos, un combobox con busqueda incremental y un exportador de informes a Excel.
 
-Componentes personalizados para aplicaciones de lienzo de Power Apps.
+Componentes personalizados para aplicaciones de lienzo de Power Apps y para formularios de Dataverse. Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
 
-| Control | Que selecciona | Salidas principales |
-| --- | --- | --- |
-| `DatePicker` | Una sola fecha en un calendario | `date` |
-| `DateTimePicker` | Una sola fecha y hora | `dateTime`, `date`, `time` |
-| `DateRangePicker` | Fecha inicial y final | `startDate`, `endDate` |
-| `DateTimeRangePicker` | Fecha y hora inicial y final | `startDateTime`, `endDateTime` |
-| `SearchableComboBox` | Elementos de una tabla o colección con filtro tipo contiene | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` |
+## Controles
 
-## DatePicker
+| Control | Que resuelve | Salidas principales | Version | Documentacion |
+| --- | --- | --- | --- | --- |
+| `DatePicker` | Seleccionar una sola fecha en un calendario | `date` | 1.0.3 | [docs/DatePicker.md](docs/DatePicker.md) |
+| `DateTimePicker` | Seleccionar una sola fecha y hora | `dateTime`, `date`, `time` | 1.0.3 | [docs/DateTimePicker.md](docs/DateTimePicker.md) |
+| `DateRangePicker` | Seleccionar un rango de fechas | `startDate`, `endDate` | 1.0.11 | [docs/DateRangePicker.md](docs/DateRangePicker.md) |
+| `DateTimeRangePicker` | Seleccionar un rango de fecha y hora | `startDateTime`, `endDateTime` | 1.0.11 | [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) |
+| `SearchableComboBox` | Elegir elementos de una tabla o coleccion con busqueda tipo contiene | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | 1.0.1 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) |
+| `ExcelReportPicker` | Desplegar informes definidos en JSON sobre la tabla enlazada y descargarlos en Excel | `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `columnsDetected`, `isLoading`, `dataStatus` | 1.4.1 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) |
 
-Selector de una sola fecha con el mismo diseno de `DateRangePicker`: modo compacto cerrado (campo de solo lectura y boton de calendario) y panel expandido con navegacion mensual. La fecha de hoy se marca con un borde y la fecha elegida se resalta en color.
+Todos comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con borde gris y boton azul a la derecha, y panel expandido en superposicion con encabezado, cuerpo y pie. El espacio de nombres es `ID10005`, por lo que el identificador de cada componente es `id5_ID10005.<Constructor>`.
 
-- `initialDate`: entrada opcional. Fecha inicial para precargar el control usando el formato configurado.
-- `resetKey`: entrada opcional. Cuando cambia de valor, se limpia la fecha seleccionada.
-- `format`: entrada opcional. Cualquiera de los formatos de [docs/formatos.md](docs/formatos.md).
-- `zIndex`: entrada opcional. Prioridad visual del panel abierto. Predeterminado: `2147483647`.
-- `date`: salida. Fecha seleccionada en el formato configurado.
-
-Al elegir un dia el panel se contrae y el valor queda publicado. El boton **Limpiar** del pie del panel borra la seleccion.
-
-## DateTimePicker
-
-Selector de una sola fecha y hora. Ademas del calendario incluye un campo de fecha y un selector de hora cada 15 minutos, con el mismo diseno de `DateTimeRangePicker`. Al elegir un dia se conserva la hora seleccionada (si no hay valor previo se propone la hora actual alineada a 15 minutos).
-
-- `initialDateTime`: entrada opcional con formato `YYYY-MM-DDTHH:mm`, por ejemplo `2026-09-16T08:30`.
-- `resetKey`: entrada opcional. Cuando cambia de valor, se limpia la fecha y la hora.
-- `format`: entrada opcional. Formato usado en el resumen del panel.
-- `timeFormat`: entrada opcional. `24`, `12`, `24:00:00` o `12:00:00`.
-- `zIndex`: entrada opcional. Prioridad visual del panel abierto.
-- `dateTime`: salida en formato tecnico `YYYY-MM-DDTHH:mm`.
-- `date`: salida con la fecha en formato `YYYY-MM-DD`.
-- `time`: salida con la hora en formato `HH:mm`.
-
-## DateRangePicker
-
-- `initialStartDate`: entrada opcional. Fecha inicial para precargar el control.
-- `initialEndDate`: entrada opcional. Fecha final para precargar el control.
-- `format`: entrada opcional. Formato de fechas: `YYYY-MM-DD` (predeterminado), `YYYY/MM/DD`, `YYYY.MM.DD`, `YYYYMMDD`, `DD/MM/YYYY`, `MM/DD/YYYY`, `DD-MM-YYYY`, `MM-DD-YYYY`, `DD.MM.YYYY`, `MM.DD.YYYY`, `DDMMYYYY` o `MMDDYYYY`.
-- `zIndex`: entrada opcional. Prioridad visual del panel abierto. Predeterminado: `2147483647`.
-- `startDate`: salida. Fecha inicial elegida.
-- `endDate`: salida. Fecha final elegida.
-
-Al seleccionar la primera fecha, el control espera la fecha final. Al seleccionar la segunda, se resalta todo el rango. Una nueva selección después de completar el rango comienza una selección nueva.
-
-## DateTimeRangePicker
-
-Selector de fecha y hora de inicio y fin. Sus salidas son `startDateTime` y `endDateTime` en formato `YYYY-MM-DDTHH:mm`, por ejemplo `2026-09-16T08:30`.
-
-- `initialStartDateTime` y `initialEndDateTime`: entradas opcionales con formato `YYYY-MM-DDTHH:mm`.
-- `format`: entrada opcional con los formatos del listado anterior.
-- `timeFormat`: entrada opcional. `24`, `12`, `24:00:00` o `12:00:00`.
-- `zIndex`: entrada opcional. Prioridad visual del panel expandido.
-
-## SearchableComboBox
-
-Combobox con el comportamiento del combobox de lienzo de Power Apps y busqueda incremental. Enlaza una tabla o colección en `Items`, escribe cualquier parte del texto y la lista se filtra por coincidencias tipo **contiene** sobre todas las columnas, sin distinguir mayusculas ni acentos y con la coincidencia resaltada.
-
-- `items`: conjunto de datos enlazado. Columnas `value` (obligatoria), `label` y `description` (opcionales).
-- `defaultValue`: valores separados por punto y coma para precargar la selección. Admite valores o etiquetas.
-- `selectMultiple`: activa la selección múltiple con etiquetas removibles.
-- `isSearchable`: activa el cuadro de búsqueda y el filtro contiene.
-- `searchFields`: columnas donde buscar, separadas por coma. Vacío = todas las columnas.
-- `noSelectionText`: texto cuando no hay selección. Predeterminado `---`.
-- `placeholderText`: texto guía del cuadro de búsqueda. Predeterminado `Buscar...`.
-- `resetKey` y `zIndex`: igual que en los selectores de fecha.
-- Salidas: `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels` (separadas por punto y coma) y `selectedCount`.
-
-Con la lista abierta el texto largo se ve completo: el panel se superpone sobre el contenido, crece con el texto (`max-content`, limitado al 92% del ancho de la ventana) y el encabezado muestra todas las etiquetas seleccionadas. Cerrado, el control conserva su tamaño normal y recorta el texto con puntos suspensivos.
-
-Consulta el detalle de propiedades y ejemplos en [docs/combobox.md](docs/combobox.md).
-
-## Compilar
-
-```powershell
-npm install
-npm run build
-```
-
-El comando de la raíz compila los cinco controles: `DatePicker`, `DateTimePicker`, `DateRangePicker`, `DateTimeRangePicker` y `SearchableComboBox`. El proyecto anidado también se puede compilar por separado:
-
-```powershell
-Set-Location DateTimeRangePicker
-npm install
-npm run build
-```
-
-## Agregar a una solución existente
-
-Desde el directorio de un proyecto de solución que ya tenga `cdsproj`, agrega la referencia al proyecto PCF:
-
-```powershell
-pac solution add-reference --path "C:\ruta\a\ID10005_PCF_DataPicker"
-dotnet build
-```
-
-Después, importa el `.zip` generado por el proyecto de solución en Dataverse y agrega el control a la aplicación de lienzo desde **Insertar > Obtener más componentes**.
-
-## Habilitar controles PCF en Canvas
-
-En el Power Platform admin center, abre el entorno destino y ve a **Settings > Product > Features**. Activa **Power Apps component framework for canvas apps**. Esta configuración es del entorno y no se reemplaza con una component library.
-
-Importa primero `solution.zip` desde **make.powerapps.com > Solutions**. Luego abre la aplicación de lienzo, selecciona **Insertar > Obtener más componentes > Código**, busca el control que necesites (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `DateTimeRangePicker` o `SearchableComboBox`) y agrégalo.
-
-En Canvas, las salidas se pueden usar como `DateValue(DatePicker1.date)`, `DateValue(DateRangePicker1.startDate)` o `DateTimeValue(DateTimePicker1.dateTime)` cuando se necesite un valor nativo.
-
-## DateTimeRangePicker
-
-La solución también incluye `DateTimeRangePicker`, un segundo control para seleccionar fecha y hora de inicio y fin. Sus salidas son `startDateTime` y `endDateTime` en formato `YYYY-MM-DDTHH:mm`, por ejemplo `2026-09-12T08:30`.
-
-Sus entradas son `initialStartDateTime`, `initialEndDateTime`, `format` (los formatos del listado anterior) y `timeFormat` (`24`, `12`, `24:00:00` o `12:00:00`).
-También acepta `zIndex` para controlar la prioridad visual del panel expandido.
-
-Los formatos cubren los usos habituales de Power Platform y Dataverse (`YYYY-MM-DD`), SQL Server (`YYYYMMDD`, ISO y estilos regionales) y configuraciones regionales de Canvas. Las salidas de fecha y hora conservan siempre el formato técnico sin ambiguedad (`YYYY-MM-DD` y `YYYY-MM-DDTHH:mm`).
-
-## Documentación
-
-Índice completo en [docs/README.md](docs/README.md).
+## Documentacion
 
 | Documento | Contenido |
 | --- | --- |
-| [docs/controles.md](docs/controles.md) | Referencia de propiedades, salidas y comportamiento de los 5 controles |
-| [docs/formatos.md](docs/formatos.md) | Catálogo de formatos de fecha y hora que aceptan los selectores |
-| [docs/combobox.md](docs/combobox.md) | Detalle del combobox con búsqueda tipo contiene |
-| [docs/arquitectura.md](docs/arquitectura.md) | Estructura del repositorio, ciclo de vida PCF, diseño visual y decisiones |
-| [docs/compilacion.md](docs/compilacion.md) | Requisitos, comandos de compilación y empaquetado de la solución |
-| [docs/instalacion.md](docs/instalacion.md) | Importación en Dataverse y uso en aplicaciones de lienzo |
-| [docs/pruebas.md](docs/pruebas.md) | Verificaciones automáticas, arnés de lógica y checklist manual |
-| [docs/changelog.md](docs/changelog.md) | Historial de cambios por fecha y versión |
-| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnés que comprueba fechas, filtro contiene y selección (54 comprobaciones) |
+| [docs/README.md](docs/README.md) | Indice general: estructura del repositorio, compilacion, paquete de solucion, instalacion, formatos de fecha y hora compartidos, verificacion y convenciones |
+| [docs/DatePicker.md](docs/DatePicker.md) | Selector de una sola fecha |
+| [docs/DateTimePicker.md](docs/DateTimePicker.md) | Selector de una sola fecha y hora |
+| [docs/DateRangePicker.md](docs/DateRangePicker.md) | Selector de rango de fechas |
+| [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) | Selector de rango de fecha y hora |
+| [docs/SearchableComboBox.md](docs/SearchableComboBox.md) | Combobox con busqueda incremental tipo contiene |
+| [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) | Exportador de informes a Excel (informes en JSON, tipos, formatos, filtros y aviso de carga) |
+| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, filtro contiene y seleccion (70 comprobaciones) |
+| [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
 
+## Inicio rapido
+
+```powershell
+# 1. Compilar los controles
+npm install
+npm run build
+
+# 2. Generar el paquete de solucion (incluye los controles compilados)
+Set-Location solution
+dotnet build solution.cdsproj -c Release
+```
+
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.6**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+
+## Uso en Power Fx
+
+```powerfx
+// Fechas
+DateValue(DatePicker1.date)
+DateValue(DateRangePicker1.startDate)
+DateTimeValue(DateTimePicker1.dateTime)
+
+// Limpiar un selector desde un boton (propiedad Reiniciar seleccion = reiniciar)
+UpdateContext({ reiniciar: true })
+
+// Combobox con seleccion multiple
+ForAll(Split(SearchableComboBox1.selectedValues, ";"), { Valor: ThisRecord.Value })
+
+// Resultado de una exportacion a Excel
+ExcelReportPicker1.lastFile
+```
+
+## Verificacion
+
+```powershell
+npm run lint                        # ESLint (0 errores)
+npm run build                       # compila los controles
+node tools/verificar-controles.js    # 70 de 70 verificaciones correctas
+node tools/verificar-nombres-campo.js  # 40 de 40 verificaciones correctas
+
+Set-Location solution
+dotnet build solution.cdsproj -c Release
+```
+
+El detalle de los arneses, los criterios de aceptacion y la rutina completa antes de publicar estan en [docs/README.md](docs/README.md#9-verificacion-y-pruebas).
+
+## Convenciones
+
+- Idioma: espanol. Los nombres de propiedades se citan como aparecen en Power Apps o con su nombre tecnico del manifiesto.
+- Fechas en formato `YYYY-MM-DD`.
+- Todos los ejemplos usan **datos inventados**: no contienen nombres de tablas, campos, entornos ni datos de ningun cliente.
+- Licencia: ver [LICENSE](LICENSE).

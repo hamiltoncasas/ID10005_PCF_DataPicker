@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Fecha: 2026-09-16. Descripcion: Contrato de propiedades, recursos y metadatos del selector de fecha simple. -->
 <manifest>
-  <control namespace="ID10005" constructor="DatePicker" version="1.0.1" display-name-key="DatePicker" description-key="DatePicker description" control-type="virtual" >
+  <control namespace="ID10005" constructor="DatePicker" version="1.0.3" display-name-key="DatePicker" description-key="DatePicker description" control-type="virtual" >
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     Example1:
@@ -20,10 +20,39 @@
     </external-service-usage>
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="initialDate" display-name-key="Initial_Date" description-key="Initial_Date_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="defaultDate" display-name-key="Default_Date" description-key="Default_Date_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="format" display-name-key="Date_Format" description-key="Date_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <!-- Propiedades equivalentes a las del selector de fecha nativo de Power Apps. -->
+    <property name="placeholderText" display-name-key="Placeholder_Text" description-key="Placeholder_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="isEditable" display-name-key="Is_Editable" description-key="Is_Editable_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="startYear" display-name-key="Start_Year" description-key="Start_Year_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="endYear" display-name-key="End_Year" description-key="End_Year_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="startOfWeek" display-name-key="Start_Of_Week" description-key="Start_Of_Week_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="minDate" display-name-key="Min_Date" description-key="Min_Date_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="maxDate" display-name-key="Max_Date" description-key="Max_Date_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="accessibleLabel" display-name-key="Accessible_Label" description-key="Accessible_Label_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <!-- Propiedades de datos y de estilo equivalentes a las del selector de fecha nativo. -->
+    <property name="dateTimeZone" display-name-key="Date_Time_Zone" description-key="Date_Time_Zone_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="language" display-name-key="Language" description-key="Language_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="chevronBackground" display-name-key="Chevron_Background" description-key="Chevron_Background_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="chevronFill" display-name-key="Chevron_Fill" description-key="Chevron_Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="iconBackground" display-name-key="Icon_Background" description-key="Icon_Background_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="iconFill" display-name-key="Icon_Fill" description-key="Icon_Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderColor" display-name-key="Border_Color" description-key="Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderStyle" display-name-key="Border_Style" description-key="Border_Style_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderThickness" display-name-key="Border_Thickness" description-key="Border_Thickness_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="color" display-name-key="Color" description-key="Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="fill" display-name-key="Fill" description-key="Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="font" display-name-key="Font" description-key="Font_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="size" display-name-key="Size" description-key="Size_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="fontWeight" display-name-key="Font_Weight" description-key="Font_Weight_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="italic" display-name-key="Italic" description-key="Italic_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="strikethrough" display-name-key="Strikethrough" description-key="Strikethrough_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="underline" display-name-key="Underline" description-key="Underline_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="zIndex" display-name-key="Z_Index" description-key="Z_Index_Desc" of-type="Whole.None" usage="input" required="false" />
     <property name="date" display-name-key="Date" description-key="Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedDate" display-name-key="Selected_Date" description-key="Selected_Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <resources>
       <code path="index.ts" order="1"/>
       <css path="DatePicker.css" order="1" />
