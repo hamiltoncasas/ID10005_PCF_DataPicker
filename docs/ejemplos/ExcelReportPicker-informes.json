@@ -1,0 +1,73 @@
+{
+  "pedidos": {
+    "nombre": "Pedidos del periodo",
+    "descripcion": "Una fila por pedido, con entrega, producto y total",
+    "columnas": "Pedido,Cliente,Estado,Fecha,FechaEntrega,Producto,Cantidad,Total",
+    "titulos": {
+      "Pedido": "Pedido",
+      "Cliente": "Cliente",
+      "Estado": "Estado",
+      "Fecha": "Fecha del pedido",
+      "FechaEntrega": "Fecha de entrega",
+      "Producto": "Producto",
+      "Cantidad": "Unidades",
+      "Total": "Total"
+    },
+    "tipos": {
+      "Fecha": "fecha",
+      "FechaEntrega": "fecha",
+      "Cantidad": "entero",
+      "Total": "moneda"
+    },
+    "archivo": "pedidos_{fecha}.xlsx",
+    "hoja": "Pedidos",
+    "filtros": "Estado <> Cancelada; Total > 0",
+    "ordenarPor": "Pedido",
+    "ordenDescendente": false
+  },
+  "resumen_por_vendedor": {
+    "nombre": "Resumen por vendedor",
+    "descripcion": "Solo los pedidos entregados o despachados, ordenados por vendedor",
+    "columnas": "Vendedor,Fecha,Pedido,Cliente,Estado,Total",
+    "titulos": {
+      "Vendedor": "Vendedor",
+      "Fecha": "Fecha del pedido",
+      "Total": "Total"
+    },
+    "tipos": {
+      "Fecha": "fecha",
+      "Total": "moneda"
+    },
+    "formatos": {
+      "Total": "\"$\" #,##0.00"
+    },
+    "archivo": "ventas_por_vendedor_{fecha}.xlsx",
+    "hoja": "Vendedores",
+    "filtros": "Estado = [Entregado, Despachado]",
+    "ordenarPor": "Vendedor"
+  },
+  "detalle_con_alias_ingles": {
+    "name": "Detalle con los alias en ingles",
+    "description": "El mismo informe escrito con los alias en ingles de cada campo",
+    "columns": "Pedido,Cliente,Estado,Fecha,Total",
+    "titles": {
+      "Pedido": "Pedido",
+      "Cliente": "Cliente",
+      "Estado": "Estado",
+      "Fecha": "Fecha del pedido",
+      "Total": "Total"
+    },
+    "types": {
+      "Fecha": "fecha",
+      "Total": "moneda"
+    },
+    "formats": {
+      "Total": "\"$\" #,##0.00"
+    },
+    "fileName": "detalle_{fecha}_{hora}.xlsx",
+    "sheetName": "Detalle",
+    "filters": "Total >= 100000",
+    "sortBy": "Fecha",
+    "sortDescending": true
+  }
+}
