@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Fecha: 2026-10-13. Descripcion: Contrato del visor de paginas web (iframe) para Power Apps Canvas. -->
+<manifest>
+  <control namespace="ID10005" constructor="WebPageViewer" version="1.0.1" display-name-key="WebPageViewer" description-key="WebPageViewer description" control-type="virtual" >
+    <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
+    If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
+    El visor dibuja un iframe del navegador: el codigo del control no llama a ningun
+    servicio externo, por eso no se declaran dominios.
+    -->
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="url" display-name-key="Url" description-key="Url_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="baseUrl" display-name-key="Base_Url" description-key="Base_Url_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="accessibleLabel" display-name-key="Accessible_Label" description-key="Accessible_Label_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="showToolbar" display-name-key="Show_Toolbar" description-key="Show_Toolbar_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="allowFullScreen" display-name-key="Allow_Full_Screen" description-key="Allow_Full_Screen_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="sandbox" display-name-key="Sandbox" description-key="Sandbox_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="allowFeatures" display-name-key="Allow_Features" description-key="Allow_Features_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="loadingMode" display-name-key="Loading_Mode" description-key="Loading_Mode_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="reloadKey" display-name-key="Reload_Key" description-key="Reload_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="loadTimeoutMs" display-name-key="Load_Timeout_Ms" description-key="Load_Timeout_Ms_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="loadingText" display-name-key="Loading_Text" description-key="Loading_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="hintText" display-name-key="Hint_Text" description-key="Hint_Text_Desc" of-type="Multiple" usage="input" required="false" />
+    <property name="emptyText" display-name-key="Empty_Text" description-key="Empty_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="openButtonText" display-name-key="Open_Button_Text" description-key="Open_Button_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="reloadButtonText" display-name-key="Reload_Button_Text" description-key="Reload_Button_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <!-- Propiedades de estilo equivalentes a las de los demas controles del proyecto. -->
+    <property name="borderColor" display-name-key="Border_Color" description-key="Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderStyle" display-name-key="Border_Style" description-key="Border_Style_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderThickness" display-name-key="Border_Thickness" description-key="Border_Thickness_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="fill" display-name-key="Fill" description-key="Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <!-- Salidas: direccion mostrada y estado de carga del visor. -->
+    <property name="currentUrl" display-name-key="Current_Url" description-key="Current_Url_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="isLoading" display-name-key="Is_Loading" description-key="Is_Loading_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="hasError" display-name-key="Has_Error" description-key="Has_Error_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="errorMessage" display-name-key="Error_Message" description-key="Error_Message_Desc" of-type="Multiple" usage="output" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="WebPageViewer.css" order="1" />
+      <platform-library name="React" version="16.14.0" />
+      <resx path="strings/WebPageViewer.1033.resx" version="1.0.0" />
+    </resources>
+  </control>
+</manifest>

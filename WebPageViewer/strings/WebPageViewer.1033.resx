@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="WebPageViewer" xml:space="preserve"><value>Visor de páginas web</value></data>
+  <data name="WebPageViewer description" xml:space="preserve"><value>Muestra una página web dentro de la aplicación de lienzo, sin salir de ella, y avisa cuando el sitio no permite integrarse en un iframe.</value></data>
+  <data name="Url" xml:space="preserve"><value>Dirección de la página</value></data>
+  <data name="Url_Desc" xml:space="preserve"><value>Dirección que se muestra en el visor. Admitida con esquema completo (https://...) o como ruta relativa cuando se configura la URL base.</value></data>
+  <data name="Base_Url" xml:space="preserve"><value>URL base</value></data>
+  <data name="Base_Url_Desc" xml:space="preserve"><value>Prefijo que se agrega cuando la dirección es una ruta relativa, por ejemplo https://intranet.empresa.com/portal. Vacío = la dirección se usa tal cual.</value></data>
+  <data name="Accessible_Label" xml:space="preserve"><value>Etiqueta accesible</value></data>
+  <data name="Accessible_Label_Desc" xml:space="preserve"><value>Texto que anuncian los lectores de pantalla para describir la página mostrada.</value></data>
+  <data name="Show_Toolbar" xml:space="preserve"><value>Mostrar barra de acciones</value></data>
+  <data name="Show_Toolbar_Desc" xml:space="preserve"><value>Si está activa, se muestra la barra superior con la dirección y los botones de recarga y de apertura externa.</value></data>
+  <data name="Allow_Full_Screen" xml:space="preserve"><value>Permitir pantalla completa</value></data>
+  <data name="Allow_Full_Screen_Desc" xml:space="preserve"><value>Si está activa, la página puede entrar en pantalla completa desde su propio contenido.</value></data>
+  <data name="Sandbox" xml:space="preserve"><value>Restricciones del iframe (sandbox)</value></data>
+  <data name="Sandbox_Desc" xml:space="preserve"><value>Valor del atributo sandbox del iframe, por ejemplo allow-scripts allow-same-origin allow-forms. Vacío = sin restricciones adicionales (máxima compatibilidad).</value></data>
+  <data name="Allow_Features" xml:space="preserve"><value>Permisos del navegador (allow)</value></data>
+  <data name="Allow_Features_Desc" xml:space="preserve"><value>Valor del atributo allow, por ejemplo fullscreen; geolocation; camera. Vacío = permisos predeterminados del navegador.</value></data>
+  <data name="Loading_Mode" xml:space="preserve"><value>Modo de carga</value></data>
+  <data name="Loading_Mode_Desc" xml:space="preserve"><value>eager carga la página de inmediato (predeterminado); lazy la carga cuando el visor entra en pantalla.</value></data>
+  <data name="Reload_Key" xml:space="preserve"><value>Recargar página</value></data>
+  <data name="Reload_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el visor vuelve a cargar la página indicada.</value></data>
+  <data name="Load_Timeout_Ms" xml:space="preserve"><value>Espera máxima (ms)</value></data>
+  <data name="Load_Timeout_Ms_Desc" xml:space="preserve"><value>Milisegundos que se espera la página antes de mostrar el aviso. 0 desactiva el aviso. Predeterminado 12000.</value></data>
+  <data name="Loading_Text" xml:space="preserve"><value>Texto de carga</value></data>
+  <data name="Loading_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra mientras la página termina de cargar. Predeterminado: Cargando la página...</value></data>
+  <data name="Hint_Text" xml:space="preserve"><value>Aviso de página no visible</value></data>
+  <data name="Hint_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra cuando la página no aparece dentro del tiempo configurado. También aparece si el sitio bloquea la integración en un iframe.</value></data>
+  <data name="Empty_Text" xml:space="preserve"><value>Texto sin dirección</value></data>
+  <data name="Empty_Text_Desc" xml:space="preserve"><value>Mensaje que se muestra cuando no hay ninguna dirección configurada.</value></data>
+  <data name="Open_Button_Text" xml:space="preserve"><value>Texto del botón Abrir</value></data>
+  <data name="Open_Button_Text_Desc" xml:space="preserve"><value>Texto y etiqueta accesible del botón que abre la página en una pestaña nueva del navegador.</value></data>
+  <data name="Reload_Button_Text" xml:space="preserve"><value>Texto del botón Recargar</value></data>
+  <data name="Reload_Button_Text_Desc" xml:space="preserve"><value>Texto y etiqueta accesible del botón que vuelve a cargar la página dentro del visor.</value></data>
+  <data name="Border_Color" xml:space="preserve"><value>Color del borde</value></data>
+  <data name="Border_Color_Desc" xml:space="preserve"><value>Color del borde del visor. Vacío = color predeterminado.</value></data>
+  <data name="Border_Style" xml:space="preserve"><value>Estilo del borde</value></data>
+  <data name="Border_Style_Desc" xml:space="preserve"><value>Solid, Dashed, Dotted, Double o None. También se acepta BorderStyle.None. Vacío = Solid.</value></data>
+  <data name="Border_Thickness" xml:space="preserve"><value>Grosor del borde</value></data>
+  <data name="Border_Thickness_Desc" xml:space="preserve"><value>Grosor del borde en píxeles. 0 quita el borde. Vacío = 1.</value></data>
+  <data name="Fill" xml:space="preserve"><value>Color de fondo</value></data>
+  <data name="Fill_Desc" xml:space="preserve"><value>Color de fondo de la barra de acciones y del área alrededor de la página. Acepta #RRGGBB, rgb(), nombres CSS y Color.X de Power Apps.</value></data>
+  <data name="Current_Url" xml:space="preserve"><value>Dirección mostrada</value></data>
+  <data name="Current_Url_Desc" xml:space="preserve"><value>Dirección que está mostrando el visor; sirve para confirmar qué página se abrió.</value></data>
+  <data name="Is_Loading" xml:space="preserve"><value>Cargando</value></data>
+  <data name="Is_Loading_Desc" xml:space="preserve"><value>Verdadero mientras la página está cargando; falso cuando termina o cuando no hay dirección.</value></data>
+  <data name="Has_Error" xml:space="preserve"><value>Página no visible</value></data>
+  <data name="Has_Error_Desc" xml:space="preserve"><value>Verdadero cuando la página no apareció dentro del tiempo configurado. Un sitio puede bloquear la integración sin que el control lo detecte, por eso conviene dejar el aviso activo.</value></data>
+  <data name="Error_Message" xml:space="preserve"><value>Mensaje del aviso</value></data>
+  <data name="Error_Message_Desc" xml:space="preserve"><value>Mensaje de ayuda que corresponde al estado de la salida Página no visible.</value></data>
+</root>

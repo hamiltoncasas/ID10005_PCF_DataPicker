@@ -1,0 +1,27 @@
+/*
+ * Fecha: 2026-10-13
+ * Descripcion: Estilos del visor de paginas web, alineados al diseno de los
+ * demas controles: la misma paleta, tipografia y barra de acciones con borde
+ * gris; el cuerpo lo ocupa la pagina embebida.
+ */
+.wpv-root { position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; height: 100%; min-height: 120px; overflow: hidden; color: #243238; background: #fff; border: 1px solid #8a8a8a; border-radius: 2px; font-family: 'Segoe UI', sans-serif; }
+.wpv-root.is-disabled { opacity: .9; }
+.wpv-toolbar { display: flex; flex: 0 0 32px; align-items: center; gap: 8px; min-width: 0; height: 32px; padding: 0 8px; border-bottom: 1px solid #e7ded0; background: #fffdf8; }
+.wpv-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #b86e49; }
+.wpv-url { flex: 1; min-width: 0; overflow: hidden; color: #80684e; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.wpv-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+.wpv-button { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border: 1px solid #244b8b; border-radius: 2px; color: #fff; background: #2f5da8; font: 600 12px 'Segoe UI', sans-serif; white-space: nowrap; cursor: pointer; }
+.wpv-button:hover:not(:disabled), .wpv-button:focus-visible { background: #244b8b; }
+.wpv-button:disabled { border-color: #a8a8a8; background: #a8a8a8; cursor: default; }
+.wpv-button-icon { font-size: 13px; line-height: 1; }
+.wpv-body { position: relative; flex: 1 1 auto; min-height: 0; background: #f7f1e8; }
+.wpv-frame { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+.wpv-frame.is-disabled { pointer-events: none; }
+/* Avisos superpuestos: carga, ayuda cuando la pagina no aparece y falta de direccion. */
+.wpv-overlay { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-sizing: border-box; padding: 18px; color: #80684e; background: rgba(255, 253, 248, .96); text-align: center; }
+.wpv-overlay-hint { background: rgba(255, 253, 248, .9); }
+.wpv-hint { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 440px; }
+.wpv-kicker { color: #ad6b45; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.wpv-message { margin: 0; color: #35464b; font-size: 13px; line-height: 1.4; }
+.wpv-spinner { width: 22px; height: 22px; border: 2px solid #e6d8c6; border-top-color: #b86e49; border-radius: 50%; animation: wpv-spin .7s linear infinite; }
+@keyframes wpv-spin { to { transform: rotate(360deg); } }
