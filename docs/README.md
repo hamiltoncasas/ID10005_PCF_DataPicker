@@ -1,9 +1,11 @@
 # Documentacion - ID10005 PCF DataPicker
 
 > Fecha: 2026-09-27
-> Descripcion: Indice general del proyecto y de la documentacion de los seis controles PCF para Power Apps Canvas.
+> Descripcion: Indice general del proyecto y de la documentacion de los siete controles PCF para Power Apps Canvas.
 
-Este repositorio entrega **seis controles PCF** (`control-type="virtual"`) listos para Power Apps Canvas y para formularios de Dataverse. La documentacion tiene **un archivo por control** y este indice con todo lo que es comun a los seis.
+Este repositorio entrega **siete controles PCF** (`control-type="virtual"`) listos para Power Apps Canvas y para formularios de Dataverse. La documentacion tiene **un archivo por control** y este indice con todo lo que es comun a los siete.
+
+El proyecto PCF de la raiz contiene seis controles. `DateTimeRangePicker` vive en un proyecto anidado independiente; la solucion de Dataverse compila ambos proyectos y empaqueta los siete. Por eso `npm run build` desde la raiz no compila el selector de rango de fecha y hora.
 
 ## 1. Controles incluidos
 
@@ -15,6 +17,7 @@ Este repositorio entrega **seis controles PCF** (`control-type="virtual"`) listo
 | `DateTimeRangePicker` | 1.0.11 | Seleccionar un **rango de fecha y hora** | `startDateTime`, `endDateTime`, `selectedDate` | [DateTimeRangePicker.md](DateTimeRangePicker.md) |
 | `SearchableComboBox` | 1.0.1 | Elegir elementos de una tabla o coleccion con **busqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | [SearchableComboBox.md](SearchableComboBox.md) |
 | `ExcelReportPicker` | 1.4.1 | Desplegar **informes definidos en JSON** sobre la tabla enlazada y descargarlos en Excel | `selectedReport`, `lastReport`, `lastReportName`, `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `hasError`, `columnsDetected`, `availableColumnsJson`, `isLoading`, `dataStatus` | [ExcelReportPicker.md](ExcelReportPicker.md) |
+| `WebPageViewer` | 1.0.1 | Mostrar una **pagina web** dentro de la aplicacion, con aviso cuando el sitio no admite iframes | `currentUrl`, `isLoading`, `hasError`, `errorMessage` | [WebPageViewer.md](WebPageViewer.md) |
 
 Datos de identidad de los componentes:
 
@@ -31,7 +34,7 @@ Datos de identidad de los componentes:
 | Dato | Valor |
 | --- | --- |
 | Nombre unico | `ID0005_DataPickers` |
-| Version | `1.0.2.6` |
+| Version | `1.0.2.7` |
 | Publicador / prefijo | `ID0005` / `id5` |
 | Tipo de paquete | `Unmanaged` (`<Managed>0</Managed>`) |
 | Archivo generado | `solution/bin/Release/solution.zip` |
@@ -57,11 +60,12 @@ ID10005_PCF_DataPicker/
 |  |- ExcelReportPickerView.tsx       Vista React del panel
 |  |- reportModel.ts                  Logica pura: definicion de informes, tipos, filtros, formatos
 |  \- excelWriter.ts                  Construccion del libro de Excel
+|- WebPageViewer/                     Control: visor de paginas web embebidas (prefijo wpv-)
 |- DateTimeRangePicker/               Proyecto PCF anidado (rango de fecha y hora, prefijo dtrp-)
 |  |- DateTimeRangePicker.pcfproj     Proyecto MSBuild propio
 |  |- package.json / tsconfig.json    Entorno de build independiente
 |  \- DateTimeRangePicker/            Control (manifest, index.ts, vista, css, resx)
-|- ID10005_PCF_DataPicker.pcfproj     Proyecto MSBuild raiz (paquete con 5 controles)
+|- ID10005_PCF_DataPicker.pcfproj     Proyecto MSBuild raiz (paquete con 6 controles)
 |- package.json                       Scripts de build, lint y arnes local
 |- pcfconfig.json                     outDir: ./out/controls
 |- eslint.config.mjs                  Reglas de calidad (ESLint 9 + reglas Power Apps)
@@ -142,16 +146,16 @@ Compilacion correcta. 0 Advertencia(s) 0 Errores
 
 | Archivo | Contenido |
 | --- | --- |
-| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 6 controles en `Controls/id5_ID10005.<Control>/` |
+| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 7 controles en `Controls/id5_ID10005.<Control>/` |
 
 El empaquetado toma la carpeta `solution/src/` (los componentes compilados, `Other/Solution.xml` y `Other/Customizations.xml`) y arma el `.zip` con `solution.xml`, `customizations.xml`, `Controls/...` y `[Content_Types].xml`.
 
 ### 5.1 Version del paquete (`.zip`)
 
-La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.6`.**
+La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.7`.**
 
 ```xml
-<Version>1.0.2.6</Version>
+<Version>1.0.2.7</Version>
 ```
 
 Para una entrega nueva: sube ese valor, ejecuta `dotnet build solution.cdsproj -c Release` y comprueba el paquete **antes de importarlo**:
@@ -161,7 +165,7 @@ Expand-Archive solution\bin\Release\solution.zip -DestinationPath tmp\sol -Force
 Select-String -Path tmp\sol\solution.xml -Pattern '<Version>|<Managed>'
 ```
 
-Salida esperada: `<Version>1.0.2.6</Version>` y `<Managed>0</Managed>` (paquete no administrado).
+Salida esperada: `<Version>1.0.2.7</Version>` y `<Managed>0</Managed>` (paquete no administrado).
 
 La version del paquete es independiente de la version de cada control (`<Control>/ControlManifest.Input.xml`): puedes subir una sin la otra, pero en una entrega conviene subir ambas.
 
@@ -189,13 +193,13 @@ En el **Power Platform admin center** abre el entorno destino, ve a **Configurac
 ### 6.2 Importar la solucion
 
 1. Ve a **make.powerapps.com > Soluciones > Importar solucion** y selecciona `solution/bin/Release/solution.zip`.
-2. Comprueba que la solucion contenga los seis controles en **Objetos > Controles personalizados**.
+2. Comprueba que la solucion contenga los siete controles en **Objetos > Controles personalizados**.
 3. Publica todos los cambios personalizados.
 
 ### 6.3 Agregar el control a la aplicacion de lienzo
 
 1. Abre la aplicacion y entra en **Insertar > Obtener mas componentes > Codigo**.
-2. Busca el control por su nombre (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `DateTimeRangePicker`, `SearchableComboBox` o `ExcelReportPicker`) y agregalo.
+2. Busca el control por su nombre (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `DateTimeRangePicker`, `SearchableComboBox`, `ExcelReportPicker` o `WebPageViewer`) y agregalo.
 3. Configura las propiedades de entrada en el panel derecho con el control seleccionado.
 
 Los controles son de tipo `virtual`, por lo que funcionan igual en aplicaciones de lienzo y en formularios de Dataverse.
@@ -204,12 +208,13 @@ Los controles son de tipo `virtual`, por lo que funcionan igual en aplicaciones 
 
 | Necesidad | Expresion |
 | --- | --- |
-| Fecha nativa | `DateValue(DatePicker1.date)` |
+| Fecha nativa (zona `Local`) | `DateValue(DatePicker1.date)` |
 | Inicio y fin de un rango | `DateValue(DateRangePicker1.startDate)` y `DateValue(DateRangePicker1.endDate)` |
-| Fecha y hora nativa | `DateTimeValue(DateTimePicker1.dateTime)` |
+| Fecha y hora nativa (zona `Local`) | `DateTimeValue(DateTimePicker1.dateTime)` |
 | Valores de un combobox | `SearchableComboBox1.selectedValues` (separados por `;`) |
 | Resultado de una exportacion | `ExcelReportPicker1.lastFile`, `ExcelReportPicker1.lastRows`, `ExcelReportPicker1.lastStatus` |
-| Reiniciar un selector | `UpdateContext({ r: true })` con la propiedad *Reiniciar seleccion* = `r` |
+| Estado del visor de paginas web | `WebPageViewer1.currentUrl`; el aviso de pagina no visible esta en `WebPageViewer1.hasError` y `WebPageViewer1.errorMessage` |
+| Reiniciar un selector | Alterna una variable con `Set(varReset, !varReset)` y enlazala a *Reiniciar seleccion* |
 
 ## 7. Formatos de fecha y hora
 
@@ -243,7 +248,7 @@ Un formato desconocido no rompe el control: se usa `YYYY-MM-DD`.
 | `24:00:00` | `18:30:45` | Reloj de 24 horas con segundos |
 | `12:00:00` | `06:30:45 PM` | Reloj de 12 horas con segundos |
 
-`timeFormat` solo cambia la **presentacion** en el panel. Las salidas `dateTime`, `startDateTime` y `endDateTime` siempre se escriben en formato tecnico de 24 horas (`YYYY-MM-DDTHH:mm`).
+`timeFormat` solo cambia la **presentacion**; no agrega precision a la seleccion, que es de 15 minutos. En zona `Local`, las salidas usan `YYYY-MM-DDTHH:mm`. En zona `Utc`, las salidas incluyen el sufijo `Z`, por ejemplo `2026-09-16T08:30Z`.
 
 ### 7.3 Conversion en Power Fx
 
@@ -260,11 +265,15 @@ DateTimeValue(DateTimeRangePicker1.endDateTime)
 | --- | --- |
 | `resetKey` (*Reiniciar seleccion*, Si/No) | Cuando el valor cambia, el control limpia la seleccion. Se usa para reiniciar desde Power Fx |
 | `zIndex` (*Prioridad visual del panel*) | `z-index` del panel flotante; se limita entre 1 y 2147483647; el predeterminado es `2147483647` |
+| `dateTimeZone` (*Zona horaria de los valores*) | `Local` (predeterminado) lee las fechas y horas como estan escritas; `Utc` convierte entradas ISO con desplazamiento (`Z`, `+hh:mm`) y publica valores UTC con `Z`. No es una zona regional como `America/Bogota` |
+| `startOfWeek` (*Primer dia de la semana*) | Acepta nombres completos de dias en espanol o ingles, o numeros de 0 (domingo) a 6 (sabado); vacio o invalido usa lunes |
+| `language` (*Idioma del calendario*) | Un codigo BCP 47 valido (por ejemplo `en-US`) localiza meses y dias; sin valor o con codigo invalido se usan los nombres predeterminados en espanol |
 | Paneles superpuestos | Los paneles se dibujan fuera del contenedor (posicion fija), asi que no los recorta el lienzo; el combobox y el exportador siguen ademas el desplazamiento de la pagina |
 | Control deshabilitado | Con `DisplayMode` en `View` o `Disabled` no se abre el panel ni se cambia el valor |
 | Salidas de texto | Las fechas, horas y valores publicados son texto; se convierten con `DateValue`, `DateTimeValue` o `Value` |
 | Accesibilidad | Los campos y botones exponen etiquetas `aria-*` (por ejemplo *Mes anterior*, *Mes siguiente*, *Contraer selector*) y admiten navegacion por teclado |
 | Tema visual | Todos comparten el mismo diseno: modo compacto de 32 px, boton azul a la derecha y panel con encabezado, cuerpo y pie |
+| Visor de paginas web | El visor resuelve *Direccion de la pagina* contra la *URL base*, vuelve a cargar con *Recargar pagina* y avisa con `hasError` y `errorMessage` cuando la pagina no aparece. Un sitio que bloquea iframes solo se puede ver con **Abrir en pestana nueva** |
 | React | Se declara como biblioteca de plataforma (`platform-library name="React" version="16.14.0"`), por lo que se carga desde el host |
 
 ## 9. Verificacion y pruebas
@@ -273,7 +282,7 @@ DateTimeValue(DateTimeRangePicker1.endDateTime)
 
 ```powershell
 npm run lint          # ESLint sobre las fuentes (0 errores)
-npm run build         # compila los 6 controles en out/controls
+npm run build         # compila los 7 controles en out/controls
 Get-ChildItem out\controls -Directory | Select-Object Name
 ```
 
@@ -291,6 +300,8 @@ Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la co
 ```text
 70 de 70 verificaciones correctas
 ```
+
+El visor de paginas web no tiene arnes automatizado: depende del navegador y del sitio remoto, por eso se verifica con la tabla manual de [WebPageViewer.md](WebPageViewer.md#9-verificacion).
 
 ### 9.3 Arnes de columnas del exportador (40 comprobaciones)
 
@@ -318,7 +329,7 @@ node tools/verificar-nombres-campo.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptacion: lint sin errores, build correcto, `70 de 70` y `40 de 40` verificaciones correctas, y paquete de solucion generado con los 6 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.6` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
+Criterios de aceptacion: lint sin errores, build correcto, `70 de 70` y `40 de 40` verificaciones correctas, y paquete de solucion generado con los 7 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.7` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
 
 ## 10. Problemas comunes
 

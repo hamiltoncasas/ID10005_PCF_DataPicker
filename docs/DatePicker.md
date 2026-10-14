@@ -37,8 +37,8 @@ Resultado: el control muestra la fecha elegida y publica la salida `DatePicker1.
 
 | Propiedad (nombre tecnico) | Nombre en Power Apps | Tipo | Predeterminado | Descripcion |
 | --- | --- | --- | --- | --- |
-| `initialDate` | *Fecha inicial* | Texto | vacio | Fecha para precargar el control. Se interpreta con el formato de **Formato de fecha** |
-| `defaultDate` | *Fecha predeterminada* | Texto | vacio | Valor de mayor prioridad: si no esta vacio, sustituye a *Fecha inicial*. Se usa cuando la aplicacion escribe el valor |
+| `initialDate` | *Fecha precargada* | Texto | vacio | Fecha para precargar el control. Se interpreta con el formato de **Formato de fecha**; tambien acepta ISO `YYYY-MM-DD` |
+| `defaultDate` | *Fecha precargada por omision* | Texto | vacio | Valor de mayor prioridad: si no esta vacio, sustituye a *Fecha precargada*. La entrada se vuelve a aplicar si cambia |
 | `format` | *Formato de fecha* | Texto | `YYYY-MM-DD` | Formato de la salida y de la precarga. Catalogo en [README.md](README.md#7-formatos-de-fecha-y-hora) |
 | `resetKey` | *Reiniciar seleccion* | Si/No | No | Cuando cambia de valor, el control limpia la fecha seleccionada. Ideal para un boton *Limpiar* |
 | `zIndex` | *Prioridad visual del panel* | Numero | `2147483647` | `z-index` del panel abierto. Se limita entre 1 y 2147483647 |
@@ -49,9 +49,9 @@ Resultado: el control muestra la fecha elegida y publica la salida `DatePicker1.
 | `maxDate` | *Fecha maxima* | Texto | vacio | Ultimo dia seleccionable |
 | `startYear` | *Ano inicial* | Numero | `0` | Ano menor del calendario (`0` = sin limite) |
 | `endYear` | *Ano final* | Numero | `0` | Ano mayor del calendario (`0` = sin limite) |
-| `startOfWeek` | *Primer dia de la semana* | Texto | regional | `auto`, `sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday` o `saturday` |
-| `dateTimeZone` | *Zona horaria* | Texto | local del dispositivo | Zona usada para calcular *hoy* y la fecha inicial |
-| `language` | *Idioma* | Texto | regional | Codigo de idioma para los nombres de meses y dias (por ejemplo `es-ES` o `en-US`) |
+| `startOfWeek` | *Primer dia de la semana* | Texto | `monday` | Nombre completo del dia en espanol o ingles, o numero de 0 (domingo) a 6 (sabado). Un valor vacio o no reconocido usa lunes |
+| `dateTimeZone` | *Zona horaria de los valores* | Texto | `Local` | Solo `Utc` activa el modo UTC; cualquier otro valor se interpreta como `Local`. En UTC, una salida elegida se publica como instante con `Z` |
+| `language` | *Idioma del calendario* | Texto | espanol | Codigo BCP 47, por ejemplo `es-ES` o `en-US`; vacio/invalido usa los nombres predeterminados en espanol |
 
 ### 3.2 Apariencia (equivalentes al selector nativo)
 
@@ -82,7 +82,7 @@ Estas propiedades siguen los mismos nombres y el mismo espiritu que las del cont
 | `date` | Texto | Fecha seleccionada en el formato configurado. Vacia si no hay seleccion |
 | `selectedDate` | Texto | Mismo valor que `date`. Se conserva para aplicaciones escritas con versiones anteriores del control |
 
-Las dos salidas publican siempre lo mismo: usa `date` en el codigo nuevo.
+En zona `Local`, ambas salidas son la fecha en el formato `format`. En zona `Utc`, ambas publican una fecha ISO a medianoche UTC, como `2026-09-16T00:00:00Z`. Usa `date` en el codigo nuevo. `DateValue` es adecuado para la salida local; para la salida UTC usa una conversion que tenga en cuenta el sufijo `Z` y la zona deseada.
 
 ## 5. Comportamiento
 
@@ -90,16 +90,16 @@ Las dos salidas publican siempre lo mismo: usa `date` en el codigo nuevo.
 2. **Elegir un dia:** el dia queda resaltado, la salida `date` se publica en el formato configurado y el panel se contrae.
 3. **Volver a abrir:** el mes visible es el de la fecha ya elegida, con esa fecha resaltada y *hoy* marcado con un borde.
 4. **Boton Limpiar** (pie del panel): vacia la seleccion, publica `date` vacio y el campo vuelve al texto de ayuda.
-5. **Escribir la fecha** (solo con *Editable* activo): el texto se interpreta con el formato configurado; si es valido se publica, si no, el valor anterior no cambia.
+5. **Escribir la fecha** (solo con *Permitir escribir la fecha* activo): se escribe en el campo compacto con el formato configurado y se confirma al presionar Enter o al salir del campo. Una fecha invalida o fuera de limites no cambia la salida.
 6. **Limites del calendario:** con *Fecha minima* y *Fecha maxima* los dias fuera del rango quedan deshabilitados; con *Ano inicial* y *Ano final* la navegacion mensual tambien se detiene en el limite.
 7. **Reiniciar desde Power Fx:** cuando el valor de *Reiniciar seleccion* cambia, la seleccion se limpia y la salida publica vacio.
-8. **Precargar:** el valor de *Fecha predeterminada* tiene prioridad; si esta vacio se usa *Fecha inicial*. El valor se aplica cuando cambia (por ejemplo al abrir la pantalla o al alimentarlo desde otra pantalla) y se interpreta con el formato configurado.
+8. **Precargar:** *Fecha precargada por omision* tiene prioridad sobre *Fecha precargada*. La entrada se aplica al inicializar y cuando cambia; no es un enlace bidireccional con la salida.
 9. **Valor inicial invalido:** no rompe el control; se ignora y el panel abre en el mes actual.
 10. **Control deshabilitado:** con `DisplayMode` en `View` (o `DisplayMode.Disabled`) no se puede abrir el panel ni cambiar la seleccion.
 
 ### 5.1 Formato de la salida frente al formato de la pantalla
 
-El calendario muestra los nombres de mes y dia segun el **idioma del dispositivo** (o el de la propiedad *Idioma*). La **salida** `date` siempre se escribe con el formato de la propiedad *Formato de fecha*, asi que es estable: la misma configuracion produce la misma cadena en cualquier equipo.
+El calendario muestra los nombres de mes y dia segun *Idioma*; sin un codigo valido usa los nombres predeterminados en espanol, no necesariamente el idioma del dispositivo. En zona `Local`, la salida `date` respeta *Formato de fecha*. En zona `Utc`, se publica un instante con sufijo `Z` en formato ISO, independientemente de `format`.
 
 ## 6. Ejemplos en Power Fx
 
@@ -113,17 +113,18 @@ Filter(Pedidos, Fecha = DateValue(DatePicker1.date))
 // 3. Mostrar la fecha con el idioma del usuario (para una etiqueta)
 Text(DateValue(DatePicker1.date), "[$-es-ES]dddd, dd 'de' mmmm 'de' yyyy")
 
-// 4. Precargar la fecha de hoy al abrir la pantalla
-//    Propiedad Fecha inicial = Text(Today(), "yyyy-mm-dd")
+// 4. Propiedad Fecha precargada = Text(Today(), "yyyy-mm-dd")
+//    Propiedad Formato de fecha = YYYY-MM-DD
 
 // 5. Limpiar el control desde un boton
-UpdateContext({ reiniciarFecha: true });   // y en el control: Reiniciar seleccion = reiniciarFecha
+// App.OnStart o Screen.OnVisible: Set(varReiniciarFecha, false)
+Set(varReiniciarFecha, !varReiniciarFecha)   // Reiniciar seleccion = varReiniciarFecha
 
 // 6. Validar antes de guardar
 If(IsBlank(DatePicker1.date), Notify("Selecciona una fecha", NotificationType.Warning))
 
-// 7. Solo permitir hasta hoy
-//    Propiedad Fecha maxima = Text(Today(), "yyyy-mm-dd")
+// 7. Propiedades Fecha minima / Fecha maxima
+//    Text(DateAdd(Today(), -30, Days), "yyyy-mm-dd") / Text(Today(), "yyyy-mm-dd")
 ```
 
 Consejo: si vas a convertir la salida con `DateValue`, deja el formato en `YYYY-MM-DD` (o `YYYY/MM/DD`) para evitar ambiguedades entre dia y mes en equipos con otras convenciones regionales.
@@ -132,7 +133,7 @@ Consejo: si vas a convertir la salida con `DateValue`, deja el formato en `YYYY-
 
 - **El control no crece en el lienzo:** el panel flotante es el que crece; el modo compacto mide 32 px de alto. El ancho minimo del panel es 320 px.
 - **Paneles superpuestos:** el panel se dibuja con posicion fija en el cuerpo de la pagina, asi que no lo recorta el contenedor. Si en la pantalla hay elementos con `z-index` propio por encima, sube *Prioridad visual del panel*.
-- **Zona horaria:** las fechas se construyen y comparan en la hora local del navegador (o en la zona de *Zona horaria*); no hay conversion a UTC.
+- **Zona horaria:** `Local` conserva los componentes de fecha escritos; `Utc` convierte entradas ISO que llevan desplazamiento (`Z` o `+hh:mm`) y publica salidas con `Z`. La opcion no acepta zonas regionales IANA.
 - **Formatos:** la salida se escribe tal cual en el formato configurado; el control no cambia el separador decimal ni el idioma de la cadena.
 - **Un valor por pantalla:** si necesitas un rango, usa `DateRangePicker`.
 - **Precarga, no sincronizacion:** el control aplica el valor inicial cuando cambia; no es una entrada enlazada (no se debe usar como un campo de formulario).
@@ -142,9 +143,9 @@ Consejo: si vas a convertir la salida con `DateValue`, deja el formato en `YYYY-
 | Sintoma | Causa probable | Solucion |
 | --- | --- | --- |
 | La salida no cambia al elegir | No se esta leyendo `DatePicker1.date` | Revisa el nombre del control y usa el panel de propiedades |
-| La fecha inicial no aparece | El texto no coincide con el formato configurado | Escribe el valor con el mismo formato de *Formato de fecha* (`2026-09-27`) |
+| La fecha precargada no aparece | El texto no coincide con el formato o con ISO `YYYY-MM-DD` | Escribe la fecha en el formato configurado o ISO |
 | El panel se ve detras de otro elemento | Otro elemento del lienzo tiene `z-index` mayor | Sube *Prioridad visual del panel* |
-| No se puede limpiar desde un boton | `resetKey` recibe el mismo valor | Cambia el valor solo cuando quieras reiniciar (por ejemplo `Set(varR, !varR)`) |
+| No se puede limpiar desde un boton | `resetKey` no cambio de valor | Inicializa una variable booleana y alternala con `Set(varR, !varR)` en cada pulsacion |
 | Los dias anteriores no se pueden elegir | `minDate`/`maxDate` o `startYear`/`endYear` los deshabilitan | Ajusta los limites |
 | `DateValue` devuelve error | El formato configurado es ambiguo para la region del usuario | Usa `YYYY-MM-DD` como formato de salida |
 
