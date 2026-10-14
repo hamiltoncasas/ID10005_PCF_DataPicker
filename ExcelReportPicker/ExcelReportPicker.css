@@ -11,7 +11,8 @@
 .erp-trigger { display: flex; flex: 1; align-items: center; gap: 7px; min-width: 0; padding: 0 8px; border: 0; outline: 0; color: #333; background: transparent; font: 13px 'Segoe UI', sans-serif; text-align: left; cursor: pointer; }
 .erp-trigger:disabled { color: #777; cursor: default; }
 .erp-trigger-text { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.erp-icon { position: relative; flex: 0 0 16px; width: 16px; height: 16px; border-radius: 3px; background: linear-gradient(135deg, #2f8a5b, #1f6b45); }
+/* Icono de Excel: la hoja verde con la esquina superior derecha doblada y la X del formato. */
+.erp-icon { position: relative; flex: 0 0 16px; width: 16px; height: 16px; border-radius: 3px; background: linear-gradient(45deg, #1f7a46 0 87%, #8ec9a8 87% 100%); }
 .erp-icon::before, .erp-icon::after { position: absolute; top: 4px; left: 7px; width: 2px; height: 8px; background: #fff; content: ''; }
 .erp-icon::before { transform: rotate(45deg); }
 .erp-icon::after { transform: rotate(-45deg); }
