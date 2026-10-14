@@ -1,13 +1,13 @@
 # ExcelReportPicker
 
-> Fecha: 2026-09-27
+> Fecha: 2026-10-13
 > Descripcion: Exportador de informes a Excel para Power Apps Canvas: informes definidos en JSON, tipos y formatos nativos de Excel, filtros por informe, aviso del estado de carga y descarga del archivo. Indice general en [README.md](README.md).
 
 ## 1. Que resuelve
 
 `ExcelReportPicker` es **un unico elemento visual** (no un boton estandar de Power Apps) que:
 
-1. Se ve como un campo compacto con un icono de Excel y una etiqueta configurable.
+1. Se ve como un campo compacto con el **icono de Excel** (la hoja verde con la esquina doblada y la X del formato) y una etiqueta configurable.
 2. Al hacer clic despliega el panel con la lista de informes definidos en JSON.
 3. Al elegir un informe muestra al frente la barra con el boton **Descargar Excel**, el nombre del archivo y los contadores de columnas y registros.
 4. Al pulsar el boton genera el `.xlsx` y lo descarga en el navegador.
@@ -18,7 +18,7 @@
 | Dato | Valor |
 | --- | --- |
 | Identificador de componente | `id5_ID10005.ExcelReportPicker` |
-| Version | 1.4.1 |
+| Version | 1.4.2 |
 | Conjunto de datos | `items` (los registros que se exportan) |
 | Dependencia de JavaScript | `xlsx` (SheetJS, edicion comunitaria) incluida en el bundle |
 | Requiere servicios externos | No |
@@ -92,7 +92,7 @@ colInforme
 
 ## 6. Aviso del estado de carga
 
-Mientras el host entrega los registros de **Items** (y las paginas adicionales), el control lo avisa en el propio elemento visual: el icono se reemplaza por un **giro** y el texto pasa a *Texto mientras carga*. Cuando el origen termina, aparece un **visto bueno** con *Texto cuando esta listo* durante el tiempo configurado y despues el control vuelve a su texto normal.
+Mientras el host entrega los registros de **Items** (y las paginas adicionales), el control lo avisa en el propio elemento visual: el icono de Excel se reemplaza por un **giro** y el texto pasa a *Texto mientras carga*. Cuando el origen termina, aparece un **visto bueno** con *Texto cuando esta listo* durante el tiempo configurado y despues el control vuelve a su texto normal.
 
 | Propiedad | Que hace | Predeterminado |
 | --- | --- | --- |
@@ -259,6 +259,17 @@ Detalles del comportamiento:
 | `hora` | Por minuto del dia |
 | `entero`, `numero`, `moneda`, `porcentaje` | Comparacion numerica |
 | `texto` y demas | Texto normalizado (minusculas y sin acentos) |
+
+### 7.6 Ejemplos listos del repositorio
+
+Los ejemplos de esta guia estan tambien como archivos JSON inventados, listos para copiar y pegar:
+
+| Archivo | Contenido |
+| --- | --- |
+| [`docs/ejemplos/ExcelReportPicker-informes.json`](ejemplos/ExcelReportPicker-informes.json) | Tres informes: *Pedidos del periodo*, *Resumen por vendedor* y uno con los alias en ingles (`name`, `columns`, `titles`, `types`, `formats`, `fileName`, `sheetName`, `filters`, `sortBy`, `sortDescending`) |
+| [`docs/ejemplos/ExcelReportPicker-items.json`](ejemplos/ExcelReportPicker-items.json) | Seis pedidos inventados que ilustran la forma de **Items** (fechas, enteros, moneda y un pedido cancelado) |
+
+Los datos son inventados: no hay nombres de tablas, campos de ningun entorno ni datos de ninguna organizacion. El detalle de la politica esta en [`docs/ejemplos/README.md`](ejemplos/README.md) y en [12. Datos de ejemplo](README.md#12-datos-de-ejemplo).
 
 ## 8. Propiedades del control
 
@@ -437,6 +448,8 @@ Select(ExcelReportPicker1)   // o guia al usuario al panel del control
 
 Pasos de uso: enlaza **Items**, pega el `JSON({...})` en *Definicion de informes (JSON)*, abre el panel del control, revisa **Columnas detectadas** y pulsa **Descargar Excel** en el informe que quieras.
 
+Los registros inventados de este ejemplo estan en [`docs/ejemplos/ExcelReportPicker-items.json`](ejemplos/ExcelReportPicker-items.json) y los informes en [`docs/ejemplos/ExcelReportPicker-informes.json`](ejemplos/ExcelReportPicker-informes.json).
+
 ## 12. Seguridad
 
 El control se ejecuta en el cliente (el navegador del usuario) y no abre canales de salida: no declara servicios externos ni dominios, no usa `fetch`, `XMLHttpRequest`, `WebSocket` ni `postMessage`, no evalua codigo (`eval` / `new Function`), no inyecta HTML y no guarda nada en `localStorage`, `sessionStorage` ni `indexedDB`. El libro se arma en memoria y se entrega con una descarga del navegador; el control no escribe en Dataverse ni en ningun servicio.
@@ -500,6 +513,7 @@ Medidas concretas frente a un libro danado o a datos inesperados:
 | 14 | Definir textos propios en *Texto mientras carga* y *Texto cuando esta listo* | El aviso los usa tal cual |
 | 15 | Poner *Milisegundos del aviso listo* en `0` | El mensaje de listo se queda visible |
 | 16 | Desactivar *Mostrar aviso de carga* | El control no cambia su texto ni su icono |
+| 17 | Mirar el elemento con el panel cerrado y sin carga en curso | Se ve el icono de Excel: la hoja verde con la esquina doblada y la X del formato, junto a la etiqueta del boton |
 
 Automatizado: el arnes `tools/verificar-nombres-campo.js` comprueba el reconocimiento de columnas y la lectura de celdas con un registro simulado (ver [README.md](README.md#9-verificacion-y-pruebas)).
 
@@ -514,3 +528,5 @@ Automatizado: el arnes `tools/verificar-nombres-campo.js` comprueba el reconocim
 | `ExcelReportPicker/ExcelReportPickerView.tsx` | Vista React: elemento compacto, panel, lista de informes, mensajes y bloque de columnas detectadas |
 | `ExcelReportPicker/ExcelReportPicker.css` | Estilos con prefijo de clases `erp-` |
 | `ExcelReportPicker/strings/ExcelReportPicker.1033.resx` | Nombres y descripciones localizados del panel de propiedades |
+
+Ejemplos inventados que acompanan esta guia: [`docs/ejemplos/ExcelReportPicker-informes.json`](ejemplos/ExcelReportPicker-informes.json) y [`docs/ejemplos/ExcelReportPicker-items.json`](ejemplos/ExcelReportPicker-items.json).

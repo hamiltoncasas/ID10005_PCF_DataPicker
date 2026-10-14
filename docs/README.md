@@ -1,6 +1,6 @@
 # Documentacion - ID10005 PCF DataPicker
 
-> Fecha: 2026-09-27
+> Fecha: 2026-10-13
 > Descripcion: Indice general del proyecto y de la documentacion de los siete controles PCF para Power Apps Canvas.
 
 Este repositorio entrega **siete controles PCF** (`control-type="virtual"`) listos para Power Apps Canvas y para formularios de Dataverse. La documentacion tiene **un archivo por control** y este indice con todo lo que es comun a los siete.
@@ -16,7 +16,7 @@ El proyecto PCF de la raiz contiene seis controles. `DateTimeRangePicker` vive e
 | `DateRangePicker` | 1.0.11 | Seleccionar un **rango de fechas** | `startDate`, `endDate`, `selectedDate` | [DateRangePicker.md](DateRangePicker.md) |
 | `DateTimeRangePicker` | 1.0.11 | Seleccionar un **rango de fecha y hora** | `startDateTime`, `endDateTime`, `selectedDate` | [DateTimeRangePicker.md](DateTimeRangePicker.md) |
 | `SearchableComboBox` | 1.0.1 | Elegir elementos de una tabla o coleccion con **busqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | [SearchableComboBox.md](SearchableComboBox.md) |
-| `ExcelReportPicker` | 1.4.1 | Desplegar **informes definidos en JSON** sobre la tabla enlazada y descargarlos en Excel | `selectedReport`, `lastReport`, `lastReportName`, `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `hasError`, `columnsDetected`, `availableColumnsJson`, `isLoading`, `dataStatus` | [ExcelReportPicker.md](ExcelReportPicker.md) |
+| `ExcelReportPicker` | 1.4.2 | Desplegar **informes definidos en JSON** sobre la tabla enlazada y descargarlos en Excel | `selectedReport`, `lastReport`, `lastReportName`, `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `hasError`, `columnsDetected`, `availableColumnsJson`, `isLoading`, `dataStatus` | [ExcelReportPicker.md](ExcelReportPicker.md) |
 | `WebPageViewer` | 1.0.1 | Mostrar una **pagina web** dentro de la aplicacion, con aviso cuando el sitio no admite iframes | `currentUrl`, `isLoading`, `hasError`, `errorMessage` | [WebPageViewer.md](WebPageViewer.md) |
 
 Datos de identidad de los componentes:
@@ -34,7 +34,7 @@ Datos de identidad de los componentes:
 | Dato | Valor |
 | --- | --- |
 | Nombre unico | `ID0005_DataPickers` |
-| Version | `1.0.2.7` |
+| Version | `1.0.2.8` |
 | Publicador / prefijo | `ID0005` / `id5` |
 | Tipo de paquete | `Unmanaged` (`<Managed>0</Managed>`) |
 | Archivo generado | `solution/bin/Release/solution.zip` |
@@ -70,7 +70,8 @@ ID10005_PCF_DataPicker/
 |- pcfconfig.json                     outDir: ./out/controls
 |- eslint.config.mjs                  Reglas de calidad (ESLint 9 + reglas Power Apps)
 |- solution/solution.cdsproj          Proyecto de solucion y paquetes zip
-|- docs/                              Un documento por control y este indice
+|- docs/                              Un documento por control, los ejemplos y este indice
+|- docs/ejemplos/                     Ejemplos JSON inventados (sin datos de clientes)
 |- tools/verificar-controles.js       Arnes de logica (70 comprobaciones)
 |- tools/verificar-nombres-campo.js   Arnes de columnas de ExcelReportPicker (40 comprobaciones)
 \- out/                               Salida del build (no se versiona)
@@ -152,10 +153,10 @@ El empaquetado toma la carpeta `solution/src/` (los componentes compilados, `Oth
 
 ### 5.1 Version del paquete (`.zip`)
 
-La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.7`.**
+La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.8`.**
 
 ```xml
-<Version>1.0.2.7</Version>
+<Version>1.0.2.8</Version>
 ```
 
 Para una entrega nueva: sube ese valor, ejecuta `dotnet build solution.cdsproj -c Release` y comprueba el paquete **antes de importarlo**:
@@ -165,7 +166,7 @@ Expand-Archive solution\bin\Release\solution.zip -DestinationPath tmp\sol -Force
 Select-String -Path tmp\sol\solution.xml -Pattern '<Version>|<Managed>'
 ```
 
-Salida esperada: `<Version>1.0.2.7</Version>` y `<Managed>0</Managed>` (paquete no administrado).
+Salida esperada: `<Version>1.0.2.8</Version>` y `<Managed>0</Managed>` (paquete no administrado).
 
 La version del paquete es independiente de la version de cada control (`<Control>/ControlManifest.Input.xml`): puedes subir una sin la otra, pero en una entrega conviene subir ambas.
 
@@ -329,7 +330,7 @@ node tools/verificar-nombres-campo.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptacion: lint sin errores, build correcto, `70 de 70` y `40 de 40` verificaciones correctas, y paquete de solucion generado con los 7 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.7` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
+Criterios de aceptacion: lint sin errores, build correcto, `70 de 70` y `40 de 40` verificaciones correctas, y paquete de solucion generado con los 7 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.8` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
 
 ## 10. Problemas comunes
 
@@ -353,3 +354,13 @@ Criterios de aceptacion: lint sin errores, build correcto, `70 de 70` y `40 de 4
 ## 12. Datos de ejemplo
 
 Todos los ejemplos de esta documentacion usan **datos inventados** (pedidos, movimientos, eventos y selecciones de prueba). No contienen nombres de tablas, campos, entornos ni datos de ningun cliente.
+
+Los ejemplos que se pueden copiar como archivo estan en `docs/ejemplos/`, que es la unica excepcion de `.gitignore` para archivos de datos:
+
+| Archivo | Contenido | Guia |
+| --- | --- | --- |
+| `docs/ejemplos/ExcelReportPicker-informes.json` | Tres informes de ejemplo: dos en espanol y uno con los alias en ingles | [ExcelReportPicker.md](ExcelReportPicker.md#7-definicion-de-informes-json) |
+| `docs/ejemplos/ExcelReportPicker-items.json` | Seis pedidos inventados que ilustran la forma de **Items** | [ExcelReportPicker.md](ExcelReportPicker.md#11-ejemplo-completo-datos-inventados) |
+| `docs/ejemplos/README.md` | Que hay en la carpeta y como usarlo | - |
+
+Los extractos reales (`.csv`, `.tsv`, `.xlsx`, `.accdb`) siguen excluidos por `.gitignore`: no se versionan en ningun caso.

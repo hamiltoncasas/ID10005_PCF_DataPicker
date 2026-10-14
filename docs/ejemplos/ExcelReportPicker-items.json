@@ -1,0 +1,68 @@
+[
+  {
+    "Pedido": "PED-1001",
+    "Cliente": "Cliente Norte",
+    "Estado": "Entregado",
+    "Fecha": "2026-03-02",
+    "FechaEntrega": "2026-03-05",
+    "Producto": "Cafe molido 500 g",
+    "Cantidad": 12,
+    "Total": 148500,
+    "Vendedor": "Vendedor A"
+  },
+  {
+    "Pedido": "PED-1002",
+    "Cliente": "Cliente Centro",
+    "Estado": "Despachado",
+    "Fecha": "2026-03-03",
+    "FechaEntrega": "2026-03-06",
+    "Producto": "Te en hebras 250 g",
+    "Cantidad": 30,
+    "Total": 214000,
+    "Vendedor": "Vendedor B"
+  },
+  {
+    "Pedido": "PED-1003",
+    "Cliente": "Cliente Sur",
+    "Estado": "Pendiente",
+    "Fecha": "2026-03-04",
+    "FechaEntrega": "2026-03-10",
+    "Producto": "Cafe en grano 1 kg",
+    "Cantidad": 8,
+    "Total": 356000,
+    "Vendedor": "Vendedor A"
+  },
+  {
+    "Pedido": "PED-1004",
+    "Cliente": "Cliente Occidente",
+    "Estado": "Cancelada",
+    "Fecha": "2026-03-05",
+    "FechaEntrega": "2026-03-09",
+    "Producto": "Filtro de repuesto",
+    "Cantidad": 4,
+    "Total": 0,
+    "Vendedor": "Vendedor C"
+  },
+  {
+    "Pedido": "PED-1005",
+    "Cliente": "Cliente Norte",
+    "Estado": "Entregado",
+    "Fecha": "2026-03-06",
+    "FechaEntrega": "2026-03-09",
+    "Producto": "Cafetera de goteo",
+    "Cantidad": 2,
+    "Total": 520000,
+    "Vendedor": "Vendedor B"
+  },
+  {
+    "Pedido": "PED-1006",
+    "Cliente": "Cliente Oriente",
+    "Estado": "Despachado",
+    "Fecha": "2026-03-07",
+    "FechaEntrega": "2026-03-11",
+    "Producto": "Molino manual",
+    "Cantidad": 6,
+    "Total": 198000,
+    "Vendedor": "Vendedor C"
+  }
+]

@@ -1,6 +1,6 @@
 # ID10005 PCF DataPicker
 
-> Fecha: 2026-09-27
+> Fecha: 2026-10-13
 > Descripcion: Siete controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora y rangos, un combobox con busqueda incremental, un exportador de informes a Excel y un visor de paginas web.
 
 Componentes personalizados para aplicaciones de lienzo de Power Apps y para formularios de Dataverse. Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
@@ -14,7 +14,7 @@ Componentes personalizados para aplicaciones de lienzo de Power Apps y para form
 | `DateRangePicker` | Seleccionar un rango de fechas | `startDate`, `endDate` | 1.0.11 | [docs/DateRangePicker.md](docs/DateRangePicker.md) |
 | `DateTimeRangePicker` | Seleccionar un rango de fecha y hora | `startDateTime`, `endDateTime` | 1.0.11 | [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) |
 | `SearchableComboBox` | Elegir elementos de una tabla o coleccion con busqueda tipo contiene | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | 1.0.1 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) |
-| `ExcelReportPicker` | Desplegar informes definidos en JSON sobre la tabla enlazada y descargarlos en Excel | `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `columnsDetected`, `isLoading`, `dataStatus` | 1.4.1 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) |
+| `ExcelReportPicker` | Desplegar informes definidos en JSON sobre la tabla enlazada y descargarlos en Excel | `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `columnsDetected`, `isLoading`, `dataStatus` | 1.4.2 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) |
 | `WebPageViewer` | Mostrar una pagina web dentro de la aplicacion con aviso cuando el sitio no admite iframes | `currentUrl`, `isLoading`, `hasError`, `errorMessage` | 1.0.1 | [docs/WebPageViewer.md](docs/WebPageViewer.md) |
 
 Todos comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con borde gris y boton azul a la derecha, y panel expandido en superposicion con encabezado, cuerpo y pie. El espacio de nombres es `ID10005`, por lo que el identificador de cada componente es `id5_ID10005.<Constructor>`.
@@ -33,6 +33,7 @@ Todos comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con bor
 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) | Combobox con busqueda incremental tipo contiene |
 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) | Exportador de informes a Excel (informes en JSON, tipos, formatos, filtros y aviso de carga) |
 | [docs/WebPageViewer.md](docs/WebPageViewer.md) | Visor de paginas web dentro de la aplicacion (direccion y URL base, barra de acciones, aviso de carga y limites de los iframes) |
+| [docs/ejemplos/](docs/ejemplos/README.md) | Ejemplos JSON inventados (informes y registros de prueba) para copiar y pegar, sin datos de clientes |
 | [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, filtro contiene y seleccion (70 comprobaciones) |
 | [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
 
@@ -48,7 +49,7 @@ Set-Location solution
 dotnet build solution.cdsproj -c Release
 ```
 
-Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.7**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.8**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
 
 ## Uso en Power Fx
 
