@@ -201,10 +201,43 @@ async function main() {
         generatePasswordHash({}, password, iterations),
         "El motor criptografico no esta disponible en este entorno."
     );
-    await checkRejects(
+
+    /* Respaldo JavaScript: sin SubtleCrypto o con SubtleCrypto bloqueado. */
+    check(
         "validar sin Web Crypto",
-        validatePassword(undefined, password, expected.toString("base64"), saltBytes.toString("base64"), iterations),
-        "El motor criptografico no esta disponible en este entorno."
+        await validatePassword(undefined, password, expected.toString("base64"), saltBytes.toString("base64"), iterations),
+        true
+    );
+    check(
+        "validar sin SubtleCrypto",
+        await validatePassword({}, password, expected.toString("base64"), saltBytes.toString("base64"), iterations),
+        true
+    );
+
+    const fallbackCrypto = {
+        getRandomValues(array) {
+            nodeCrypto.randomFillSync(array);
+            return array;
+        },
+        subtle: {
+            importKey: async () => {
+                throw new Error("SubtleCrypto bloqueado");
+            },
+        },
+    };
+    const fallbackGenerated = await generatePasswordHash(fallbackCrypto, password, iterations);
+    const fallbackSalt = Buffer.from(base64ToBytes(fallbackGenerated.salt));
+    const fallbackExpected = nodeCrypto.pbkdf2Sync(password, fallbackSalt, iterations, 32, "sha256");
+    check("respaldo JS coincide con Node", fallbackGenerated.hash, fallbackExpected.toString("base64"));
+    check(
+        "validar hash del respaldo JS",
+        await validatePassword(undefined, password, fallbackGenerated.hash, fallbackGenerated.salt, iterations),
+        true
+    );
+    check(
+        "validar con SubtleCrypto bloqueado",
+        await validatePassword(fallbackCrypto, password, fallbackGenerated.hash, fallbackGenerated.salt, iterations),
+        true
     );
 
     /* Los mensajes de error no filtran la contrasena. */

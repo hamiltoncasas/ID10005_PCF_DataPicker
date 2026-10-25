@@ -84,37 +84,44 @@ If(
     !IsBlank(LookUp(colUsuarios, Usuario = Trim(txtNuevoUsuario.Text))),
     Notify("Ese usuario ya existe.", NotificationType.Warning),
     Set(varModoPassword, "REGISTRO");
-    Set(varPasswordOperation, "GENERATE");
+    Set(varPasswordOperation, "CREAR_USUARIO");
     Set(varPasswordToken, varPasswordToken + 1)
 )
 ```
 
-La ultima rama del `If` ejecuta tres acciones separadas por `;`. El incremento del token es el disparador real.
+La ultima rama del `If` ejecuta tres acciones separadas por `;`. El incremento del token es el disparador real. `CREAR_USUARIO` es un alias de `GENERATE`; tambien puedes usar `CREATE`.
 
 ### 3.4 Evento Al completar la generacion
 
 ```powerfx
-Set(varPasswordHash, TCGPasswordEngine1.GeneratedHash);
-Set(varPasswordSalt, TCGPasswordEngine1.GeneratedSalt);
-Set(varPasswordIterations, TCGPasswordEngine1.GeneratedIterations);
-Set(varPasswordVersion, TCGPasswordEngine1.GeneratedVersion);
+If(
+    !TCGPasswordEngine1.Success,
+    // Error de entrada o tecnico: no guardes nada.
+    Notify(TCGPasswordEngine1.Message, NotificationType.Warning),
 
-Collect(
-    colUsuarios,
-    {
-        ID: varSiguienteUsuario,
-        Usuario: Trim(txtNuevoUsuario.Text),
-        Nombre: Trim(txtNuevoNombre.Text),
-        HashPassword: varPasswordHash,
-        SaltPassword: varPasswordSalt,
-        IteracionesPassword: varPasswordIterations,
-        VersionPassword: varPasswordVersion
-    }
-);
-Set(varSiguienteUsuario, varSiguienteUsuario + 1);
-Set(varPasswordOperation, "");
-Reset(txtNuevaPassword);
-Notify("Cuenta creada. Ya puedes iniciar sesion.", NotificationType.Success)
+    // Exito: guarda solo los valores generados.
+    Set(varPasswordHash, TCGPasswordEngine1.GeneratedHash);
+    Set(varPasswordSalt, TCGPasswordEngine1.GeneratedSalt);
+    Set(varPasswordIterations, TCGPasswordEngine1.GeneratedIterations);
+    Set(varPasswordVersion, TCGPasswordEngine1.GeneratedVersion);
+
+    Collect(
+        colUsuarios,
+        {
+            ID: varSiguienteUsuario,
+            Usuario: Trim(txtNuevoUsuario.Text),
+            Nombre: Trim(txtNuevoNombre.Text),
+            HashPassword: varPasswordHash,
+            SaltPassword: varPasswordSalt,
+            IteracionesPassword: varPasswordIterations,
+            VersionPassword: varPasswordVersion
+        }
+    );
+    Set(varSiguienteUsuario, varSiguienteUsuario + 1);
+    Set(varPasswordOperation, "");
+    Reset(txtNuevaPassword);
+    Notify("Cuenta creada. Ya puedes iniciar sesion.", NotificationType.Success)
+)
 ```
 
 `GeneratedIterations` es el valor realmente usado, no el `0` de entrada. Guardalo tal cual: en la validacion debes pasar el mismo numero.
@@ -219,7 +226,7 @@ No hace falta borrar el hash de la coleccion: el cierre de sesion limpia las var
 
 ## 5. Cambio de contrasena
 
-El cambio usa `GENERATE` de nuevo. **Nunca reutilices el salt anterior**: `GENERATE` crea uno nuevo y ese es el correcto.
+El cambio usa `GENERATE`, `UPDATE` o `CAMBIAR_CLAVE` de nuevo. **Nunca reutilices el salt anterior**: la operacion crea uno nuevo y ese es el correcto.
 
 ### 5.1 Boton Generar nuevo hash
 
@@ -230,35 +237,42 @@ If(
     Len(txtPasswordNueva.Text) < 10,
     Notify("La nueva contrasena debe tener al menos 10 caracteres.", NotificationType.Warning),
     Set(varModoPassword, "CAMBIO");
-    Set(varPasswordOperation, "GENERATE");
+    Set(varPasswordOperation, "CAMBIAR_CLAVE");
     Set(varPasswordToken, varPasswordToken + 1)
 )
 ```
+
+`CAMBIAR_CLAVE` es un alias de `GENERATE`; tambien puedes usar `UPDATE`. El evento que se dispara sigue siendo `OnGenerationCompleted`.
 
 ### 5.2 Evento Al completar la generacion (control de cambio)
 
 Si la pantalla de cambio tiene **su propio** control `TCGPasswordEngine`, el evento no necesita distinguir modos:
 
 ```powerfx
-Set(varPasswordHash, TCGPasswordEngine1.GeneratedHash);
-Set(varPasswordSalt, TCGPasswordEngine1.GeneratedSalt);
-Set(varPasswordIterations, TCGPasswordEngine1.GeneratedIterations);
-Set(varPasswordVersion, TCGPasswordEngine1.GeneratedVersion);
+If(
+    !TCGPasswordEngine1.Success,
+    Notify(TCGPasswordEngine1.Message, NotificationType.Warning),
 
-Patch(
-    colUsuarios,
-    LookUp(colUsuarios, ID = varUsuarioActual.ID),
-    {
-        HashPassword: varPasswordHash,
-        SaltPassword: varPasswordSalt,
-        IteracionesPassword: varPasswordIterations,
-        VersionPassword: varPasswordVersion
-    }
-);
-Set(varUsuarioActual, LookUp(colUsuarios, ID = varUsuarioActual.ID));
-Set(varPasswordOperation, "");
-Reset(txtPasswordNueva);
-Notify("Contrasena actualizada.", NotificationType.Success)
+    Set(varPasswordHash, TCGPasswordEngine1.GeneratedHash);
+    Set(varPasswordSalt, TCGPasswordEngine1.GeneratedSalt);
+    Set(varPasswordIterations, TCGPasswordEngine1.GeneratedIterations);
+    Set(varPasswordVersion, TCGPasswordEngine1.GeneratedVersion);
+
+    Patch(
+        colUsuarios,
+        LookUp(colUsuarios, ID = varUsuarioActual.ID),
+        {
+            HashPassword: varPasswordHash,
+            SaltPassword: varPasswordSalt,
+            IteracionesPassword: varPasswordIterations,
+            VersionPassword: varPasswordVersion
+        }
+    );
+    Set(varUsuarioActual, LookUp(colUsuarios, ID = varUsuarioActual.ID));
+    Set(varPasswordOperation, "");
+    Reset(txtPasswordNueva);
+    Notify("Contrasena actualizada.", NotificationType.Success)
+)
 ```
 
 Si reutilizas un unico control para alta y cambio, el evento debe decidir con una variable de modo **antes** de guardar; no mezcles en el mismo `Patch` los datos de un usuario nuevo con los del usuario actual. Lo mas seguro es un control por pantalla.
@@ -334,7 +348,9 @@ Deben estar asignados **antes** de incrementar el token. La operacion lee las pr
 | --- | --- | --- |
 | El motor no hace nada | Se cambio `Operation` sin cambiar el token | Incrementa `ExecutionToken` |
 | La validacion falla siempre | Iteraciones o version no son las almacenadas | Copia los cuatro valores del registro |
-| El evento no se dispara | Hubo un error de entrada o el resultado se descarto | Revisa `Success` y `Message` |
+| El evento no se dispara | Se cambio `Operation` sin cambiar el token o el valor de `Operation` no es reconocido | Incrementa `ExecutionToken` y usa `GENERATE`/`CREATE`/`UPDATE` o `VALIDATE` |
+| El evento llega con `Success` falso | Error de entrada o tecnico; no es una credencial valida ni invalida | No guardes ni cuentes el intento; muestra `Message` |
+| El formulario queda en “Generando hash...” | El manejador no apaga el indicador en la rama de error | Comprueba `Success` al inicio del evento y apaga el indicador en ambas ramas |
 | `IsValid` es falso y `Success` verdadero | La contrasena no coincide | Es el resultado normal de una credencial incorrecta |
 | `IsValid` es falso y `Success` falso | Error tecnico o de entrada | No muestres "contrasena incorrecta"; muestra `Message` |
 | Dos clics generan dos operaciones | El boton no se deshabilita | Usa `IsProcessing` en `DisplayMode` |

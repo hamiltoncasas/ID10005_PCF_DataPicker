@@ -10,17 +10,17 @@
 | Dato | Valor |
 | --- | --- |
 | Identificador de componente | `id5_ID10005.TCGPasswordEngine` |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | Tipo de control | `standard` (invisible) |
 | Algoritmo | PBKDF2 con SHA-256, hash de 32 bytes y salt aleatorio de 16 bytes |
 | Version de formato | `PBKDF2-SHA256-V1` |
 | Salida principal | `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations`, `GeneratedVersion`, `IsValid` |
-| Requiere servicios externos | No: solo usa `window.crypto.subtle` del navegador |
+| Requiere servicios externos | No: usa `window.crypto` del navegador y, si no hay `subtle`, un respaldo PBKDF2 en JavaScript |
 
 El control sirve para dos operaciones:
 
-- **GENERATE:** crea un salt nuevo y deriva el hash de la contrasena. Devuelve hash, salt, iteraciones y version para guardarlos en Dataverse, SharePoint, SQL o cualquier almacenamiento que ya uses.
-- **VALIDATE:** toma el hash, el salt y las iteraciones almacenados, deriva el hash de la contrasena escrita por el usuario y compara ambos valores en tiempo constante. Devuelve `IsValid`.
+- **GENERATE (o sus alias `CREATE`, `UPDATE`, `CREAR_USUARIO`, `CAMBIAR_CLAVE`, `REGISTRO` y `CAMBIO`):** crea un salt nuevo y deriva el hash de la contrasena. Devuelve hash, salt, iteraciones y version para guardarlos en Dataverse, SharePoint, SQL o cualquier almacenamiento que ya uses. Usa el mismo alias para **crear** y para **actualizar** una contrasena: en ambos casos se genera un hash nuevo con un salt nuevo.
+- **VALIDATE (o sus alias `LOGIN` e `INICIAR_SESION`):** toma el hash, el salt y las iteraciones almacenados, deriva el hash de la contrasena escrita por el usuario y compara ambos valores en tiempo constante. Devuelve `IsValid`.
 
 La contrasena **no se guarda** en propiedades privadas, no se escribe en las salidas y no se incluye en los mensajes. El control tampoco llama a ningun servicio externo ni requiere una licencia premium.
 
@@ -37,7 +37,7 @@ Esta guia reproduce el caso mas comun: **registrar una contrasena y validarla de
 | PCF para canvas activo y solucion publicada | Power Platform admin center > Entorno > Caracteristicas; Soluciones > `ID0005_DataPickers` |
 | Control disponible en el estudio | **Insertar > Obtener mas componentes > Codigo > TCGPasswordEngine** |
 | Destino para los cuatro valores generados | Tabla con columnas de texto para hash/salt/version y una columna entera para iteraciones |
-| Navegador con Web Crypto | El control usa `window.crypto.subtle`; en contextos no seguros el navegador puede no exponerlo |
+| Navegador con `crypto.getRandomValues` | El salt necesita aleatoriedad criptografica. `crypto.subtle` es lo recomendado; si no esta disponible, el control usa un respaldo PBKDF2 en JavaScript |
 
 ### 2.2 Pasos
 
@@ -94,7 +94,7 @@ Esta guia reproduce el caso mas comun: **registrar una contrasena y validarla de
    ```
 
 6. **Carga los valores al validar:** antes de incrementar el token, asigna a `varPasswordHash`, `varPasswordSalt`, `varPasswordIterations` y `varPasswordVersion` los valores almacenados del usuario. Enlaza `Operation` a `"VALIDATE"` y en el boton **Iniciar sesion** ejecuta `Set(varPasswordToken, varPasswordToken + 1)`.
-7. **Interpreta el resultado en el evento** *Al completar la validacion* (`OnValidationCompleted`). `Success` indica que la operacion termino; `IsValid` indica si la contrasena coincide. Un error tecnico no dispara el evento: muestra `Message` cuando `Success` sea falso. La guia completa, con alta, login y cambio de contrasena, esta en [ejemplos/TCGPasswordEngine.md](ejemplos/TCGPasswordEngine.md).
+7. **Interpreta el resultado en el evento** *Al completar la validacion* (`OnValidationCompleted`). `Success` indica que la operacion termino; `IsValid` indica si la contrasena coincide. El evento tambien se dispara cuando hay un error tecnico o de entrada, con `Success = false`: muestra `Message` y no cuentes ese caso como intento fallido. La guia completa, con alta, login y cambio de contrasena, esta en [ejemplos/TCGPasswordEngine.md](ejemplos/TCGPasswordEngine.md).
 
 ### 2.3 Configuracion minima recomendada
 
@@ -110,7 +110,7 @@ Esta guia reproduce el caso mas comun: **registrar una contrasena y validarla de
 ### 2.4 Comprobar que funciona
 
 1. Con `Operation` vacia, el motor no procesa nada al abrir la pantalla.
-2. Genera con una contrasena de menos de 10 caracteres: `Success` es falso, `Message` explica el minimo y no se dispara el evento.
+2. Genera con una contrasena de menos de 10 caracteres: `Success` es falso, `Message` explica el minimo y el evento se dispara con `Success = false` para que puedas apagar el indicador de carga.
 3. Genera con una contrasena valida: `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations` y `GeneratedVersion` tienen valor, y el evento guarda el registro.
 4. Valida con la contrasena correcta: `Success = true` e `IsValid = true`.
 5. Valida con otra contrasena: `Success = true` e `IsValid = false`.
@@ -123,23 +123,23 @@ Resultado: la contrasena se transforma en hash y la aplicacion guarda los cuatro
 
 El control **no se ejecuta en cada cambio de propiedad**. Solo lo hace cuando cambia `ExecutionToken` y la operacion es reconocida:
 
-1. Lee `Operation`; se aceptan `GENERATE` y `VALIDATE` sin distinguir mayusculas y con espacios exteriores. Cualquier otro valor se ignora.
+1. Lee `Operation`; se aceptan `GENERATE`, `CREATE`, `UPDATE`, `CREAR_USUARIO`, `CAMBIAR_CLAVE`, `REGISTRO` y `CAMBIO` como generacion, y `VALIDATE`, `LOGIN` e `INICIAR_SESION` como validacion. No distingue mayusculas y recorta espacios exteriores. Cualquier otro valor se ignora.
 2. Compara `ExecutionToken` con el ultimo token consumido. Si es igual, no hace nada, aunque hayan cambiado la contrasena u otras entradas.
 3. Si el token es distinto, inicia la operacion. Un mismo token nunca ejecuta dos veces la misma operacion.
-4. Si mientras se calcula llega otro token, la operacion anterior se descarta y solo se publica el resultado vigente.
+4. Si mientras se calcula llega otro token, el resultado anterior se descarta y solo se publica el resultado vigente.
 
 Consecuencias practicas:
 
 - Para repetir una operacion con la misma contrasena, **incrementa el token**.
 - Cambiar `Operation` de `GENERATE` a `VALIDATE` sin cambiar el token **no** inicia la validacion.
-- El primer token aceptado tambien ejecuta (aunque sea `0` o este vacio). Por eso conviene mantener `Operation` vacia hasta que el usuario pida la operacion; asi el control no trabaja al montar la pantalla.
+- El token que ya existe cuando el control se monta se considera consumido. Por eso conviene mantener `Operation` vacia hasta que el usuario pida la operacion e incrementar `ExecutionToken` en el boton; asi el control no trabaja al montar la pantalla.
 - La operacion se lee en el momento del cambio de token. Las entradas deben estar actualizadas en ese instante.
 
 ## 4. Propiedades de entrada
 
 | Propiedad | Nombre en Power Apps | Tipo | Predeterminado | Uso |
 | --- | --- | --- | --- | --- |
-| `Operation` | *Operacion* | Texto | vacio | `GENERATE` o `VALIDATE`. Se recorta y se ignora cualquier otro valor |
+| `Operation` | *Operacion* | Texto | vacio | `GENERATE`/`CREATE`/`UPDATE` para generar, `VALIDATE` para validar. Tambien acepta `CREAR_USUARIO`, `CAMBIAR_CLAVE`, `REGISTRO`, `CAMBIO`, `LOGIN` e `INICIAR_SESION`. Se recorta y se ignora cualquier otro valor |
 | `Password` | *Contrasena temporal* | Texto | vacio | Contrasena que se procesa. No se almacena ni se devuelve |
 | `StoredHash` | *Hash almacenado* | Texto | vacio | Hash Base64 guardado. Obligatorio en `VALIDATE` |
 | `StoredSalt` | *Salt almacenado* | Texto | vacio | Salt Base64 guardado. Obligatorio en `VALIDATE` |
@@ -160,11 +160,11 @@ Reglas de la contrasena:
 | --- | --- | --- | --- |
 | `Success` | *Operacion correcta* | Si/No | Verdadero cuando la operacion termino sin errores tecnicos ni de validacion de entradas. En `VALIDATE` es verdadero aunque la contrasena no coincida |
 | `IsProcessing` | *En proceso* | Si/No | Verdadero mientras se calcula el hash; falso al terminar |
-| `IsValid` | *Contrasena valida* | Si/No | Resultado de `VALIDATE`. En `GENERATE` siempre es falso |
-| `GeneratedHash` | *Hash generado* | Texto | Hash PBKDF2-SHA256 en Base64 producido por `GENERATE` |
-| `GeneratedSalt` | *Salt generado* | Texto | Salt aleatorio de 16 bytes en Base64 producido por `GENERATE` |
-| `GeneratedIterations` | *Iteraciones generadas* | Numero entero | Iteraciones realmente usadas por `GENERATE` (incluido el valor predeterminado) |
-| `GeneratedVersion` | *Version generada* | Texto | Version del formato producida por `GENERATE`: `PBKDF2-SHA256-V1` |
+| `IsValid` | *Contrasena valida* | Si/No | Resultado de `VALIDATE`. En `GENERATE`, `CREATE` y `UPDATE` siempre es falso |
+| `GeneratedHash` | *Hash generado* | Texto | Hash PBKDF2-SHA256 en Base64 producido por `GENERATE`, `CREATE` o `UPDATE` |
+| `GeneratedSalt` | *Salt generado* | Texto | Salt aleatorio de 16 bytes en Base64 producido por `GENERATE`, `CREATE` o `UPDATE` |
+| `GeneratedIterations` | *Iteraciones generadas* | Numero entero | Iteraciones realmente usadas por `GENERATE`, `CREATE` o `UPDATE` (incluido el valor predeterminado) |
+| `GeneratedVersion` | *Version generada* | Texto | Version del formato producida por `GENERATE`, `CREATE` o `UPDATE`: `PBKDF2-SHA256-V1` |
 | `Message` | *Mensaje* | Texto | Estado o error controlado. Nunca contiene la contrasena, el hash ni el salt |
 
 `Success` e `IsValid` son cosas distintas:
@@ -178,27 +178,44 @@ Las salidas generadas se limpian al comenzar cada `GENERATE` y tambien si ese `G
 
 ## 6. Eventos
 
-| Evento | Nombre en Power Apps | Cuando se dispara | Cuando no se dispara |
-| --- | --- | --- | --- |
-| `OnGenerationCompleted` | *Al completar la generacion* | Una vez por cada `GENERATE` que termina correctamente, despues de publicar las salidas | En errores de entrada, fallos de Web Crypto o resultados descartados por un token mas reciente |
-| `OnValidationCompleted` | *Al completar la validacion* | Una vez por cada `VALIDATE` que termina correctamente, tanto si `IsValid` es verdadero como falso, despues de publicar las salidas | En errores de entrada, Base64 invalido, fallos de Web Crypto o resultados descartados |
+| Evento | Nombre en Power Apps | Cuando se dispara |
+| --- | --- | --- |
+| `OnGenerationCompleted` | *Al completar la generacion* | Una vez por cada `GENERATE`, `CREATE` o `UPDATE` aceptado, despues de publicar las salidas. `Success` indica si termino bien |
+| `OnValidationCompleted` | *Al completar la validacion* | Una vez por cada `VALIDATE` aceptado, despues de publicar las salidas. `Success` distingue una validacion real de un error de entrada o tecnico |
 
 Los eventos no reciben argumentos. El manejador lee las salidas del control por su nombre, por ejemplo `TCGPasswordEngine1.GeneratedHash`, y el control publica las salidas antes de disparar el evento.
 
-Los errores **no disparan eventos**. Para mostrarlos, enlaza `Message` a una etiqueta o a `Notify()` desde un cambio observado de `IsProcessing`:
+El evento se dispara tanto si la operacion termina bien como si falla. Comprueba siempre `Success` primero:
 
 ```powerfx
-// Texto de una etiqueta de estado
-TCGPasswordEngine1.Message
-
-// Aviso cuando una operacion termino con error
+// OnGenerationCompleted
 If(
-    !TCGPasswordEngine1.IsProcessing && !TCGPasswordEngine1.Success && !IsBlank(TCGPasswordEngine1.Message),
-    Notify(TCGPasswordEngine1.Message, NotificationType.Warning)
+    !TCGPasswordEngine1.Success,
+    // Error de entrada o tecnico: apaga el indicador y muestra el motivo.
+    Set(varCreandoUsuario, false);
+    Notify(TCGPasswordEngine1.Message, NotificationType.Warning),
+
+    // Exito: aqui puedes leer GeneratedHash, GeneratedSalt, etc.
+    Set(varHashUsuario, TCGPasswordEngine1.GeneratedHash)
 )
 ```
 
-La segunda formula es una idea para una etiqueta; no la pongas en `OnVisible` sin controlar el estado inicial, porque al montar el control `Success` es falso y `Message` esta vacio.
+```powerfx
+// OnValidationCompleted
+If(
+    !TCGPasswordEngine1.Success,
+    // Error tecnico o de entrada: NO es una contrasena incorrecta.
+    Set(varErrorLogin, TCGPasswordEngine1.Message);
+    Set(varValidandoLogin, false),
+
+    !TCGPasswordEngine1.IsValid,
+    // La validacion termino y la contrasena no coincide.
+    Notify("Usuario o contrasena incorrectos.", NotificationType.Error),
+
+    // La validacion termino y la contrasena coincide.
+    Notify("Credenciales validas.", NotificationType.Success)
+)
+```
 
 ## 7. Contrato de GENERATE
 
@@ -266,6 +283,8 @@ Comportamiento:
 | Contrasena incorrecta | true | false | `Usuario o contrasena incorrectos.` |
 
 Los mensajes son textos controlados y estables para que puedas compararlos o mostrarlos. No incluyen datos de la contrasena ni valores criptograficos.
+
+Cada fila de la tabla termina con el evento correspondiente (`OnGenerationCompleted` o `OnValidationCompleted`) y `IsProcessing = false`. En los errores, `Success = false`; no interpretes una validacion fallida como contrasena incorrecta salvo que `Success` sea verdadero e `IsValid` sea falso.
 
 ## 10. Ejemplos en Power Fx
 
@@ -358,6 +377,82 @@ TCGPasswordEngine1.Message
 If(TCGPasswordEngine1.IsProcessing, DisplayMode.Disabled, DisplayMode.Edit)
 ```
 
+### 10.5 Un solo control para crear y actualizar
+
+El mismo control sirve para el alta y para el cambio de contrasena. En ambos casos la operacion es de generacion: se crea un salt nuevo y se derivan los cuatro valores. La diferencia esta en la accion que guarda el resultado.
+
+```powerfx
+// Boton Guardar de alta
+Set(varPasswordInputUsuario, txtNuevaClave.Text);
+Set(varAccionHashUsuario, "CREAR_USUARIO");
+Set(varPasswordOperationUsuario, "CREAR_USUARIO"); // alias de GENERATE
+Set(varTokenPasswordUsuario, varTokenPasswordUsuario + 1)
+```
+
+```powerfx
+// Boton Guardar de actualizacion
+Set(varPasswordInputUsuario, txtNuevaClave.Text);
+Set(varAccionHashUsuario, "CAMBIAR_CLAVE");
+Set(varPasswordOperationUsuario, "CAMBIAR_CLAVE"); // alias de GENERATE
+Set(varTokenPasswordUsuario, varTokenPasswordUsuario + 1)
+```
+
+Propiedades del control:
+
+| Propiedad | Expresion |
+| --- | --- |
+| `Operation` | `varPasswordOperationUsuario` |
+| `Password` | `varPasswordInputUsuario` |
+| `ExecutionToken` | `varTokenPasswordUsuario` |
+| `Iterations` | `varIteracionesUsuario` |
+| `HashVersion` | `varVersionHashUsuario` |
+
+En el evento `OnGenerationCompleted`, comprueba primero `Success` y despues usa `varAccionHashUsuario` para decidir si haces `Patch` sobre `Defaults(Usuarios)` (alta) o sobre `LookUp(Usuarios, ID = varIdUsuarioCambioClave)` (actualizacion). Limpia las variables sensibles al final:
+
+```powerfx
+If(
+    !TCGPasswordEngine1.Success,
+    Set(varErrorNuevoUsuario, Coalesce(TCGPasswordEngine1.Message, "No fue posible generar la contrasena."));
+    Set(varCreandoUsuario, false);
+    Set(varProcesandoCambioClave, false),
+
+    Switch(
+        varAccionHashUsuario,
+        "CREAR_USUARIO",
+        Patch(
+            Usuarios,
+            Defaults(Usuarios),
+            {
+                HashClave: TCGPasswordEngine1.GeneratedHash,
+                SaltClave: TCGPasswordEngine1.GeneratedSalt,
+                IteracionesHash: TCGPasswordEngine1.GeneratedIterations,
+                VersionHash: TCGPasswordEngine1.GeneratedVersion
+            }
+        ),
+        "CAMBIAR_CLAVE",
+        Patch(
+            Usuarios,
+            LookUp(Usuarios, ID = varIdUsuarioCambioClave),
+            {
+                HashClave: TCGPasswordEngine1.GeneratedHash,
+                SaltClave: TCGPasswordEngine1.GeneratedSalt,
+                IteracionesHash: TCGPasswordEngine1.GeneratedIterations,
+                VersionHash: TCGPasswordEngine1.GeneratedVersion
+            }
+        )
+    )
+);
+
+Set(varPasswordInputUsuario, "");
+Set(varPasswordOperationUsuario, "");
+Set(varAccionHashUsuario, "");
+Set(varCreandoUsuario, false);
+Set(varProcesandoCambioClave, false)
+```
+
+No enlaces `StoredHash` ni `StoredSalt` para generar: esas entradas solo se usan en `VALIDATE`. En la actualizacion tampoco reutilices el salt anterior; el control genera uno nuevo.
+
+
 ## 11. Seguridad
 
 - **Nunca guardes la contrasena.** Guarda `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations` y `GeneratedVersion`. La contrasena solo debe existir en el control de texto y en la memoria del navegador durante la operacion.
@@ -366,7 +461,7 @@ If(TCGPasswordEngine1.IsProcessing, DisplayMode.Disabled, DisplayMode.Edit)
 - **Compara en tiempo constante.** El control usa XOR acumulado y recorre siempre la misma longitud. Aun asi, la validacion definitiva debe vivir en el servidor cuando la seguridad sea critica.
 - **La validacion en Canvas se ejecuta en el cliente.** Un usuario con acceso al navegador puede inspeccionar el bundle, modificar variables o saltarse la pantalla. Este control es util para flujos de baja criticidad, demostraciones o para preparar el hash antes de enviarlo; **no sustituye** la autenticacion ni la autorizacion del servidor.
 - **PBKDF2 no es memory-hard.** Es ampliamente compatible y suficiente para muchos escenarios, pero Argon2id o scrypt son preferibles cuando el servidor los soporta.
-- **HTTPS y Web Crypto.** `crypto.subtle` solo esta disponible en contextos seguros (HTTPS o localhost). Los navegadores modernos de Power Apps lo ofrecen; un WebView antiguo puede no hacerlo y el control devolvera el mensaje de motor no disponible.
+- **HTTPS y Web Crypto.** `crypto.subtle` solo esta disponible en contextos seguros (HTTPS o localhost). Si el WebView no lo expone, el control aplica un respaldo PBKDF2 en JavaScript con el mismo formato; si tampoco existe `crypto.getRandomValues`, devuelve el mensaje de motor no disponible.
 - **No hay secretos en el control.** El algoritmo y el bundle son publicos: la seguridad depende de la contrasena, el salt y las iteraciones, no de ocultar el codigo.
 - **No registres valores sensibles.** Evita `Trace`, `Notify` o etiquetas con la contrasena, el hash o el salt. `Message` ya esta disenado para mostrarse.
 
@@ -374,8 +469,9 @@ If(TCGPasswordEngine1.IsProcessing, DisplayMode.Disabled, DisplayMode.Edit)
 
 | Sintoma | Causa probable | Solucion |
 | --- | --- | --- |
-| No ocurre nada al pulsar el boton | El token no cambio, `Operation` esta vacia o tiene un valor distinto de `GENERATE`/`VALIDATE` | Revisa la formula del boton y usa exactamente los dos valores admitidos |
-| El evento no se dispara | Hubo un error de entrada, Web Crypto fallo o el resultado se descarto por un token mas reciente | Revisa `Success`, `IsProcessing` y `Message`; corrige la entrada |
+| No ocurre nada al pulsar el boton | El token no cambio o `Operation` esta vacia o tiene un valor no reconocido | Revisa la formula del boton y usa `GENERATE`, `CREATE`, `UPDATE` o `VALIDATE` |
+| El evento no se dispara | El token no cambio, `Operation` no es valida o el resultado se descarto por un token mas reciente | Revisa `Success`, `IsProcessing` y `Message`; corrige la entrada e incrementa el token |
+| El formulario queda en “Generando hash...” | El manejador del evento no revisa `Success` o no se ejecuto | En `OnGenerationCompleted`, comprueba `Success` antes de leer las salidas y apaga el indicador tambien en la rama de error |
 | `GeneratedHash` queda vacio | La ultima operacion fue `VALIDATE` o el `GENERATE` fallo | Ejecuta `GENERATE` de nuevo y comprueba `Success` |
 | `IsValid` es falso aunque la contrasena sea correcta | El hash, salt, iteraciones o version no son los que se usaron al generar; la contrasena tiene espacios distintos | Usa los cuatro valores generados juntos y no recortes la contrasena si se genero con espacios |
 | Mensaje de iteraciones invalidas | `Iterations` esta vacio, es decimal o es menor que 100000 en `VALIDATE` | Usa `GeneratedIterations` o un entero mayor o igual que 100000 |
@@ -408,7 +504,7 @@ La prueba compara el hash del control con `crypto.pbkdf2Sync` de Node para la mi
 Salida esperada:
 
 ```text
-61 de 61 verificaciones correctas
+65 de 65 verificaciones correctas
 ```
 
 Durante el desarrollo, el ciclo de vida del control (tokens, eventos, errores y descarte de resultados obsoletos) se probo con un contexto de PCF simulado en `obj/checks-component`, fuera del codigo versionado; ese arnes no forma parte de la entrega. La rutina completa de compilacion esta en [README.md](README.md#9-verificacion-y-pruebas).
@@ -418,6 +514,6 @@ Durante el desarrollo, el ciclo de vida del control (tokens, eventos, errores y 
 
 - No hay interfaz ni campos visuales: la aplicacion debe aportar el control de texto, el boton y las etiquetas de estado.
 - Los eventos no llevan parametros; el manejador debe leer las propiedades de salida del control.
-- Los errores no tienen evento propio; se consultan en `Message`, `Success` e `IsProcessing`.
+- Los errores no tienen un evento propio; llegan por el evento de finalizacion con `Success = false` y el motivo en `Message`.
 - El control no cifra, no compara contra una base de datos y no aplica politicas de complejidad. Solo deriva y compara hashes.
 - El algoritmo y los parametros son fijos (`PBKDF2-SHA256-V1`, hash de 32 bytes, salt de 16 bytes). Cambiar el formato exige una version nueva y conservar la anterior para validar hashes existentes.

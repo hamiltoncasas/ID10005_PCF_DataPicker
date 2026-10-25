@@ -25,8 +25,41 @@ interface IPasswordEngineEvents extends ComponentFramework.IEventBag {
 
 type Operation = "GENERATE" | "VALIDATE";
 
+/** Instantanea de entradas que se ejecuta de forma serializada. */
+interface IOperationRequest {
+    operation: Operation;
+    sequence: number;
+    password: string;
+    storedHash: string;
+    storedSalt: string;
+    iterations: number | null | undefined;
+    hashVersion: string;
+}
+
+/** Evento pendiente de disparar despues de publicar las salidas. */
+interface ICompletionEvent {
+    operation: Operation;
+    sequence: number;
+}
+
 const OPERATION_GENERATE = "GENERATE";
 const OPERATION_VALIDATE = "VALIDATE";
+const GENERATION_OPERATION_ALIASES: readonly string[] = [
+    OPERATION_GENERATE,
+    "CREATE",
+    "UPDATE",
+    "CREAR_USUARIO",
+    "CAMBIAR_CLAVE",
+    "REGISTRO",
+    "CAMBIO",
+];
+const VALIDATION_OPERATION_ALIASES: readonly string[] = [
+    OPERATION_VALIDATE,
+    "LOGIN",
+    "INICIAR_SESION",
+];
+const COMPLETION_EVENT_DELAY_MS = 50;
+const COMPLETION_EVENT_FALLBACK_MS = 1000;
 
 const MESSAGE_PASSWORD_REQUIRED = "La contrasena no puede estar vacia.";
 const MESSAGE_PASSWORD_TOO_SHORT = "La contrasena debe tener al menos 10 caracteres.";
@@ -50,9 +83,14 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
     private context: ComponentFramework.Context<IInputs, IPasswordEngineEvents> | undefined;
     private container: HTMLDivElement | undefined;
 
-    private lastExecutionToken: number | null = null;
+    private lastExecutionToken = 0;
     private operationSequence = 0;
     private activeOperation: Operation | null = null;
+    private isRunning = false;
+    private queuedRequest: IOperationRequest | null = null;
+    private pendingCompletionEvent: ICompletionEvent | null = null;
+    private eventAfterOutputsTimer: number | undefined;
+    private eventFallbackTimer: number | undefined;
 
     private success = false;
     private isProcessing = false;
@@ -79,6 +117,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
         this.context = context;
         this.notifyOutputChanged = notifyOutputChanged;
         this.container = container;
+        this.lastExecutionToken = this.readExecutionToken(context);
         this.applyHiddenContainerStyle();
     }
 
@@ -103,23 +142,32 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
 
         this.lastExecutionToken = token;
         this.operationSequence += 1;
-        const sequence = this.operationSequence;
-        this.activeOperation = operation;
+        const request: IOperationRequest = {
+            operation,
+            sequence: this.operationSequence,
+            password: String(context.parameters.Password?.raw ?? ""),
+            storedHash: String(context.parameters.StoredHash?.raw ?? "").trim(),
+            storedSalt: String(context.parameters.StoredSalt?.raw ?? "").trim(),
+            iterations: context.parameters.Iterations?.raw,
+            hashVersion: String(context.parameters.HashVersion?.raw ?? "").trim(),
+        };
 
-        if (operation === OPERATION_GENERATE) {
-            this.clearGeneratedResults();
-            this.startGeneration(context, sequence);
-        } else {
-            this.startValidation(context, sequence);
+        this.discardPendingCompletionEvent();
+        if (this.isRunning) {
+            this.queuedRequest = request;
+            return;
         }
+
+        this.startOperation(request);
     }
 
     /**
-     * Publica el estado y los resultados actuales.
+     * Publica el estado y los resultados actuales. El evento de finalizacion se
+     * programa aqui, cuando el anfitrion ya ha recogido las salidas.
      * @returns Salidas del componente.
      */
     public getOutputs(): IOutputs {
-        return {
+        const outputs: IOutputs = {
             Success: this.success,
             IsProcessing: this.isProcessing,
             IsValid: this.isValid,
@@ -129,6 +177,8 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
             GeneratedVersion: this.generatedVersion,
             Message: this.message,
         };
+        this.scheduleEventAfterOutputs();
+        return outputs;
     }
 
     /**
@@ -137,17 +187,27 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
     public destroy(): void {
         this.operationSequence += 1;
         this.activeOperation = null;
+        this.isRunning = false;
+        this.queuedRequest = null;
+        this.discardPendingCompletionEvent();
         this.context = undefined;
         this.container = undefined;
         this.notifyOutputChanged = undefined;
     }
 
-    /** Interpreta el valor de Operation y descarta valores no reconocidos. */
+    /**
+     * Interpreta el valor de Operation. GENERATE, CREATE y UPDATE producen el
+     * mismo resultado criptografico; el evento comun es OnGenerationCompleted.
+     * Descarta valores no reconocidos.
+     */
     private readOperation(context: ComponentFramework.Context<IInputs, IPasswordEngineEvents>): Operation | null {
         const raw = context.parameters.Operation?.raw;
         const text = typeof raw === "string" ? raw.trim().toUpperCase() : "";
-        if (text === OPERATION_GENERATE || text === OPERATION_VALIDATE) {
-            return text;
+        if (GENERATION_OPERATION_ALIASES.includes(text)) {
+            return OPERATION_GENERATE;
+        }
+        if (VALIDATION_OPERATION_ALIASES.includes(text)) {
+            return OPERATION_VALIDATE;
         }
         return null;
     }
@@ -158,57 +218,90 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
         return typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
     }
 
+    /** Marca el inicio de una operacion serializada. */
+    private startOperation(request: IOperationRequest): void {
+        this.isRunning = true;
+        this.activeOperation = request.operation;
+
+        if (request.operation === OPERATION_GENERATE) {
+            this.clearGeneratedResults();
+            this.startGeneration(request);
+        } else {
+            this.startValidation(request);
+        }
+    }
+
     /** Valida las entradas y arranca GENERATE. */
-    private startGeneration(
-        context: ComponentFramework.Context<IInputs, IPasswordEngineEvents>,
-        sequence: number
-    ): void {
-        const password = String(context.parameters.Password?.raw ?? "");
+    private startGeneration(request: IOperationRequest): void {
+        const password = request.password;
         if (password.length === 0) {
-            this.finishWithError(OPERATION_GENERATE, sequence, MESSAGE_PASSWORD_REQUIRED);
+            this.finishWithError(OPERATION_GENERATE, request.sequence, MESSAGE_PASSWORD_REQUIRED);
+            this.completeOperation();
             return;
         }
         if (passwordLength(password) < MIN_PASSWORD_LENGTH) {
-            this.finishWithError(OPERATION_GENERATE, sequence, MESSAGE_PASSWORD_TOO_SHORT);
+            this.finishWithError(OPERATION_GENERATE, request.sequence, MESSAGE_PASSWORD_TOO_SHORT);
+            this.completeOperation();
             return;
         }
 
-        const iterations = resolveIterations(context.parameters.Iterations?.raw);
+        const iterations = resolveIterations(request.iterations);
         this.beginProcessing(OPERATION_GENERATE);
-        void this.runGeneration(password, iterations, sequence);
+        void this.runGeneration(password, iterations, request.sequence);
     }
 
     /** Valida las entradas almacenadas y arranca VALIDATE. */
-    private startValidation(
-        context: ComponentFramework.Context<IInputs, IPasswordEngineEvents>,
-        sequence: number
-    ): void {
-        const password = String(context.parameters.Password?.raw ?? "");
-        const storedHash = String(context.parameters.StoredHash?.raw ?? "").trim();
-        const storedSalt = String(context.parameters.StoredSalt?.raw ?? "").trim();
-        const iterationsRaw = context.parameters.Iterations?.raw;
-        const hashVersion = String(context.parameters.HashVersion?.raw ?? "").trim();
+    private startValidation(request: IOperationRequest): void {
+        const password = request.password;
+        const storedHash = request.storedHash;
+        const storedSalt = request.storedSalt;
+        const iterationsRaw = request.iterations;
+        const hashVersion = request.hashVersion;
 
         if (password.length === 0) {
-            this.finishWithError(OPERATION_VALIDATE, sequence, MESSAGE_PASSWORD_REQUIRED);
+            this.finishWithError(OPERATION_VALIDATE, request.sequence, MESSAGE_PASSWORD_REQUIRED);
+            this.completeOperation();
             return;
         }
         if (storedHash.length === 0 || storedSalt.length === 0) {
-            this.finishWithError(OPERATION_VALIDATE, sequence, MESSAGE_STORED_DATA_REQUIRED);
+            this.finishWithError(OPERATION_VALIDATE, request.sequence, MESSAGE_STORED_DATA_REQUIRED);
+            this.completeOperation();
             return;
         }
         if (!isValidIterationCount(iterationsRaw)) {
-            this.finishWithError(OPERATION_VALIDATE, sequence, MESSAGE_ITERATIONS_INVALID);
+            this.finishWithError(OPERATION_VALIDATE, request.sequence, MESSAGE_ITERATIONS_INVALID);
+            this.completeOperation();
             return;
         }
         if (hashVersion !== HASH_VERSION) {
-            this.finishWithError(OPERATION_VALIDATE, sequence, MESSAGE_VERSION_INVALID);
+            this.finishWithError(OPERATION_VALIDATE, request.sequence, MESSAGE_VERSION_INVALID);
+            this.completeOperation();
             return;
         }
 
         const iterations = Number(iterationsRaw);
         this.beginProcessing(OPERATION_VALIDATE);
-        void this.runValidation(password, storedHash, storedSalt, iterations, sequence);
+        void this.runValidation(password, storedHash, storedSalt, iterations, request.sequence);
+    }
+
+    /** Libera el turno y arranca la ultima solicitud que haya llegado mientras tanto. */
+    private completeOperation(): void {
+        this.isRunning = false;
+        this.activeOperation = null;
+
+        const nextRequest = this.queuedRequest;
+        this.queuedRequest = null;
+        if (nextRequest !== null && nextRequest.sequence === this.operationSequence) {
+            this.startOperation(nextRequest);
+        }
+    }
+
+    /** Obtiene Web Crypto del entorno, sin asumir que SubtleCrypto exista. */
+    private getCrypto(): Crypto | undefined {
+        if (typeof window !== "undefined" && window.crypto !== undefined) {
+            return window.crypto;
+        }
+        return typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
     }
 
     /** Publica el estado de calculo antes de esperar la promesa criptografica. */
@@ -223,7 +316,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
     /** Ejecuta la generacion y publica el resultado solo si sigue vigente. */
     private async runGeneration(password: string, iterations: number, sequence: number): Promise<void> {
         try {
-            const result = await generatePasswordHash(window.crypto, password, iterations);
+            const result = await generatePasswordHash(this.getCrypto(), password, iterations);
             if (!this.isCurrent(sequence, OPERATION_GENERATE)) {
                 return;
             }
@@ -236,8 +329,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
             this.generatedIterations = result.iterations;
             this.generatedVersion = result.version;
             this.message = MESSAGE_GENERATED;
-            this.publishOutputs();
-            this.fireCompletedEvent(OPERATION_GENERATE, sequence);
+            this.queueCompletedEvent(OPERATION_GENERATE, sequence);
         } catch (error) {
             this.finishWithError(
                 OPERATION_GENERATE,
@@ -245,7 +337,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
                 this.describeError(error, MESSAGE_GENERATION_FAILED)
             );
         } finally {
-            this.clearActiveOperation(sequence, OPERATION_GENERATE);
+            this.completeOperation();
         }
     }
 
@@ -258,7 +350,13 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
         sequence: number
     ): Promise<void> {
         try {
-            const isValid = await validatePassword(window.crypto, password, storedHash, storedSalt, iterations);
+            const isValid = await validatePassword(
+                this.getCrypto(),
+                password,
+                storedHash,
+                storedSalt,
+                iterations
+            );
             if (!this.isCurrent(sequence, OPERATION_VALIDATE)) {
                 return;
             }
@@ -267,8 +365,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
             this.isProcessing = false;
             this.isValid = isValid;
             this.message = isValid ? MESSAGE_VALID : MESSAGE_INVALID;
-            this.publishOutputs();
-            this.fireCompletedEvent(OPERATION_VALIDATE, sequence);
+            this.queueCompletedEvent(OPERATION_VALIDATE, sequence);
         } catch (error) {
             this.finishWithError(
                 OPERATION_VALIDATE,
@@ -276,11 +373,15 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
                 this.describeError(error, MESSAGE_VALIDATION_FAILED)
             );
         } finally {
-            this.clearActiveOperation(sequence, OPERATION_VALIDATE);
+            this.completeOperation();
         }
     }
 
-    /** Publica un error controlado y deja el control listo para otra operacion. */
+    /**
+     * Publica un error controlado y deja el control listo para otra operacion.
+     * Tambien dispara el evento de finalizacion para que la aplicacion pueda
+     * apagar sus indicadores de carga y mostrar Message.
+     */
     private finishWithError(operation: Operation, sequence: number, message: string): void {
         if (!this.isCurrent(sequence, operation)) {
             return;
@@ -293,8 +394,7 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
         if (operation === OPERATION_GENERATE) {
             this.clearGeneratedResults();
         }
-        this.activeOperation = null;
-        this.publishOutputs();
+        this.queueCompletedEvent(operation, sequence);
     }
 
     /** Indica si el resultado de la secuencia sigue siendo el vigente. */
@@ -306,10 +406,52 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
         );
     }
 
-    /** Limpia el estado activo solo cuando coincide con la secuencia terminada. */
-    private clearActiveOperation(sequence: number, operation: Operation): void {
-        if (this.operationSequence === sequence && this.activeOperation === operation) {
-            this.activeOperation = null;
+    /** Programa el evento para despues de que el anfitrion lea las salidas. */
+    private queueCompletedEvent(operation: Operation, sequence: number): void {
+        this.pendingCompletionEvent = { operation, sequence };
+        this.clearCompletionTimers();
+        this.publishOutputs();
+        this.eventFallbackTimer = window.setTimeout(() => {
+            this.eventFallbackTimer = undefined;
+            const pending = this.pendingCompletionEvent;
+            if (pending === null || pending.sequence !== sequence) {
+                return;
+            }
+            this.pendingCompletionEvent = null;
+            this.fireCompletedEvent(pending.operation, pending.sequence);
+        }, COMPLETION_EVENT_FALLBACK_MS);
+    }
+
+    /** Se ejecuta dentro de getOutputs, cuando el anfitrion ya tiene el resultado. */
+    private scheduleEventAfterOutputs(): void {
+        const pending = this.pendingCompletionEvent;
+        if (pending === null) {
+            return;
+        }
+
+        this.pendingCompletionEvent = null;
+        this.clearCompletionTimers();
+        this.eventAfterOutputsTimer = window.setTimeout(() => {
+            this.eventAfterOutputsTimer = undefined;
+            this.fireCompletedEvent(pending.operation, pending.sequence);
+        }, COMPLETION_EVENT_DELAY_MS);
+    }
+
+    /** Descarta un evento que aun no se habia disparado. */
+    private discardPendingCompletionEvent(): void {
+        this.pendingCompletionEvent = null;
+        this.clearCompletionTimers();
+    }
+
+    /** Cancela los temporizadores de eventos pendientes. */
+    private clearCompletionTimers(): void {
+        if (this.eventAfterOutputsTimer !== undefined) {
+            window.clearTimeout(this.eventAfterOutputsTimer);
+            this.eventAfterOutputsTimer = undefined;
+        }
+        if (this.eventFallbackTimer !== undefined) {
+            window.clearTimeout(this.eventFallbackTimer);
+            this.eventFallbackTimer = undefined;
         }
     }
 
@@ -342,10 +484,14 @@ export class TCGPasswordEngine implements ComponentFramework.StandardControl<IIn
             return;
         }
 
-        if (operation === OPERATION_GENERATE) {
-            events.OnGenerationCompleted?.();
-        } else {
-            events.OnValidationCompleted?.();
+        try {
+            if (operation === OPERATION_GENERATE) {
+                events.OnGenerationCompleted?.();
+            } else {
+                events.OnValidationCompleted?.();
+            }
+        } catch {
+            // Un error del manejador no debe alterar las salidas ya publicadas.
         }
     }
 

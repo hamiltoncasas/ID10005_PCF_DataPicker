@@ -21,7 +21,7 @@ Excepcion de visibilidad: `TCGPasswordEngine` es un control **invisible** (no di
 | `SearchableComboBox` | 1.0.1 | Elegir elementos de una tabla o coleccion con **busqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | [SearchableComboBox.md](SearchableComboBox.md) |
 | `ExcelReportPicker` | 1.4.2 | Desplegar **informes definidos en JSON** sobre la tabla enlazada y descargarlos en Excel | `selectedReport`, `lastReport`, `lastReportName`, `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `hasError`, `columnsDetected`, `availableColumnsJson`, `isLoading`, `dataStatus` | [ExcelReportPicker.md](ExcelReportPicker.md) |
 | `WebPageViewer` | 1.0.1 | Mostrar una **pagina web** dentro de la aplicacion, con aviso cuando el sitio no admite iframes | `currentUrl`, `isLoading`, `hasError`, `errorMessage` | [WebPageViewer.md](WebPageViewer.md) |
-| `TCGPasswordEngine` | 1.0.0 | **Generar y validar contrasenas** con PBKDF2-HMAC-SHA256 sin dibujar interfaz; se dispara con un token y notifica por eventos | `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations`, `IsValid`, `Success`, `Message`, `IsProcessing` y senales de evento | [TCGPasswordEngine.md](TCGPasswordEngine.md) |
+| `TCGPasswordEngine` | 1.0.1 | **Generar y validar contrasenas** con PBKDF2-HMAC-SHA256 sin dibujar interfaz; se dispara con un token y notifica por eventos | `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations`, `IsValid`, `Success`, `Message`, `IsProcessing` y senales de evento | [TCGPasswordEngine.md](TCGPasswordEngine.md) |
 
 Datos de identidad de los componentes:
 
