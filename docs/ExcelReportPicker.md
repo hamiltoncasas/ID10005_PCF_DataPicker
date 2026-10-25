@@ -31,13 +31,74 @@
 | Solucion con el control importada y publicada | make.powerapps.com > Soluciones |
 | Permiso para agregar codigo a la aplicacion | Power Studio > Insertar > Obtener mas componentes > Codigo |
 
-## 3. Empezar rapido (3 pasos)
+## 3. Guia de uso paso a paso
 
-1. Agrega el control: **Insertar > Obtener mas componentes > Codigo > ExcelReportPicker**.
-2. En **Items** enlaza la tabla o coleccion y aplica los filtros con Power Fx, como en una galeria (seccion 5).
-3. En **Definicion de informes (JSON)** escribe el informe con `JSON({...})`: ahi van las columnas que se exportan (por su **nombre visible** o su **nombre logico**), los titulos, el archivo y el orden (seccion 7).
+Esta guia reproduce el caso mas comun: **exportar los pedidos filtrados por periodo y estado a un archivo Excel**. Al terminar, el usuario abre el panel, elige el informe, ve las columnas detectadas y descarga el `.xlsx`.
 
-Abre el panel del control: veras la lista de informes, el bloque **Columnas detectadas** (campo, tipo y formato) y, al elegir un informe, el boton de descarga. **No hay que mapear columnas**: los nombres se toman del origen.
+### 3.1 Antes de empezar
+
+1. Confirma los requisitos de la seccion 2.
+2. Ten a mano una tabla o coleccion con datos representativos. En esta guia se usa `Pedidos` con las columnas `Pedido`, `Cliente`, `Estado`, `Fecha`, `FechaEntrega`, `Cantidad` y `Total`.
+3. Decide que columnas se exportan y con que titulo. No hay que mapear tipos: el control los detecta, pero puedes declararlos en `tipos` para forzar el formato.
+4. Si vas a usar `DateRangePicker` como filtro, insertalo primero y dale un nombre estable (`rangoPedidos`).
+
+### 3.2 Pasos
+
+1. **Inserta el control:** **Insertar > Obtener mas componentes > Codigo > ExcelReportPicker**. Renombralo, por ejemplo `expPedidos`.
+2. **Filtra en Items:** escribe `Filter(Pedidos, Fecha >= DateValue(rangoPedidos.startDate) && Fecha <= DateValue(rangoPedidos.endDate))`. La exportacion contiene exactamente esos registros; no hay una propiedad de filtro aparte que los vuelva a recortar.
+3. **Define el informe:** en *Definicion de informes (JSON)* escribe el JSON minimo de la seccion 3.3. El objeto exterior es un diccionario de informes; cada clave es el identificador interno y cada valor describe un informe.
+4. **Ajusta los formatos:** deja *Validacion estricta* en `true` durante la puesta a punto para que el panel bloquee nombres de columna mal escritos. Pasalo a `false` cuando el informe ya este validado.
+5. **Decide el alcance:** *Limite de filas* en `0` exporta todo. Un valor como `5000` protege al usuario de libros enormes.
+6. **Abre el panel y elige el informe:** revisa el bloque **Columnas detectadas** (nombre, tipo y formato), pulsa **Copiar nombres** si necesitas ajustar el JSON y comprueba los contadores de columnas y registros.
+7. **Descarga y valida:** pulsa **Descargar Excel**, abre el archivo y confirma encabezados, orden, formatos de fecha/moneda y que el numero de filas coincide con los contadores. El escenario completo esta en [ejemplos/ExcelReportPicker.md](ejemplos/ExcelReportPicker.md).
+
+### 3.3 JSON minimo que funciona
+
+```powerfx
+JSON({
+    pedidos: {
+        nombre: "Pedidos del periodo",
+        columnas: "Pedido,Cliente,Estado,Fecha,FechaEntrega,Cantidad,Total",
+        titulos: {
+            Pedido: "Pedido",
+            Cliente: "Cliente",
+            Estado: "Estado",
+            Fecha: "Fecha del pedido",
+            FechaEntrega: "Fecha de entrega",
+            Cantidad: "Cantidad",
+            Total: "Total"
+        },
+        tipos: { Fecha: "fecha", FechaEntrega: "fecha", Cantidad: "entero", Total: "moneda" },
+        archivo: "pedidos_{fecha}.xlsx",
+        hoja: "Pedidos",
+        ordenarPor: "Pedido"
+    }
+})
+```
+
+`{fecha}` se sustituye por la fecha de generacion. Los nombres de `columnas`, `titulos`, `tipos` y `ordenarPor` pueden ser el **nombre visible** o el **nombre logico**; el control resuelve ambas formas (seccion 7.3).
+
+### 3.4 Configuracion minima recomendada
+
+| Propiedad | Valor sugerido | Por que |
+| --- | --- | --- |
+| **Items** | `Filter(Pedidos, ...)` | Define el conjunto exacto que se exporta |
+| *Definicion de informes (JSON)* | El JSON de la seccion 3.3 | Sin informes, el panel no ofrece descargas |
+| *Validacion estricta* | `true` en pruebas, `false` en produccion | Detecta columnas mal escritas sin bloquear al usuario final |
+| *Limite de filas* | `0` o un tope de negocio | Evita exportaciones accidentales de toda la tabla |
+| *Incluir titulo del informe* | Activado | Da contexto al libro |
+| *Incluir resumen de filtros* | Activado | Deja constancia del periodo o filtro aplicado |
+| *Formato de fecha* | `dd/mm/yyyy` | Formato nativo de Excel para las columnas de fecha |
+
+### 3.5 Comprobar que funciona
+
+1. Con **Items** sin registros, el panel muestra el contador `Registros: 0`; no hay un aviso propio dentro del panel. Si pulsas **Descargar Excel**, la descarga se completa: el libro conserva el titulo y el resumen (si estan activados) y el encabezado, pero no agrega filas de datos; el mensaje de exito incluye *Texto sin registros*.
+2. Con una columna mal escrita y *Validacion estricta* activa, la descarga se bloquea y el aviso identifica el campo.
+3. Con *Validacion estricta* desactivada, el informe se genera y el aviso queda visible.
+4. El archivo descargado abre en Excel sin reparaciones, con una hoja por informe y los encabezados definidos en `titulos`.
+5. Cambia el filtro de **Items** y vuelve a exportar: los contadores y las filas del archivo cambian.
+
+Resultado: el panel muestra los informes del JSON, las columnas detectadas y descarga un `.xlsx` con los registros de **Items**. La guia completa, con datos inventados, varios informes, filtros por informe y pruebas, esta en [ejemplos/ExcelReportPicker.md](ejemplos/ExcelReportPicker.md).
 
 ## 4. Guia de parametros: donde va cada cosa
 
@@ -60,7 +121,7 @@ Abre el panel del control: veras la lista de informes, el bloque **Columnas dete
 
 ## 5. La propiedad Items
 
-`Items` es un conjunto de datos: se enlaza una tabla o una coleccion **igual que en una galeria**, y ahi mismo se filtran los registros.
+En el panel de propiedades, la etiqueta de esta propiedad es *Items (tabla o coleccion filtrada)*; en el resto de la guia se abrevia como **Items**. Es un conjunto de datos: se enlaza una tabla o una coleccion **igual que en una galeria**, y ahi mismo se filtran los registros.
 
 | Forma | Ejemplo |
 | --- | --- |
@@ -277,7 +338,7 @@ Los datos son inventados: no hay nombres de tablas, campos de ningun entorno ni 
 
 | Propiedad (nombre tecnico) | Nombre en Power Apps | Tipo | Predeterminado | Descripcion |
 | --- | --- | --- | --- | --- |
-| `items` | *Items* | Conjunto de datos | - | Tabla o coleccion con los registros que se exportan, ya filtrados con Power Fx (seccion 5) |
+| `items` | *Items (tabla o coleccion filtrada)* | Conjunto de datos | - | Tabla o coleccion con los registros que se exportan, ya filtrados con Power Fx (seccion 5) |
 | `reportsJson` | *Definicion de informes (JSON)* | Texto multilinea | vacio | Informes configurados (seccion 7) |
 | `strictFilters` | *Validacion estricta* | Si/No | No | Bloquea la descarga si una columna o un tipo declarado no se puede resolver |
 | `dateFormat` | *Formato de fecha Excel* | Texto | `dd/mm/yyyy` | Formato nativo de las fechas y orden dia/mes al leer textos de fecha |
@@ -396,6 +457,7 @@ Fila 5  PED-1001 | Comercial Andina | Despachado | 12/03/2026 | ...
 - El encabezado depende de *Incluir encabezado*; el autofiltro de *Autofiltro de Excel* (se aplica solo si hay encabezado y filas).
 - Los anchos de columna se calculan entre 8 y 60 caracteres por columna cuando *Ajustar ancho de columnas* esta activo.
 - La fila 2 muestra los filtros con los valores recibidos (por eso las fechas aparecen como `YYYY-MM-DD`) y la ultima parte nombra la columna y el operador aplicados.
+- Con cero registros, el libro conserva el titulo y el resumen (si estan activados) y la fila de encabezado, pero no escribe filas de datos ni aplica autofiltro.
 - El nombre de la hoja sale de `hoja` (maximo 31 caracteres, sin `[ ] \ / ? * :`).
 
 ## 11. Ejemplo completo (datos inventados)
@@ -404,7 +466,7 @@ Pantalla con un `DateRangePicker`, un desplegable de vendedor, una etiqueta de a
 
 ```powerfx
 // Boton de la pantalla: limpiar el periodo
-Set(varReiniciar, true);      // conectado a la propiedad Reiniciar seleccion del selector de fechas
+Set(varReiniciar, true);      // conectado a la propiedad Reiniciar selección del selector de fechas
 
 // Propiedad Items del control
 Filter(Pedidos,

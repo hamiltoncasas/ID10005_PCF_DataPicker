@@ -1,9 +1,9 @@
 # ID10005 PCF DataPicker
 
-> Fecha: 2026-10-13
-> Descripcion: Siete controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora y rangos, un combobox con busqueda incremental, un exportador de informes a Excel y un visor de paginas web.
+> Fecha: 2026-10-25
+> Descripcion: Ocho controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora y rangos, un combobox con busqueda incremental, un exportador de informes a Excel, un visor de paginas web y un motor invisible de generacion y validacion de contrasenas.
 
-Componentes personalizados para aplicaciones de lienzo de Power Apps y para formularios de Dataverse. Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
+Componentes personalizados para aplicaciones de lienzo de Power Apps (y para formularios de Dataverse en los siete controles visuales). Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
 
 ## Controles
 
@@ -16,10 +16,11 @@ Componentes personalizados para aplicaciones de lienzo de Power Apps y para form
 | `SearchableComboBox` | Elegir elementos de una tabla o coleccion con busqueda tipo contiene | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | 1.0.1 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) |
 | `ExcelReportPicker` | Desplegar informes definidos en JSON sobre la tabla enlazada y descargarlos en Excel | `lastFile`, `lastRows`, `lastStatus`, `errorMessage`, `columnsDetected`, `isLoading`, `dataStatus` | 1.4.2 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) |
 | `WebPageViewer` | Mostrar una pagina web dentro de la aplicacion con aviso cuando el sitio no admite iframes | `currentUrl`, `isLoading`, `hasError`, `errorMessage` | 1.0.1 | [docs/WebPageViewer.md](docs/WebPageViewer.md) |
+| `TCGPasswordEngine` | Generar y validar hashes PBKDF2-SHA256 sin interfaz visible | `Success`, `IsValid`, `GeneratedHash`, `GeneratedSalt`, `GeneratedIterations`, `GeneratedVersion`, `IsProcessing`, `Message` | 1.0.0 | [docs/TCGPasswordEngine.md](docs/TCGPasswordEngine.md) |
 
-Todos comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con borde gris y boton azul a la derecha, y panel expandido en superposicion con encabezado, cuerpo y pie. El espacio de nombres es `ID10005`, por lo que el identificador de cada componente es `id5_ID10005.<Constructor>`.
+Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con borde gris y boton azul a la derecha, y panel expandido en superposicion con encabezado, cuerpo y pie. `TCGPasswordEngine` es la excepcion: no dibuja interfaz, se ejecuta como motor criptografico invisible. El espacio de nombres es `ID10005`, por lo que el identificador de cada componente es `id5_ID10005.<Constructor>`.
 
-**Alcance de los proyectos:** el proyecto PCF raiz compila seis controles (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `SearchableComboBox`, `ExcelReportPicker` y `WebPageViewer`). `DateTimeRangePicker` tiene un proyecto PCF anidado y se compila por separado. El proyecto de solucion referencia ambos proyectos y empaqueta los siete controles.
+**Alcance de los proyectos:** el proyecto PCF raiz compila siete controles (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `SearchableComboBox`, `ExcelReportPicker`, `WebPageViewer` y `TCGPasswordEngine`). `DateTimeRangePicker` tiene un proyecto PCF anidado y se compila por separado. El proyecto de solucion referencia ambos proyectos y empaqueta los ocho controles.
 
 ## Documentacion
 
@@ -33,6 +34,8 @@ Todos comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con bor
 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) | Combobox con busqueda incremental tipo contiene |
 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) | Exportador de informes a Excel (informes en JSON, tipos, formatos, filtros y aviso de carga) |
 | [docs/WebPageViewer.md](docs/WebPageViewer.md) | Visor de paginas web dentro de la aplicacion (direccion y URL base, barra de acciones, aviso de carga y limites de los iframes) |
+| [docs/TCGPasswordEngine.md](docs/TCGPasswordEngine.md) | Motor invisible de contrasenas PBKDF2-SHA256 (GENERATE/VALIDATE, eventos, iteraciones, seguridad y ejemplos) |
+| [tools/verificar-password-engine.js](tools/verificar-password-engine.js) | Arnes criptografico: vectores de Node, Base64, Unicode, iteraciones y errores (61 comprobaciones) |
 | [docs/ejemplos/](docs/ejemplos/README.md) | Ejemplos JSON inventados (informes y registros de prueba) para copiar y pegar, sin datos de clientes |
 | [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, filtro contiene y seleccion (70 comprobaciones) |
 | [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
@@ -49,7 +52,7 @@ Set-Location solution
 dotnet build solution.cdsproj -c Release
 ```
 
-Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.8**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.9**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
 
 ## Uso en Power Fx
 
@@ -71,6 +74,17 @@ ExcelReportPicker1.lastFile
 // Visor de paginas web: direccion mostrada y aviso de pagina no visible
 WebPageViewer1.currentUrl
 If(WebPageViewer1.hasError, Notify(WebPageViewer1.errorMessage, NotificationType.Warning))
+
+// Motor de contrasenas: generar (Operation = varOperacion, ExecutionToken = varToken)
+Set(varOperacion, "GENERATE");
+Set(varToken, varToken + 1)
+
+// Motor de contrasenas: validar (las propiedades almacenadas ya estan cargadas)
+Set(varOperacion, "VALIDATE");
+Set(varToken, varToken + 1)
+
+// Leer el resultado desde el evento OnValidationCompleted
+TCGPasswordEngine1.Success && TCGPasswordEngine1.IsValid
 ```
 
 Inicializa `varReiniciar` en `false` al iniciar la pantalla o la aplicacion. La propiedad *Reiniciar seleccion* actua cuando cambia de valor; alternar la variable permite volver a activarla en cada pulsacion.
@@ -82,6 +96,8 @@ npm run lint                        # ESLint (0 errores)
 npm run build                       # compila los controles
 node tools/verificar-controles.js    # 70 de 70 verificaciones correctas
 node tools/verificar-nombres-campo.js  # 40 de 40 verificaciones correctas
+npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
+node tools/verificar-password-engine.js  # 61 de 61 verificaciones correctas
 
 Set-Location solution
 dotnet build solution.cdsproj -c Release

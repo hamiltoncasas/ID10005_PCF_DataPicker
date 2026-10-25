@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Fecha: 2026-10-25. Descripcion: Contrato del motor criptografico invisible de generacion y validacion de contrasenas (PBKDF2-SHA256). -->
+<manifest>
+  <control namespace="ID10005" constructor="TCGPasswordEngine" version="1.0.0" display-name-key="TCGPasswordEngine" description-key="TCGPasswordEngine description" control-type="standard" >
+    <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
+    If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
+    El control solo usa la API criptografica del navegador: no llama a ningun servicio externo.
+    -->
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <!-- Entradas: operacion solicitada, datos temporales y token de ejecucion. -->
+    <property name="Operation" display-name-key="Operation" description-key="Operation_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="Password" display-name-key="Password" description-key="Password_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="StoredHash" display-name-key="Stored_Hash" description-key="Stored_Hash_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="StoredSalt" display-name-key="Stored_Salt" description-key="Stored_Salt_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="Iterations" display-name-key="Iterations" description-key="Iterations_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="HashVersion" display-name-key="Hash_Version" description-key="Hash_Version_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ExecutionToken" display-name-key="Execution_Token" description-key="Execution_Token_Desc" of-type="Whole.None" usage="input" required="false" />
+    <!-- Salidas: estado de la operacion y resultados genericos. -->
+    <property name="Success" display-name-key="Success" description-key="Success_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="IsProcessing" display-name-key="Is_Processing" description-key="Is_Processing_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="IsValid" display-name-key="Is_Valid" description-key="Is_Valid_Desc" of-type="TwoOptions" usage="output" required="false" />
+    <property name="GeneratedHash" display-name-key="Generated_Hash" description-key="Generated_Hash_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="GeneratedSalt" display-name-key="Generated_Salt" description-key="Generated_Salt_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="GeneratedIterations" display-name-key="Generated_Iterations" description-key="Generated_Iterations_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="GeneratedVersion" display-name-key="Generated_Version" description-key="Generated_Version_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="Message" display-name-key="Message" description-key="Message_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <!-- Eventos genericos de finalizacion. Se disparan una sola vez por operacion aceptada. -->
+    <event name="OnGenerationCompleted" display-name-key="On_Generation_Completed" description-key="On_Generation_Completed_Desc" />
+    <event name="OnValidationCompleted" display-name-key="On_Validation_Completed" description-key="On_Validation_Completed_Desc" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <resx path="strings/TCGPasswordEngine.1033.resx" version="1.0.0" />
+    </resources>
+  </control>
+</manifest>

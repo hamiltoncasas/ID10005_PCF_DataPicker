@@ -23,13 +23,48 @@ Comparte el lenguaje visual de los demas selectores del repositorio:
 
 Cuando lo usas: cuando necesitas controlar el **formato de la salida**, limitar el calendario (ano, mes minimo y maximo) o replicar el aspecto de los demas selectores del repositorio. Si solo necesitas una fecha para escribir en Dataverse y el formato nativo te sirve, el selector de fecha del propio Power Apps es suficiente.
 
-## 2. Empezar rapido
+## 2. Guia de uso paso a paso
 
-1. En el estudio de Power Apps: **Insertar > Obtener mas componentes > Codigo > DatePicker**.
-2. Opcional: escribe un formato en la propiedad **Formato de fecha** (por ejemplo `DD/MM/YYYY`). Si la dejas vacia se usa `YYYY-MM-DD`.
-3. Opcional: precarga con la propiedad **Fecha inicial** (`initialDate`) y conecta **Reiniciar seleccion** (`resetKey`) a una variable si quieres poder limpiar el control desde Power Fx.
+Esta guia reproduce el caso mas comun: **capturar una fecha en un formulario y guardarla en un registro**. Al final, la aplicacion valida que haya seleccion, escribe la fecha y permite limpiarla.
 
-Resultado: el control muestra la fecha elegida y publica la salida `DatePicker1.date` en el formato configurado.
+### 2.1 Antes de empezar
+
+| Requisito | Como comprobarlo |
+| --- | --- |
+| La caracteristica **Power Apps component framework for canvas apps** esta activa | Power Platform admin center > Entorno > Configuracion > Producto > Caracteristicas |
+| La solucion con el control esta importada y publicada | make.powerapps.com > Soluciones > `ID0005_DataPickers` |
+| La aplicacion permite insertar codigo | Estudio de Power Apps > **Insertar > Obtener mas componentes > Codigo** |
+| Existe la tabla o coleccion donde se guarda la fecha | Datos > Tablas, o una coleccion creada con `ClearCollect` |
+
+### 2.2 Pasos
+
+1. **Inserta el control:** en el estudio abre **Insertar > Obtener mas componentes > Codigo > DatePicker**. Si no aparece, revisa la seccion 2.1 y vuelve a importar la solucion.
+2. **Dale un nombre estable:** cambia `DatePicker1` por un nombre de negocio, por ejemplo `dtpFechaEntrega`. Las formulas de esta guia usan ese nombre.
+3. **Configura el formato:** en *Formato de fecha* escribe `YYYY-MM-DD`. Es el formato recomendado para convertir la salida con `DateValue` y el que usan los ejemplos del repositorio.
+4. **Precarga si editas un registro existente:** en *Fecha precargada* (`initialDate`) escribe `Text(ThisItem.FechaEntrega, "yyyy-mm-dd")`. Si el formulario es de alta, dejala vacia.
+5. **Conecta el reinicio:** crea una variable en la pantalla con `UpdateContext({ limpiarFecha: false })` y enlaza *Reiniciar selección* (`resetKey`) a `limpiarFecha`. Un boton puede ejecutar `UpdateContext({ limpiarFecha: !limpiarFecha })`.
+6. **Lee la salida:** agrega una etiqueta con `Text(DateValue(dtpFechaEntrega.date), "dddd, dd 'de' mmmm 'de' yyyy")` para confirmar que el valor llega como fecha y no como texto ambiguo.
+7. **Guarda el registro:** en el boton **Guardar** usa `Patch` con `DateValue(dtpFechaEntrega.date)` y valida antes de escribir. El ejemplo completo esta en [ejemplos/DatePicker.md](ejemplos/DatePicker.md).
+
+### 2.3 Configuracion minima recomendada
+
+| Propiedad | Valor sugerido | Por que |
+| --- | --- | --- |
+| *Formato de fecha* | `YYYY-MM-DD` | Evita ambiguedades entre dia y mes al usar `DateValue` |
+| *Fecha precargada* | `Text(ThisItem.FechaEntrega, "yyyy-mm-dd")` | Muestra el valor actual al editar |
+| *Reiniciar selección* | `limpiarFecha` | Permite limpiar el control desde un boton |
+| *Fecha mínima* | `Text(Today(), "yyyy-mm-dd")` | Impide elegir fechas pasadas (opcional) |
+| *Etiqueta accesible* | `Fecha de entrega` | Mejora la lectura con lectores de pantalla |
+
+### 2.4 Comprobar que funciona
+
+1. Abre la pantalla sin valor precargado: el campo muestra `Selecciona fecha`.
+2. Elige un dia: el panel se contrae y `dtpFechaEntrega.date` publica `YYYY-MM-DD`.
+3. Pulsa el boton de limpiar: la salida queda vacia y vuelve el texto de ayuda.
+4. Intenta guardar sin fecha: la aplicacion debe mostrar el aviso definido con `Notify`.
+5. Cambia *Formato de fecha* a `DD/MM/YYYY`: la salida cambia de formato, pero `DateValue` sigue interpretandola segun la configuracion regional.
+
+Resultado: el control muestra la fecha elegida y publica la salida `dtpFechaEntrega.date` en el formato configurado. La guia completa con tabla de datos, formulas de guardado y variantes esta en [ejemplos/DatePicker.md](ejemplos/DatePicker.md).
 
 ## 3. Propiedades de entrada
 
@@ -40,16 +75,16 @@ Resultado: el control muestra la fecha elegida y publica la salida `DatePicker1.
 | `initialDate` | *Fecha precargada* | Texto | vacio | Fecha para precargar el control. Se interpreta con el formato de **Formato de fecha**; tambien acepta ISO `YYYY-MM-DD` |
 | `defaultDate` | *Fecha precargada por omision* | Texto | vacio | Valor de mayor prioridad: si no esta vacio, sustituye a *Fecha precargada*. La entrada se vuelve a aplicar si cambia |
 | `format` | *Formato de fecha* | Texto | `YYYY-MM-DD` | Formato de la salida y de la precarga. Catalogo en [README.md](README.md#7-formatos-de-fecha-y-hora) |
-| `resetKey` | *Reiniciar seleccion* | Si/No | No | Cuando cambia de valor, el control limpia la fecha seleccionada. Ideal para un boton *Limpiar* |
-| `zIndex` | *Prioridad visual del panel* | Numero | `2147483647` | `z-index` del panel abierto. Se limita entre 1 y 2147483647 |
-| `placeholderText` | *Texto de ayuda* | Texto | `Selecciona fecha` | Texto del campo cuando no hay fecha elegida |
-| `isEditable` | *Editable* | Si/No | No | Permite **escribir** la fecha en el campo (ademas de elegirla en el calendario). El texto escrito se interpreta con el formato configurado |
+| `resetKey` | *Reiniciar selección* | Si/No | No | Cuando cambia de valor, el control limpia la fecha seleccionada. Ideal para un boton *Limpiar* |
+| `zIndex` | *Prioridad visual del selector* | Numero | `2147483647` | `z-index` del panel abierto. Se limita entre 1 y 2147483647 |
+| `placeholderText` | *Texto de ayuda del campo* | Texto | `Selecciona fecha` | Texto del campo cuando no hay fecha elegida |
+| `isEditable` | *Permitir escribir la fecha* | Si/No | No | Permite **escribir** la fecha en el campo (ademas de elegirla en el calendario). El texto escrito se interpreta con el formato configurado |
 | `accessibleLabel` | *Etiqueta accesible* | Texto | vacio | Texto para lectores de pantalla cuando la etiqueta del lienzo no basta |
-| `minDate` | *Fecha minima* | Texto | vacio | Primer dia seleccionable. Los dias anteriores se ven deshabilitados |
-| `maxDate` | *Fecha maxima* | Texto | vacio | Ultimo dia seleccionable |
-| `startYear` | *Ano inicial* | Numero | `0` | Ano menor del calendario (`0` = sin limite) |
-| `endYear` | *Ano final* | Numero | `0` | Ano mayor del calendario (`0` = sin limite) |
-| `startOfWeek` | *Primer dia de la semana* | Texto | `monday` | Nombre completo del dia en espanol o ingles, o numero de 0 (domingo) a 6 (sabado). Un valor vacio o no reconocido usa lunes |
+| `minDate` | *Fecha mínima* | Texto | vacio | Primer dia seleccionable. Los dias anteriores se ven deshabilitados |
+| `maxDate` | *Fecha máxima* | Texto | vacio | Ultimo dia seleccionable |
+| `startYear` | *Año inicial del calendario* | Numero | `0` | Año menor del calendario (`0` = sin limite) |
+| `endYear` | *Año final del calendario* | Numero | `0` | Año mayor del calendario (`0` = sin limite) |
+| `startOfWeek` | *Primer día de la semana* | Texto | `monday` | Nombre completo del dia en espanol o ingles, o numero de 0 (domingo) a 6 (sabado). Un valor vacio o no reconocido usa lunes |
 | `dateTimeZone` | *Zona horaria de los valores* | Texto | `Local` | Solo `Utc` activa el modo UTC; cualquier otro valor se interpreta como `Local`. En UTC, una salida elegida se publica como instante con `Z` |
 | `language` | *Idioma del calendario* | Texto | espanol | Codigo BCP 47, por ejemplo `es-ES` o `en-US`; vacio/invalido usa los nombres predeterminados en espanol |
 
@@ -63,17 +98,17 @@ Estas propiedades siguen los mismos nombres y el mismo espiritu que las del cont
 | `borderStyle` | *Estilo del borde* | Texto |
 | `borderThickness` | *Grosor del borde* | Numero |
 | `color` | *Color del texto* | Texto |
-| `fill` | *Relleno* | Texto |
-| `font` | *Fuente* | Texto |
-| `size` | *Tamano de fuente* | Numero |
-| `fontWeight` | *Grosor de fuente* | Texto |
-| `italic` | *Cursiva* | Si/No |
-| `strikethrough` | *Tachado* | Si/No |
-| `underline` | *Subrayado* | Si/No |
-| `chevronBackground` | *Fondo de las flechas* | Texto |
-| `chevronFill` | *Color de las flechas* | Texto |
-| `iconBackground` | *Fondo del icono* | Texto |
-| `iconFill` | *Color del icono* | Texto |
+| `fill` | *Color de fondo del campo* | Texto |
+| `font` | *Fuente del texto* | Texto |
+| `size` | *Tamaño de la fuente* | Numero |
+| `fontWeight` | *Grosor de la fuente* | Texto |
+| `italic` | *Texto en cursiva* | Si/No |
+| `strikethrough` | *Texto tachado* | Si/No |
+| `underline` | *Texto subrayado* | Si/No |
+| `chevronBackground` | *Fondo de las flechas del calendario* | Texto |
+| `chevronFill` | *Color de las flechas del calendario* | Texto |
+| `iconBackground` | *Fondo del icono del calendario* | Texto |
+| `iconFill` | *Color del icono del calendario* | Texto |
 
 ## 4. Salidas
 
@@ -91,8 +126,8 @@ En zona `Local`, ambas salidas son la fecha en el formato `format`. En zona `Utc
 3. **Volver a abrir:** el mes visible es el de la fecha ya elegida, con esa fecha resaltada y *hoy* marcado con un borde.
 4. **Boton Limpiar** (pie del panel): vacia la seleccion, publica `date` vacio y el campo vuelve al texto de ayuda.
 5. **Escribir la fecha** (solo con *Permitir escribir la fecha* activo): se escribe en el campo compacto con el formato configurado y se confirma al presionar Enter o al salir del campo. Una fecha invalida o fuera de limites no cambia la salida.
-6. **Limites del calendario:** con *Fecha minima* y *Fecha maxima* los dias fuera del rango quedan deshabilitados; con *Ano inicial* y *Ano final* la navegacion mensual tambien se detiene en el limite.
-7. **Reiniciar desde Power Fx:** cuando el valor de *Reiniciar seleccion* cambia, la seleccion se limpia y la salida publica vacio.
+6. **Limites del calendario:** con *Fecha mínima* y *Fecha máxima* los dias fuera del rango quedan deshabilitados; con *Año inicial del calendario* y *Año final del calendario* la navegacion mensual tambien se detiene en el limite.
+7. **Reiniciar desde Power Fx:** cuando el valor de *Reiniciar selección* cambia, la seleccion se limpia y la salida publica vacio.
 8. **Precargar:** *Fecha precargada por omision* tiene prioridad sobre *Fecha precargada*. La entrada se aplica al inicializar y cuando cambia; no es un enlace bidireccional con la salida.
 9. **Valor inicial invalido:** no rompe el control; se ignora y el panel abre en el mes actual.
 10. **Control deshabilitado:** con `DisplayMode` en `View` (o `DisplayMode.Disabled`) no se puede abrir el panel ni cambiar la seleccion.
@@ -118,12 +153,12 @@ Text(DateValue(DatePicker1.date), "[$-es-ES]dddd, dd 'de' mmmm 'de' yyyy")
 
 // 5. Limpiar el control desde un boton
 // App.OnStart o Screen.OnVisible: Set(varReiniciarFecha, false)
-Set(varReiniciarFecha, !varReiniciarFecha)   // Reiniciar seleccion = varReiniciarFecha
+Set(varReiniciarFecha, !varReiniciarFecha)   // Reiniciar selección = varReiniciarFecha
 
 // 6. Validar antes de guardar
 If(IsBlank(DatePicker1.date), Notify("Selecciona una fecha", NotificationType.Warning))
 
-// 7. Propiedades Fecha minima / Fecha maxima
+// 7. Propiedades Fecha mínima / Fecha máxima
 //    Text(DateAdd(Today(), -30, Days), "yyyy-mm-dd") / Text(Today(), "yyyy-mm-dd")
 ```
 
@@ -132,7 +167,7 @@ Consejo: si vas a convertir la salida con `DateValue`, deja el formato en `YYYY-
 ## 7. Limites y buenas practicas
 
 - **El control no crece en el lienzo:** el panel flotante es el que crece; el modo compacto mide 32 px de alto. El ancho minimo del panel es 320 px.
-- **Paneles superpuestos:** el panel se dibuja con posicion fija en el cuerpo de la pagina, asi que no lo recorta el contenedor. Si en la pantalla hay elementos con `z-index` propio por encima, sube *Prioridad visual del panel*.
+- **Paneles superpuestos:** el panel se dibuja con posicion fija en el cuerpo de la pagina, asi que no lo recorta el contenedor. Si en la pantalla hay elementos con `z-index` propio por encima, sube *Prioridad visual del selector*.
 - **Zona horaria:** `Local` conserva los componentes de fecha escritos; `Utc` convierte entradas ISO que llevan desplazamiento (`Z` o `+hh:mm`) y publica salidas con `Z`. La opcion no acepta zonas regionales IANA.
 - **Formatos:** la salida se escribe tal cual en el formato configurado; el control no cambia el separador decimal ni el idioma de la cadena.
 - **Un valor por pantalla:** si necesitas un rango, usa `DateRangePicker`.
@@ -144,7 +179,7 @@ Consejo: si vas a convertir la salida con `DateValue`, deja el formato en `YYYY-
 | --- | --- | --- |
 | La salida no cambia al elegir | No se esta leyendo `DatePicker1.date` | Revisa el nombre del control y usa el panel de propiedades |
 | La fecha precargada no aparece | El texto no coincide con el formato o con ISO `YYYY-MM-DD` | Escribe la fecha en el formato configurado o ISO |
-| El panel se ve detras de otro elemento | Otro elemento del lienzo tiene `z-index` mayor | Sube *Prioridad visual del panel* |
+| El panel se ve detras de otro elemento | Otro elemento del lienzo tiene `z-index` mayor | Sube *Prioridad visual del selector* |
 | No se puede limpiar desde un boton | `resetKey` no cambio de valor | Inicializa una variable booleana y alternala con `Set(varR, !varR)` en cada pulsacion |
 | Los dias anteriores no se pueden elegir | `minDate`/`maxDate` o `startYear`/`endYear` los deshabilitan | Ajusta los limites |
 | `DateValue` devuelve error | El formato configurado es ambiguo para la region del usuario | Usa `YYYY-MM-DD` como formato de salida |
@@ -161,7 +196,7 @@ Comprobaciones rapidas despues de agregar el control a la pantalla:
 | 4 | Navegar meses con `‹` y `›` | Cambia el mes y conserva la seleccion |
 | 5 | Pulsar **Limpiar** | `date` queda vacio y el campo muestra el texto de ayuda |
 | 6 | Cambiar *Formato de fecha* a `DD/MM/YYYY` y elegir una fecha | La salida usa el formato nuevo |
-| 7 | Cambiar *Reiniciar seleccion* con un boton | La seleccion se limpia |
+| 7 | Cambiar *Reiniciar selección* con un boton | La seleccion se limpia |
 | 8 | Poner `DisplayMode` en `View` | No se puede abrir el panel |
 | 9 | Configurar `minDate` y `maxDate` | Los dias fuera del rango se ven deshabilitados |
 

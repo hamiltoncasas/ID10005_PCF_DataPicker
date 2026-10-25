@@ -23,11 +23,60 @@ Estructura visual:
 
 Cuando lo usas: cuando la tabla de origen tiene muchos registros y el combobox nativo no filtra como necesitas, o cuando quieres buscar por cualquier columna y no solo por la etiqueta.
 
-## 2. Empezar rapido
+## 2. Guia de uso paso a paso
 
-1. En el estudio de Power Apps: **Insertar > Obtener mas componentes > Codigo > SearchableComboBox**.
-2. En la propiedad **Items** enlaza la tabla o coleccion (como en una galeria) y elige los campos.
-3. Opcional: activa *Seleccion multiple*, escribe *Valores predeterminados* y ajusta los textos de ayuda.
+Esta guia reproduce el caso mas comun: **elegir una o varias categorias para filtrar una galeria**, con busqueda por cualquier columna y sin depender de la primera pagina del origen.
+
+### 2.1 Antes de empezar
+
+| Requisito | Como comprobarlo |
+| --- | --- |
+| PCF para canvas activo y solucion publicada | Power Platform admin center > Entorno > Caracteristicas; Soluciones > `ID0005_DataPickers` |
+| Control disponible en el estudio | **Insertar > Obtener mas componentes > Codigo > SearchableComboBox** |
+| Origen de datos o coleccion con un valor unico | Tabla con clave, o una coleccion creada con `ClearCollect` |
+| Decision sobre seleccion unica o multiple | *Permitir selección múltiple* activa o desactiva |
+
+### 2.2 Pasos
+
+1. **Inserta el control** desde **Insertar > Obtener mas componentes > Codigo > SearchableComboBox** y renombralo, por ejemplo `cmbCategorias`.
+2. **Prepara las opciones:** en **Elementos (tabla o colección)** escribe una tabla con las columnas `value`, `label` y, si hace falta, `description`. Ejemplo con una coleccion:
+
+   ```powerfx
+   ClearCollect(
+       colCategorias,
+       { value: "ALI", label: "Alimentos", description: "Productos no perecederos" },
+       { value: "BEB", label: "Bebidas", description: "Jugos, agua y refrescos" },
+       { value: "ASE", label: "Aseo", description: "Cuidado personal y limpieza" }
+   )
+   ```
+
+3. **Enlaza Items:** `cmbCategorias.Items = SortByColumns(colCategorias, "label")`. Si usas una tabla real, proyecta las columnas: `ShowColumns(Categorias, "Codigo"->value, "Nombre"->label)` o crea la forma con `AddColumns`.
+4. **Decide la seleccion:** activa *Permitir selección múltiple* si el usuario puede elegir varias categorias. Con seleccion unica, un segundo clic sobre la opcion activa la quita.
+5. **Limita la busqueda si hace falta:** en *Campos de búsqueda* escribe `label,description`. Vacio busca en todas las columnas enlazadas; un nombre que no exista hace que se busque en todas.
+6. **Precarga una seleccion:** en *Selección inicial* escribe `"BEB;ASE"`. Acepta valores o etiquetas separados por `;`; con seleccion unica solo se toma la primera coincidencia.
+7. **Usa las salidas:** lee `selectedValues` para filtrar y `selectedLabels` para mostrar. Valida `selectedCount > 0` antes de consultar. La guia completa esta en [ejemplos/SearchableComboBox.md](ejemplos/SearchableComboBox.md).
+
+### 2.3 Configuracion minima recomendada
+
+| Propiedad | Valor sugerido | Por que |
+| --- | --- | --- |
+| **Elementos (tabla o colección)** | `SortByColumns(colCategorias, "label")` | Ordena las opciones y fija las columnas que se buscan |
+| *Permitir selección múltiple* | Activada | Permite combinar varias categorias en un filtro |
+| *Permitir búsqueda* | Activada | Muestra el cuadro de busqueda y el filtro contiene |
+| *Campos de búsqueda* | `label,description` | Evita buscar en columnas internas |
+| *Selección inicial* | `"BEB;ASE"` | Deja una seleccion inicial visible |
+| *Texto sin selección* | `Todas las categorias` | Comunica que no hay filtro aplicado |
+| *Reiniciar selección* | `limpiarCategorias` | Permite limpiar la seleccion desde Power Fx |
+
+### 2.4 Comprobar que funciona
+
+1. Abre la lista: el foco pasa al cuadro de busqueda y se ven todas las opciones con el contador del pie.
+2. Escribe `beb`: aparecen las coincidencias aunque esten en mayuscula o con acentos, y el fragmento se resalta.
+3. Limpia la busqueda, elige dos opciones y comprueba que `selectedCount` sea `2` y `selectedValues` sea `BEB;ASE` en el orden de seleccion.
+4. Quita una etiqueta con su `x` o con Retroceso: las salidas se actualizan.
+5. Filtra una galeria con `in Split(cmbCategorias.selectedValues, ";")`: solo deben quedar las categorias elegidas.
+
+Resultado: las opciones se muestran con `value` como dato y `label` como texto, y la seleccion se publica en `cmbCategorias.selectedValues`. La guia completa, con datos de productos y filtros, esta en [ejemplos/SearchableComboBox.md](ejemplos/SearchableComboBox.md).
 
 ## 3. Enlazar los elementos (propiedad Items)
 
@@ -41,21 +90,21 @@ Notas:
 
 - Los nombres no distinguen mayusculas.
 - Si el host no informa las columnas, el control intenta leer esos tres nombres directamente.
-- La busqueda recorre **todas las columnas enlazadas**, no solo la etiqueta; con *Campos de busqueda* puedes limitarla.
-- En Canvas, la forma habitual es `SortByColumns(Filter(Origen, Condicion), "Columna")`; los filtros se aplican en la propia propiedad **Items**.
+- La busqueda recorre **todas las columnas enlazadas**, no solo la etiqueta; con *Campos de búsqueda* puedes limitarla.
+- En Canvas, la forma habitual es `SortByColumns(Filter(Origen, Condicion), "Columna")`; los filtros se aplican en la propia propiedad **Elementos (tabla o colección)**.
 
 ## 4. Propiedades de entrada
 
 | Propiedad (nombre tecnico) | Nombre en Power Apps | Tipo | Predeterminado | Descripcion |
 | --- | --- | --- | --- | --- |
-| `items` | *Items* | Conjunto de datos | - | Registros que se muestran como opciones (columnas `value`, `label`, `description`) |
-| `defaultValue` | *Valores predeterminados* | Texto | vacio | Seleccion precargada separada por `;`. Admite valores o etiquetas |
-| `selectMultiple` | *Seleccion multiple* | Si/No | No | Permite elegir varias opciones; aparece una etiqueta removible por cada una |
-| `isSearchable` | *Con busqueda* | Si/No | Si | Muestra el cuadro de busqueda y activa el filtro contiene |
-| `searchFields` | *Campos de busqueda* | Texto | vacio | Columnas donde buscar, separadas por coma. Vacio = todas; si ningun nombre coincide, se buscan todas |
-| `noSelectionText` | *Texto sin seleccion* | Texto | `---` | Texto del campo cuando no hay seleccion |
-| `placeholderText` | *Texto de ayuda* | Texto | `Buscar...` | Texto del cuadro de busqueda |
-| `resetKey` | *Reiniciar seleccion* | Si/No | No | Cuando cambia de valor limpia la seleccion |
+| `items` | *Elementos (tabla o colección)* | Conjunto de datos | - | Registros que se muestran como opciones (columnas `value`, `label`, `description`) |
+| `defaultValue` | *Selección inicial* | Texto | vacio | Seleccion precargada separada por `;`. Admite valores o etiquetas |
+| `selectMultiple` | *Permitir selección múltiple* | Si/No | No | Permite elegir varias opciones; aparece una etiqueta removible por cada una |
+| `isSearchable` | *Permitir búsqueda* | Si/No | Si | Muestra el cuadro de busqueda y activa el filtro contiene |
+| `searchFields` | *Campos de búsqueda* | Texto | vacio | Columnas donde buscar, separadas por coma. Vacio = todas; si ningun nombre coincide, se buscan todas |
+| `noSelectionText` | *Texto sin selección* | Texto | `---` | Texto del campo cuando no hay seleccion |
+| `placeholderText` | *Texto de búsqueda* | Texto | `Buscar...` | Texto del cuadro de busqueda |
+| `resetKey` | *Reiniciar selección* | Si/No | No | Cuando cambia de valor limpia la seleccion |
 | `zIndex` | *Prioridad visual de la lista* | Numero | `2147483647` | `z-index` de la lista expandida |
 
 ## 5. Salidas
@@ -78,14 +127,14 @@ Con `selectedCount` igual a `0` no hay seleccion y `selectedValue` queda vacio.
 4. El fragmento coincidente se resalta en cada opcion.
 5. Si no hay coincidencias, se muestra un mensaje con el texto buscado y el pie indica cuantos registros se estan mostrando del total.
 6. La lista solicita las paginas restantes del conjunto de datos para filtrar sobre todos los registros existentes, no solo sobre la primera pagina (hasta 5000 registros por pagina y 10 paginas).
-7. Desactivar *Con busqueda* oculta el cuadro de busqueda y muestra la lista completa.
+7. Desactivar *Permitir búsqueda* oculta el cuadro de busqueda y muestra la lista completa.
 
 ## 7. Comportamiento de seleccion
 
 - **Seleccion unica:** al hacer clic en la opcion activa, la lista se cierra y se publican `selectedValue` y `selectedLabel`. Volver a hacer clic en la opcion ya seleccionada la quita, igual que un combobox que puede quedar vacio.
 - **Seleccion multiple:** cada clic agrega o quita la opcion; la lista permanece abierta, aparecen etiquetas en el campo y cada etiqueta tiene una `×` para quitarla.
-- **Valores predeterminados:** *Valores predeterminados* acepta valores o etiquetas separados por `;`; con seleccion unica solo se toma la primera coincidencia. Si los registros todavia no llegaron, la seleccion se aplica cuando el conjunto de datos esta disponible.
-- **Reiniciar:** cuando cambia *Reiniciar seleccion*, la seleccion se limpia y las salidas publican vacio.
+- **Selección inicial:** acepta valores o etiquetas separados por `;`; con seleccion unica solo se toma la primera coincidencia. Si los registros todavia no llegaron, la seleccion se aplica cuando el conjunto de datos esta disponible.
+- **Reiniciar:** cuando cambia *Reiniciar selección*, la seleccion se limpia y las salidas publican vacio.
 
 ## 8. Teclado y cierre
 
@@ -118,7 +167,7 @@ Substitute(SearchableComboBox1.selectedLabels, ";", ", ")
 SearchableComboBox1.defaultValue = "COD-001;COD-014"
 
 // 6. Limpiar la seleccion desde un boton
-UpdateContext({ reiniciarCombo: true });   // Reiniciar seleccion = reiniciarCombo
+UpdateContext({ reiniciarCombo: true });   // Reiniciar selección = reiniciarCombo
 
 // 7. Avisar si no hay seleccion
 If(SearchableComboBox1.selectedCount = 0, "Elige al menos una opcion")
@@ -126,7 +175,7 @@ If(SearchableComboBox1.selectedCount = 0, "Elige al menos una opcion")
 
 ## 10. Limites y buenas practicas
 
-- **Filtro en memoria:** la busqueda se hace del lado del cliente sobre los registros cargados (hasta 5000 por pagina y 10 paginas). Con origenes mucho mayores conviene filtrar antes con `Filter()` en **Items** o acotar con *Campos de busqueda*.
+- **Filtro en memoria:** la busqueda se hace del lado del cliente sobre los registros cargados (hasta 5000 por pagina y 10 paginas). Con origenes mucho mayores conviene filtrar antes con `Filter()` en **Elementos (tabla o colección)** o acotar con *Campos de búsqueda*.
 - **Reducir columnas:** enlaza solo las columnas necesarias; asi la busqueda es mas rapida.
 - **Sin notificacion al escribir:** el filtro no avisa al framework en cada tecla, por lo que no se produce un ciclo de `updateView` por pulsacion.
 - **Texto largo:** la lista muestra el texto completo; el campo compacto lo recorta con puntos suspensivos y conserva el valor completo en la sugerencia nativa.
@@ -136,30 +185,30 @@ If(SearchableComboBox1.selectedCount = 0, "Elige al menos una opcion")
 
 | Sintoma | Causa probable | Solucion |
 | --- | --- | --- |
-| La lista aparece vacia | **Items** no esta enlazado o no incluye la columna `value` | Revisa el enlace y que exista la columna `value` |
+| La lista aparece vacia | **Elementos (tabla o colección)** no esta enlazado o no incluye la columna `value` | Revisa el enlace y que exista la columna `value` |
 | No encuentra un texto que si existe | El registro no esta cargado en las paginas pedidas | Filtra antes con `Filter` o acota `searchFields` |
-| La busqueda no cubre la columna esperada | *Campos de busqueda* con nombres que no coinciden | Revisa los nombres (separados por coma); vacio = todas |
+| La busqueda no cubre la columna esperada | *Campos de búsqueda* con nombres que no coinciden | Revisa los nombres (separados por coma); vacio = todas |
 | La lista se ve detras de otro elemento | Otro elemento tiene `z-index` mayor | Sube *Prioridad visual de la lista* |
-| Los valores precargados no aparecen | Los registros aun no habian llegado | El control reintenta; verifica que el valor o la etiqueta existan en **Items** |
-| La seleccion multiple no permite mas de una opcion | *Seleccion multiple* esta en No | Activa la propiedad |
+| Los valores precargados no aparecen | Los registros aun no habian llegado | El control reintenta; verifica que el valor o la etiqueta existan en **Elementos (tabla o colección)** |
+| La seleccion multiple no permite mas de una opcion | *Permitir selección múltiple* esta en No | Activa la propiedad |
 
 ## 12. Verificacion
 
 | # | Accion | Resultado esperado |
 | --- | --- | --- |
-| 1 | Enlazar una tabla en **Items** y abrir la lista | Se muestran las opciones |
+| 1 | Enlazar una tabla en **Elementos (tabla o colección)** y abrir la lista | Se muestran las opciones |
 | 2 | Escribir un texto que aparece en el medio de una etiqueta | Solo quedan los registros que lo contienen |
 | 3 | Escribir sin acentos sobre una etiqueta con tildes | La coincidencia se encuentra y se resalta |
 | 4 | Escribir texto de otra columna | La coincidencia se encuentra |
 | 5 | Escribir algo inexistente | Mensaje de sin coincidencias y contador `0 de N` |
 | 6 | Clic en una opcion (seleccion unica) | La lista se cierra y las salidas se actualizan |
-| 7 | Activar *Seleccion multiple* y elegir dos opciones | Aparecen las etiquetas y `selectedCount` vale 2 |
+| 7 | Activar *Permitir selección múltiple* y elegir dos opciones | Aparecen las etiquetas y `selectedCount` vale 2 |
 | 8 | Quitar una etiqueta con `×` | La seleccion y `selectedValues` se actualizan |
 | 9 | Usar `Flecha arriba`, `Flecha abajo`, `Enter` y `Esc` | Navegacion, seleccion y cierre funcionan |
 | 10 | Clic fuera de la lista | La lista se cierra |
 | 11 | Enlazar una etiqueta muy larga | Cerrado se recorta; abierto se superpone y muestra todo |
 | 12 | Desplazar la pagina con la lista abierta | La lista acompanha al control |
-| 13 | Escribir dos valores separados por `;` en *Valores predeterminados* | Se precargan al iniciar la aplicacion |
+| 13 | Escribir dos valores separados por `;` en *Selección inicial* | Se precargan al iniciar la aplicacion |
 
 El arnes del repositorio (ver [README.md](README.md#9-verificacion-y-pruebas)) cubre la normalizacion de acentos y mayusculas, el filtro contiene en medio del texto y en columnas distintas a la etiqueta, el caso sin coincidencias, el texto vacio, la seleccion unica y multiple, el quitar etiquetas, la navegacion con teclado con ciclo y el resaltado.
 

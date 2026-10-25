@@ -25,13 +25,49 @@ Estructura visual:
 
 Cuando lo usas: para filtrar por un intervalo de tiempo exacto (turnos, jornadas, sesiones) y para alimentar la propiedad **Items** de galerias o de `ExcelReportPicker`.
 
-## 2. Empezar rapido
+## 2. Guia de uso paso a paso
 
-1. En el estudio de Power Apps: **Insertar > Obtener mas componentes > Codigo > DateTimeRangePicker**.
-2. Opcional: define *Formato de fecha* (`YYYY-MM-DD`) y *Formato de hora* (`24`, `12`, `24:00:00` o `12:00:00`).
-3. Opcional: precarga con *Fecha y hora inicial de inicio* (`initialStartDateTime`) y *Fecha y hora inicial de fin* (`initialEndDateTime`), por ejemplo `2026-09-16T08:30` y `2026-09-16T18:30`.
+Esta guia reproduce el caso mas comun: **filtrar movimientos por un intervalo exacto de fecha y hora**, por ejemplo el turno de un operador o una ventana de mantenimiento.
 
-Resultado: `DateTimeRangePicker1.startDateTime` y `DateTimeRangePicker1.endDateTime` contienen los extremos.
+### 2.1 Antes de empezar
+
+| Requisito | Como comprobarlo |
+| --- | --- |
+| PCF para canvas activo y solucion publicada | Power Platform admin center > Entorno > Caracteristicas; Soluciones > `ID0005_DataPickers` |
+| Control disponible en el estudio | **Insertar > Obtener mas componentes > Codigo > DateTimeRangePicker** |
+| Columna de destino de tipo **Fecha y hora** | Datos > Tabla > Columna > Tipo *Fecha y hora* |
+| Regla del intervalo | Si el fin es inclusivo (`<=`) o exclusivo (`<`), y la zona horaria de los datos |
+
+### 2.2 Pasos
+
+1. **Inserta el control** desde **Insertar > Obtener mas componentes > Codigo > DateTimeRangePicker** y renombralo, por ejemplo `rangoTurno`.
+2. **Configura los formatos:** *Formato de fecha* = `YYYY-MM-DD` y *Formato de hora* = `24`. Las salidas siempre usan `YYYY-MM-DDTHH:mm` y `HH:mm` en 24 horas.
+3. **Precarga el intervalo:** en *Fecha y hora inicial precargada* (`initialStartDateTime`) escribe `Text(ThisItem.Inicio, "yyyy-mm-dd") & "T" & Text(ThisItem.Inicio, "HH:mm")`; haz lo mismo en *Fecha y hora final precargada* (`initialEndDateTime`) con `ThisItem.Fin`.
+4. **Ajusta los campos Inicio y Fin:** cada campo tiene fecha y un selector cada 15 minutos. Cambiar cualquiera de los dos publica el intervalo de inmediato, sin necesidad de tocar el calendario.
+5. **Filtra el origen:** usa `FechaHora >= DateTimeValue(rangoTurno.startDateTime) && FechaHora <= DateTimeValue(rangoTurno.endDateTime)`. Si el fin debe ser exclusivo, cambia `<=` por `<`.
+6. **Valida antes de consultar:** exige `!IsBlank(rangoTurno.startDateTime) && !IsBlank(rangoTurno.endDateTime)` y comprueba que inicio sea anterior o igual al fin.
+7. **Conecta el reinicio:** enlaza *Reiniciar selección* (`resetKey`) a `limpiarTurno` y alternalo desde un boton. La guia completa esta en [ejemplos/DateTimeRangePicker.md](ejemplos/DateTimeRangePicker.md).
+
+### 2.3 Configuracion minima recomendada
+
+| Propiedad | Valor sugerido | Por que |
+| --- | --- | --- |
+| *Formato de fecha* | `YYYY-MM-DD` | Coincide con la parte de fecha de las salidas |
+| *Formato de hora* | `24` | La salida y el resumen se leen igual |
+| *Fecha y hora inicial precargada* | `Text(ThisItem.Inicio, "yyyy-mm-dd") & "T" & Text(ThisItem.Inicio, "HH:mm")` | Precarga el intervalo del registro |
+| *Fecha y hora final precargada* | `Text(ThisItem.Fin, "yyyy-mm-dd") & "T" & Text(ThisItem.Fin, "HH:mm")` | Completa el intervalo |
+| *Zona horaria de los valores* | `Local` | Evita desplazamientos si el origen guarda hora local |
+| *Reiniciar selección* | `limpiarTurno` | Permite limpiar el intervalo desde Power Fx |
+
+### 2.4 Comprobar que funciona
+
+1. Abre el panel sin valor: la hora propuesta es la actual alineada a 15 minutos.
+2. Elige el dia inicial y el final: el resumen muestra los dos extremos y el panel se contrae.
+3. Cambia solo la hora de **Fin**: `endDateTime` se actualiza sin cambiar el dia.
+4. Pulsa **Limpiar** o alterna *Reiniciar selección*: las dos salidas quedan vacias.
+5. Filtra un origen con hora y revisa los bordes: el registro exactamente en `endDateTime` entra solo si usas `<=`.
+
+Resultado: `rangoTurno.startDateTime` y `rangoTurno.endDateTime` contienen los extremos en `YYYY-MM-DDTHH:mm`. La guia completa, con datos de prueba y variantes de filtro, esta en [ejemplos/DateTimeRangePicker.md](ejemplos/DateTimeRangePicker.md).
 
 ## 3. Propiedades de entrada
 
@@ -39,33 +75,33 @@ Resultado: `DateTimeRangePicker1.startDateTime` y `DateTimeRangePicker1.endDateT
 
 | Propiedad (nombre tecnico) | Nombre en Power Apps | Tipo | Predeterminado | Descripcion |
 | --- | --- | --- | --- | --- |
-| `initialStartDateTime` | *Fecha y hora inicial de inicio* | Texto | vacio | Extremo inicial precargado en `YYYY-MM-DDTHH:mm` |
-| `initialEndDateTime` | *Fecha y hora inicial de fin* | Texto | vacio | Extremo final precargado en `YYYY-MM-DDTHH:mm` |
-| `defaultDate` | *Fecha predeterminada* | Texto | vacio | Si no esta vacia, sustituye a *Fecha y hora inicial de inicio* |
+| `initialStartDateTime` | *Fecha y hora inicial precargada* | Texto | vacio | Extremo inicial precargado en `YYYY-MM-DDTHH:mm` |
+| `initialEndDateTime` | *Fecha y hora final precargada* | Texto | vacio | Extremo final precargado en `YYYY-MM-DDTHH:mm` |
+| `defaultDate` | *Fecha de inicio precargada por omision* | Texto | vacio | Si no esta vacia, sustituye a *Fecha y hora inicial precargada* |
 | `format` | *Formato de fecha* | Texto | `YYYY-MM-DD` | Formato de la parte de fecha en el resumen y en los campos |
 | `timeFormat` | *Formato de hora* | Texto | `24` | Apariencia de la hora: `24`, `12`, `24:00:00` o `12:00:00` |
-| `resetKey` | *Reiniciar seleccion* | Si/No | No | Cuando cambia de valor se limpia el rango completo |
-| `zIndex` | *Prioridad visual del panel* | Numero | `2147483647` | `z-index` del panel abierto |
-| `placeholderText` | *Texto de ayuda* | Texto | `Selecciona fecha` | Texto del campo cuando no hay rango |
-| `isEditable` | *Editable* | Si/No | No | Permite escribir la fecha en los campos Inicio y Fin |
+| `resetKey` | *Reiniciar selección* | Si/No | No | Cuando cambia de valor se limpia el rango completo |
+| `zIndex` | *Prioridad visual del selector* | Numero | `2147483647` | `z-index` del panel abierto |
+| `placeholderText` | *Texto de ayuda del campo* | Texto | `Selecciona fecha` | Texto del campo cuando no hay rango |
+| `isEditable` | *Permitir escribir las fechas* | Si/No | No | Permite escribir la fecha en los campos Inicio y Fin |
 | `accessibleLabel` | *Etiqueta accesible* | Texto | vacio | Texto para lectores de pantalla |
-| `minDate` | *Fecha minima* | Texto | vacio | Primer dia seleccionable del calendario |
-| `maxDate` | *Fecha maxima* | Texto | vacio | Ultimo dia seleccionable del calendario |
-| `startYear` | *Ano inicial* | Numero | `0` | Ano menor del calendario (`0` = sin limite) |
-| `endYear` | *Ano final* | Numero | `0` | Ano mayor del calendario (`0` = sin limite) |
-| `startOfWeek` | *Primer dia de la semana* | Texto | regional | `auto`, `sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday` o `saturday` |
-| `dateTimeZone` | *Zona horaria* | Texto | local del dispositivo | Zona usada para calcular *hoy* |
-| `language` | *Idioma* | Texto | regional | Codigo de idioma para meses, dias y hora de 12 horas |
+| `minDate` | *Fecha mínima* | Texto | vacio | Primer dia seleccionable del calendario |
+| `maxDate` | *Fecha máxima* | Texto | vacio | Ultimo dia seleccionable del calendario |
+| `startYear` | *Año inicial del calendario* | Numero | `0` | Año menor del calendario (`0` = sin limite) |
+| `endYear` | *Año final del calendario* | Numero | `0` | Año mayor del calendario (`0` = sin limite) |
+| `startOfWeek` | *Primer día de la semana* | Texto | regional | `auto`, `sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday` o `saturday` |
+| `dateTimeZone` | *Zona horaria de los valores* | Texto | local del dispositivo | Zona usada para calcular *hoy* |
+| `language` | *Idioma del calendario* | Texto | regional | Codigo de idioma para meses, dias y hora de 12 horas |
 
 ### 3.2 Apariencia (equivalentes al selector nativo)
 
 | Propiedad | Nombre en Power Apps | Tipo |
 | --- | --- | --- |
-| `borderColor` / `borderStyle` / `borderThickness` | *Color*, *Estilo* y *Grosor del borde* | Texto / Texto / Numero |
-| `color` / `fill` | *Color del texto* / *Relleno* | Texto |
-| `font` / `size` / `fontWeight` / `italic` / `strikethrough` / `underline` | Tipografia del control | Texto / Numero / Texto / Si-No |
-| `chevronBackground` / `chevronFill` | Flechas de navegacion del calendario | Texto |
-| `iconBackground` / `iconFill` | Icono del boton del panel | Texto |
+| `borderColor` / `borderStyle` / `borderThickness` | *Color del borde*, *Estilo del borde* y *Grosor del borde* | Texto / Texto / Numero |
+| `color` / `fill` | *Color del texto* / *Color de fondo del campo* | Texto |
+| `font` / `size` / `fontWeight` / `italic` / `strikethrough` / `underline` | *Fuente del texto*, *Tamaño de la fuente*, *Grosor de la fuente*, *Texto en cursiva*, *Texto tachado* y *Texto subrayado* | Texto / Numero / Texto / Si-No |
+| `chevronBackground` / `chevronFill` | *Fondo de las flechas del calendario* / *Color de las flechas del calendario* | Texto |
+| `iconBackground` / `iconFill` | *Fondo del icono del calendario* / *Color del icono del calendario* | Texto |
 
 ## 4. Salidas
 
@@ -83,17 +119,17 @@ Resultado: `DateTimeRangePicker1.startDateTime` y `DateTimeRangePicker1.endDateT
 4. **Nueva seleccion despues de un rango completo:** el siguiente clic empieza un rango nuevo.
 5. **Boton Limpiar:** vacia los dos extremos y publica vacio.
 6. **Formato de la hora:** `12` y `12:00:00` muestran la hora con AM/PM; `24:00:00` y `12:00:00` agregan segundos en el resumen. Las salidas siempre son `HH:mm` en 24 horas.
-7. **Limites:** *Fecha minima*/*Fecha maxima* y *Ano inicial*/*Ano final* deshabilitan dias y limitan la navegacion mensual.
-8. **Reiniciar desde Power Fx:** cuando cambia *Reiniciar seleccion* se limpia el rango y la salida publica vacio.
-9. **Precarga:** *Fecha predeterminada* tiene prioridad para el extremo inicial; los valores se aplican cuando cambian.
+7. **Limites:** *Fecha mínima*/*Fecha máxima* y *Año inicial del calendario*/*Año final del calendario* deshabilitan dias y limitan la navegacion mensual.
+8. **Reiniciar desde Power Fx:** cuando cambia *Reiniciar selección* se limpia el rango y la salida publica vacio.
+9. **Precarga:** *Fecha de inicio precargada por omision* tiene prioridad para el extremo inicial; los valores se aplican cuando cambian.
 10. **Control deshabilitado:** con `DisplayMode` en `View` no se abre el panel ni se pueden cambiar los campos.
 
 ### 5.1 Precarga desde un registro
 
 ```powerfx
 // Propiedades (texto)
-//   Fecha y hora inicial de inicio = Text(ThisItem.Inicio, "yyyy-mm-dd") & "T" & Text(ThisItem.Inicio, "hh:mm")
-//   Fecha y hora inicial de fin    = Text(ThisItem.Fin, "yyyy-mm-dd") & "T" & Text(ThisItem.Fin, "hh:mm")
+//   Fecha y hora inicial precargada = Text(ThisItem.Inicio, "yyyy-mm-dd") & "T" & Text(ThisItem.Inicio, "HH:mm")
+//   Fecha y hora final precargada    = Text(ThisItem.Fin, "yyyy-mm-dd") & "T" & Text(ThisItem.Fin, "HH:mm")
 ```
 
 ## 6. Ejemplos en Power Fx
@@ -118,14 +154,14 @@ DateDiff(DateTimeValue(DateTimeRangePicker1.startDateTime),
          DateTimeValue(DateTimeRangePicker1.endDateTime), Hours)
 
 // 5. Limpiar el rango desde un boton
-UpdateContext({ reiniciarTurno: true });   // Reiniciar seleccion = reiniciarTurno
+UpdateContext({ reiniciarTurno: true });   // Reiniciar selección = reiniciarTurno
 ```
 
 ## 7. Limites y buenas practicas
 
 - **Tramos de 15 minutos:** la granularidad de la hora es la de los selectores; los segundos solo se muestran cuando *Formato de hora* los incluye.
 - **Sin filtro automatico:** el control publica las fechas; el filtrado se escribe en la aplicacion con `Filter`, `DateDiff`, etc.
-- **Sin conversion a UTC:** los valores se construyen con la hora local del navegador (o la zona de *Zona horaria*).
+- **Sin conversion a UTC:** los valores se construyen con la hora local del navegador (o la zona de *Zona horaria de los valores*).
 - **Un rango por control:** para dos periodos a la vez, usa dos controles.
 - **Orden de los extremos:** si eliges primero un extremo mayor, el control ordena el rango para que `startDateTime` sea menor o igual que `endDateTime`.
 - **Proyecto propio:** este control se compila tambien en el proyecto anidado `DateTimeRangePicker` (ver [README.md](README.md#4-compilar-los-controles)).
@@ -137,7 +173,7 @@ UpdateContext({ reiniciarTurno: true });   // Reiniciar seleccion = reiniciarTur
 | La hora del extremo final no es la esperada | El campo **Fin** conserva la hora anterior | Escribe la hora en el campo **Fin** antes de cerrar el panel |
 | `endDateTime` vacio | Solo se eligio el inicio | Elige el segundo extremo o escribe la fecha y hora de fin |
 | Las horas no incluyen segundos | La granularidad es de 15 minutos | Ajusta la hora en la aplicacion si necesitas precision mayor |
-| El rango no se precarga | El texto no tiene el formato `YYYY-MM-DDTHH:mm` | Construye el texto con `Text(..., "yyyy-mm-dd") & "T" & Text(..., "hh:mm")` |
+| El rango no se precarga | El texto no tiene el formato `YYYY-MM-DDTHH:mm` | Construye el texto con `Text(..., "yyyy-mm-dd") & "T" & Text(..., "HH:mm")` |
 | Filtrar deja fuera el dia final | Se compara con `<=` sobre columnas con hora | Usa `< DateAdd(...)` con el dia siguiente |
 
 ## 9. Verificacion
@@ -150,7 +186,7 @@ UpdateContext({ reiniciarTurno: true });   // Reiniciar seleccion = reiniciarTur
 | 4 | Pulsar **Limpiar** | Las salidas quedan vacias |
 | 5 | Cambiar *Formato de hora* a `12` | El resumen usa 12 horas y las salidas siguen en 24 |
 | 6 | Configurar `minDate` y `maxDate` | Los dias fuera de los limites se ven deshabilitados |
-| 7 | Cambiar *Reiniciar seleccion* | El rango se limpia |
+| 7 | Cambiar *Reiniciar selección* | El rango se limpia |
 | 8 | Poner `DisplayMode` en `View` | No se puede abrir el panel |
 
 ## 10. Archivos del control
