@@ -38,7 +38,7 @@ Datos de identidad de los componentes:
 | Dato | Valor |
 | --- | --- |
 | Nombre unico | `ID0005_DataPickers` |
-| Version | `1.0.2.9` |
+| Version | `1.0.2.10` |
 | Publicador / prefijo | `ID0005` / `id5` |
 | Tipo de paquete | `Unmanaged` (`<Managed>0</Managed>`) |
 | Archivo generado | `solution/bin/Release/solution.zip` |
@@ -81,7 +81,7 @@ ID10005_PCF_DataPicker/
 |- docs/ejemplos/                     Ejemplos JSON inventados (sin datos de clientes)
 |- tools/verificar-controles.js       Arnes de logica (70 comprobaciones)
 |- tools/verificar-nombres-campo.js   Arnes de columnas de ExcelReportPicker (40 comprobaciones)
-|- tools/verificar-password-engine.js Arnes criptografico de TCGPasswordEngine (61 comprobaciones)
+|- tools/verificar-password-engine.js Arnes criptografico de TCGPasswordEngine (65 comprobaciones)
 \- out/                               Salida del build (no se versiona)
 ```
 
@@ -155,16 +155,16 @@ Compilacion correcta. 0 Advertencia(s) 0 Errores
 
 | Archivo | Contenido |
 | --- | --- |
-| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 7 controles en `Controls/id5_ID10005.<Control>/` |
+| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 8 controles en `Controls/id5_ID10005.<Control>/` |
 
 El empaquetado toma la carpeta `solution/src/` (los componentes compilados, `Other/Solution.xml` y `Other/Customizations.xml`) y arma el `.zip` con `solution.xml`, `customizations.xml`, `Controls/...` y `[Content_Types].xml`.
 
 ### 5.1 Version del paquete (`.zip`)
 
-La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.9`.**
+La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.10`.**
 
 ```xml
-<Version>1.0.2.9</Version>
+<Version>1.0.2.10</Version>
 ```
 
 Para una entrega nueva: sube ese valor, ejecuta `dotnet build solution.cdsproj -c Release` y comprueba el paquete **antes de importarlo**:
@@ -174,7 +174,7 @@ Expand-Archive solution\bin\Release\solution.zip -DestinationPath tmp\sol -Force
 Select-String -Path tmp\sol\solution.xml -Pattern '<Version>|<Managed>'
 ```
 
-Salida esperada: `<Version>1.0.2.9</Version>` y `<Managed>0</Managed>` (paquete no administrado).
+Salida esperada: `<Version>1.0.2.10</Version>` y `<Managed>0</Managed>` (paquete no administrado).
 
 La version del paquete es independiente de la version de cada control (`<Control>/ControlManifest.Input.xml`): puedes subir una sin la otra, pero en una entrega conviene subir ambas.
 
@@ -202,7 +202,7 @@ En el **Power Platform admin center** abre el entorno destino, ve a **Configurac
 ### 6.2 Importar la solucion
 
 1. Ve a **make.powerapps.com > Soluciones > Importar solucion** y selecciona `solution/bin/Release/solution.zip`.
-2. Comprueba que la solucion contenga los siete controles en **Objetos > Controles personalizados**.
+2. Comprueba que la solucion contenga los ocho controles en **Objetos > Controles personalizados**.
 3. Publica todos los cambios personalizados.
 
 ### 6.3 Agregar el control a la aplicacion de lienzo
@@ -313,7 +313,7 @@ Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la co
 
 El visor de paginas web no tiene arnes automatizado: depende del navegador y del sitio remoto, por eso se verifica con la tabla manual de [WebPageViewer.md](WebPageViewer.md#9-verificacion).
 
-### 9.3 Arnes criptografico del motor de contrasenas (61 comprobaciones)
+### 9.3 Arnes criptografico del motor de contrasenas (65 comprobaciones)
 
 ```powershell
 npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
@@ -323,7 +323,7 @@ node tools/verificar-password-engine.js
 El script compara `validatePassword` y `generatePasswordHash` con vectores independientes de `node:crypto.pbkdf2Sync`, y comprueba la version del hash, la politica de iteraciones (`GENERATE` usa 600000 por debajo del minimo; `VALIDATE` exige un entero mayor o igual a 100000), la longitud Unicode (emoji y CJK cuentan como un caracter), el Base64 canonico con y sin relleno, el rechazo de Base64 invalido, la comparacion en tiempo constante, la generacion de un salt distinto por llamada, la derivacion con una longitud de hash distinta de 32 bytes y los mensajes de error que no filtran la contrasena. Salida esperada:
 
 ```text
-61 de 61 verificaciones correctas
+65 de 65 verificaciones correctas
 ```
 
 ### 9.4 Arnes de columnas del exportador (40 comprobaciones)
@@ -354,7 +354,7 @@ node tools/verificar-password-engine.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptacion: lint sin errores, build correcto, `70 de 70`, `40 de 40` y `61 de 61` verificaciones correctas, y paquete de solucion generado con los 7 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.9` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
+Criterios de aceptacion: lint sin errores, build correcto, `70 de 70`, `40 de 40` y `65 de 65` verificaciones correctas, y paquete de solucion generado con los 8 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.10` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
 
 ## 10. Problemas comunes
 

@@ -35,7 +35,7 @@ Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado
 | [docs/ExcelReportPicker.md](docs/ExcelReportPicker.md) | Exportador de informes a Excel (informes en JSON, tipos, formatos, filtros y aviso de carga) |
 | [docs/WebPageViewer.md](docs/WebPageViewer.md) | Visor de paginas web dentro de la aplicacion (direccion y URL base, barra de acciones, aviso de carga y limites de los iframes) |
 | [docs/TCGPasswordEngine.md](docs/TCGPasswordEngine.md) | Motor invisible de contrasenas PBKDF2-SHA256 (GENERATE/VALIDATE, eventos, iteraciones, seguridad y ejemplos) |
-| [tools/verificar-password-engine.js](tools/verificar-password-engine.js) | Arnes criptografico: vectores de Node, Base64, Unicode, iteraciones y errores (61 comprobaciones) |
+| [tools/verificar-password-engine.js](tools/verificar-password-engine.js) | Arnes criptografico: vectores de Node, Base64, Unicode, iteraciones y errores (65 comprobaciones) |
 | [docs/ejemplos/](docs/ejemplos/README.md) | Ejemplos JSON inventados (informes y registros de prueba) para copiar y pegar, sin datos de clientes |
 | [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, filtro contiene y seleccion (70 comprobaciones) |
 | [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
@@ -52,7 +52,7 @@ Set-Location solution
 dotnet build solution.cdsproj -c Release
 ```
 
-Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.9**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.10**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
 
 ## Uso en Power Fx
 
@@ -97,7 +97,7 @@ npm run build                       # compila los controles
 node tools/verificar-controles.js    # 70 de 70 verificaciones correctas
 node tools/verificar-nombres-campo.js  # 40 de 40 verificaciones correctas
 npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
-node tools/verificar-password-engine.js  # 61 de 61 verificaciones correctas
+node tools/verificar-password-engine.js  # 65 de 65 verificaciones correctas
 
 Set-Location solution
 dotnet build solution.cdsproj -c Release
