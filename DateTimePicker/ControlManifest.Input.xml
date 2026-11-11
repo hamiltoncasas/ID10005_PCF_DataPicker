@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Fecha: 2026-09-16. Descripcion: Contrato de propiedades, recursos y metadatos del selector de fecha y hora simple. -->
+<!-- Fecha: 2026-11-10. Descripcion: Contrato de propiedades, recursos y metadatos del selector de fecha y hora simple. Expone el juego completo de propiedades del selector de fecha y hora nativo de Power Apps. -->
 <manifest>
-  <control namespace="ID10005" constructor="DateTimePicker" version="1.0.3" display-name-key="DateTimePicker" description-key="DateTimePicker description" control-type="virtual" >
+  <control namespace="ID10005" constructor="DateTimePicker" version="1.1.1" display-name-key="DateTimePicker" description-key="DateTimePicker description" control-type="virtual" >
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     Example1:
@@ -21,12 +21,14 @@
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="initialDateTime" display-name-key="Initial_DateTime" description-key="Initial_DateTime_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="defaultDate" display-name-key="Default_Date" description-key="Default_Date_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="defaultDateHour" display-name-key="Default_Date_Hour" description-key="Default_Date_Hour_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="format" display-name-key="Date_Format" description-key="Date_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="timeFormat" display-name-key="Time_Format" description-key="Time_Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <!-- Propiedades equivalentes a las del selector de fecha nativo de Power Apps. -->
     <property name="placeholderText" display-name-key="Placeholder_Text" description-key="Placeholder_Text_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="isEditable" display-name-key="Is_Editable" description-key="Is_Editable_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="displayMode" display-name-key="Display_Mode" description-key="Display_Mode_Desc" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="startYear" display-name-key="Start_Year" description-key="Start_Year_Desc" of-type="Whole.None" usage="input" required="false" />
     <property name="endYear" display-name-key="End_Year" description-key="End_Year_Desc" of-type="Whole.None" usage="input" required="false" />
     <property name="startOfWeek" display-name-key="Start_Of_Week" description-key="Start_Of_Week_Desc" of-type="SingleLine.Text" usage="input" required="false" />
@@ -52,10 +54,36 @@
     <property name="strikethrough" display-name-key="Strikethrough" description-key="Strikethrough_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="underline" display-name-key="Underline" description-key="Underline_Desc" of-type="TwoOptions" usage="input" required="false" />
     <property name="zIndex" display-name-key="Z_Index" description-key="Z_Index_Desc" of-type="Whole.None" usage="input" required="false" />
+    <!-- Propiedades del selector nativo que completan el juego: colores de estado y de la cabecera del calendario. -->
+    <property name="calendarHeaderFill" display-name-key="Calendar_Header_Fill" description-key="Calendar_Header_Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="disabledBorderColor" display-name-key="Disabled_Border_Color" description-key="Disabled_Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="disabledColor" display-name-key="Disabled_Color" description-key="Disabled_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="disabledFill" display-name-key="Disabled_Fill" description-key="Disabled_Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="focusedBorderColor" display-name-key="Focused_Border_Color" description-key="Focused_Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="focusedBorderThickness" display-name-key="Focused_Border_Thickness" description-key="Focused_Border_Thickness_Desc" of-type="Whole.None" usage="input" required="false" />
+    <!-- Propiedades de disposicion: tamano, posicion y relleno del control en el lienzo. -->
+    <property name="height" display-name-key="Height" description-key="Height_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="width" display-name-key="Width" description-key="Width_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="x" display-name-key="X" description-key="X_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="y" display-name-key="Y" description-key="Y_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="layoutMinHeight" display-name-key="Layout_Min_Height" description-key="Layout_Min_Height_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="layoutMinWidth" display-name-key="Layout_Min_Width" description-key="Layout_Min_Width_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="paddingBottom" display-name-key="Padding_Bottom" description-key="Padding_Bottom_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="paddingLeft" display-name-key="Padding_Left" description-key="Padding_Left_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="paddingRight" display-name-key="Padding_Right" description-key="Padding_Right_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="paddingTop" display-name-key="Padding_Top" description-key="Padding_Top_Desc" of-type="Whole.None" usage="input" required="false" />
+    <!-- Propiedades de comportamiento: foco, ayuda, visibilidad por formula. -->
+    <property name="tabIndex" display-name-key="Tab_Index" description-key="Tab_Index_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="tooltip" display-name-key="Tooltip" description-key="Tooltip_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="visible" display-name-key="Visible" description-key="Visible_Desc" of-type="TwoOptions" usage="input" required="false" default-value="true" />
     <property name="dateTime" display-name-key="DateTime" description-key="DateTime_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="date" display-name-key="Date" description-key="Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="time" display-name-key="Time" description-key="Time_Desc" of-type="SingleLine.Text" usage="output" required="false" />
     <property name="selectedDate" display-name-key="Selected_Date" description-key="Selected_Date_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedHour" display-name-key="Selected_Hour" description-key="Selected_Hour_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="selectedDateHour" display-name-key="Selected_Date_Hour" description-key="Selected_Date_Hour_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="onChange" display-name-key="On_Change" description-key="On_Change_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="onSelect" display-name-key="On_Select" description-key="On_Select_Desc" of-type="Whole.None" usage="output" required="false" />
     <resources>
       <code path="index.ts" order="1"/>
       <css path="DateTimePicker.css" order="1" />

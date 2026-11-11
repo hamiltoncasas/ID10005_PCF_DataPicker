@@ -1,10 +1,12 @@
 /**
- * Fecha: 2026-09-16
+ * Fecha: 2026-11-10
  * Descripcion: Adaptador PCF del selector de fecha y hora simple. Conecta el
- * ciclo de vida de Power Apps con la vista React del calendario y la hora.
+ * ciclo de vida de Power Apps con la vista React del calendario y la hora y
+ * publica las salidas del selector nativo (SelectedDate, SelectedHour,
+ * SelectedDateHour) mas los contadores de evento OnChange y OnSelect.
  */
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { DateTimePickerView, IDateTimePickerProps } from "./DateTimePickerView";
+import { DateTimePickerView, IDateTimePickerProps, resolveInitialDateTime } from "./DateTimePickerView";
 import * as React from "react";
 
 export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, IOutputs> {
@@ -12,6 +14,10 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
     private dateTime = "";
     private lastInputDateTime = "";
     private lastResetKey = false;
+    /** Revision de los cambios de valor; se publica en la salida onChange. */
+    private changeCount = 0;
+    /** Revision de las aperturas del panel; se publica en la salida onSelect. */
+    private selectCount = 0;
 
     /**
      * Empty constructor.
@@ -41,9 +47,11 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const inputDefault = context.parameters.defaultDate?.raw ?? "";
-        const configuredInitial = context.parameters.initialDateTime?.raw ?? "";
-        const inputDateTime = inputDefault.trim() ? inputDefault : configuredInitial;
+        const inputDateTime = resolveInitialDateTime(
+            context.parameters.initialDateTime?.raw ?? "",
+            context.parameters.defaultDate?.raw ?? "",
+            context.parameters.defaultDateHour?.raw ?? ""
+        );
         const resetKey = context.parameters.resetKey?.raw ?? false;
 
         if (resetKey !== this.lastResetKey) {
@@ -71,6 +79,11 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
             maxDate: context.parameters.maxDate?.raw ?? undefined,
             dateTimeZone: context.parameters.dateTimeZone?.raw ?? undefined,
             language: context.parameters.language?.raw ?? undefined,
+            displayMode: context.parameters.displayMode?.raw ?? undefined,
+            tabIndex: context.parameters.tabIndex?.raw ?? undefined,
+            tooltip: context.parameters.tooltip?.raw ?? undefined,
+            visible: context.parameters.visible?.raw ?? true,
+            calendarHeaderFill: context.parameters.calendarHeaderFill?.raw ?? undefined,
             chevronBackground: context.parameters.chevronBackground?.raw ?? undefined,
             chevronFill: context.parameters.chevronFill?.raw ?? undefined,
             iconBackground: context.parameters.iconBackground?.raw ?? undefined,
@@ -78,6 +91,11 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
             borderColor: context.parameters.borderColor?.raw ?? undefined,
             borderStyle: context.parameters.borderStyle?.raw ?? undefined,
             borderThickness: context.parameters.borderThickness?.raw ?? undefined,
+            disabledBorderColor: context.parameters.disabledBorderColor?.raw ?? undefined,
+            disabledColor: context.parameters.disabledColor?.raw ?? undefined,
+            disabledFill: context.parameters.disabledFill?.raw ?? undefined,
+            focusedBorderColor: context.parameters.focusedBorderColor?.raw ?? undefined,
+            focusedBorderThickness: context.parameters.focusedBorderThickness?.raw ?? undefined,
             color: context.parameters.color?.raw ?? undefined,
             fill: context.parameters.fill?.raw ?? undefined,
             font: context.parameters.font?.raw ?? undefined,
@@ -86,7 +104,22 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
             italic: context.parameters.italic?.raw ?? false,
             strikethrough: context.parameters.strikethrough?.raw ?? false,
             underline: context.parameters.underline?.raw ?? false,
+            height: context.parameters.height?.raw ?? undefined,
+            width: context.parameters.width?.raw ?? undefined,
+            x: context.parameters.x?.raw ?? undefined,
+            y: context.parameters.y?.raw ?? undefined,
+            layoutMinHeight: context.parameters.layoutMinHeight?.raw ?? undefined,
+            layoutMinWidth: context.parameters.layoutMinWidth?.raw ?? undefined,
+            paddingBottom: context.parameters.paddingBottom?.raw ?? undefined,
+            paddingLeft: context.parameters.paddingLeft?.raw ?? undefined,
+            paddingRight: context.parameters.paddingRight?.raw ?? undefined,
+            paddingTop: context.parameters.paddingTop?.raw ?? undefined,
+            onSelect: () => {
+                this.selectCount += 1;
+                this.notifyOutputChanged();
+            },
             onDateTimeChange: (dateTime) => {
+                if (dateTime !== this.dateTime) this.changeCount += 1;
                 this.dateTime = dateTime;
                 this.notifyOutputChanged();
             },
@@ -101,11 +134,16 @@ export class DateTimePicker implements ComponentFramework.ReactControl<IInputs, 
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
+        const time = this.dateTime ? this.dateTime.slice(11, 16) : "";
         return {
             dateTime: this.dateTime,
             date: this.dateTime ? this.dateTime.slice(0, 10) : "",
-            time: this.dateTime ? this.dateTime.slice(11, 16) : "",
+            time: time,
             selectedDate: this.dateTime,
+            selectedHour: time,
+            selectedDateHour: this.dateTime,
+            onChange: this.changeCount,
+            onSelect: this.selectCount,
         };
     }
 

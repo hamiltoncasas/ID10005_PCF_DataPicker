@@ -10,7 +10,7 @@ Componentes personalizados para aplicaciones de lienzo de Power Apps (y para for
 | Control | Que resuelve | Salidas principales | Version | Documentacion |
 | --- | --- | --- | --- | --- |
 | `DatePicker` | Seleccionar una sola fecha en un calendario | `date` | 1.0.3 | [docs/DatePicker.md](docs/DatePicker.md) |
-| `DateTimePicker` | Seleccionar una sola fecha y hora | `dateTime`, `date`, `time` | 1.0.3 | [docs/DateTimePicker.md](docs/DateTimePicker.md) |
+| `DateTimePicker` | Seleccionar una sola fecha y hora | `dateTime`, `date`, `time`, `selectedDate`, `selectedHour`, `selectedDateHour` | 1.1.1 | [docs/DateTimePicker.md](docs/DateTimePicker.md) |
 | `TimePicker` | Seleccionar una sola hora con listas de hora, minuto y segundo | `selectedTime`, `hour`, `minute`, `second` | 1.0.0 | [docs/TimePicker.md](docs/TimePicker.md) |
 | `DateRangePicker` | Seleccionar un rango de fechas | `startDate`, `endDate` | 1.0.11 | [docs/DateRangePicker.md](docs/DateRangePicker.md) |
 | `DateTimeRangePicker` | Seleccionar un rango de fecha y hora | `startDateTime`, `endDateTime` | 1.0.11 | [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) |
@@ -39,7 +39,7 @@ Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado
 | [docs/TCGPasswordEngine.md](docs/TCGPasswordEngine.md) | Motor invisible de contrasenas PBKDF2-SHA256 (GENERATE/VALIDATE, eventos, iteraciones, seguridad y ejemplos) |
 | [tools/verificar-password-engine.js](tools/verificar-password-engine.js) | Arnes criptografico: vectores de Node, Base64, Unicode, iteraciones y errores (65 comprobaciones) |
 | [docs/ejemplos/](docs/ejemplos/README.md) | Ejemplos JSON inventados (informes y registros de prueba) para copiar y pegar, sin datos de clientes |
-| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, horas, filtro contiene y seleccion (100 comprobaciones) |
+| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, horas, filtro contiene y seleccion (112 comprobaciones) |
 | [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
 
 ## Inicio rapido
@@ -54,7 +54,7 @@ Set-Location solution
 dotnet build solution.cdsproj -c Release
 ```
 
-Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.11**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.13**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
 
 ## Uso en Power Fx
 
@@ -63,6 +63,8 @@ Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.11**, defin
 DateValue(DatePicker1.date)
 DateValue(DateRangePicker1.startDate)
 DateTimeValue(DateTimePicker1.dateTime)
+DateTimePicker1.selectedDateHour            // valor completo como texto (SelectedDateHour)
+DateTimePicker1.onChange                     // contador de cambios: comparar con una variable
 TimeValue(TimePicker1.selectedTime)
 
 // Limpiar un selector desde un boton (propiedad Reiniciar seleccion = reiniciar)
@@ -97,7 +99,7 @@ Inicializa `varReiniciar` en `false` al iniciar la pantalla o la aplicacion. La 
 ```powershell
 npm run lint                        # ESLint (0 errores)
 npm run build                       # compila los controles
-node tools/verificar-controles.js    # 100 de 100 verificaciones correctas
+node tools/verificar-controles.js    # 112 de 112 verificaciones correctas
 node tools/verificar-nombres-campo.js  # 40 de 40 verificaciones correctas
 npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
 node tools/verificar-password-engine.js  # 65 de 65 verificaciones correctas

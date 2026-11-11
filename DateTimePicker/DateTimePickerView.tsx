@@ -23,6 +23,29 @@ export interface IPickerVisualProps {
     italic?: boolean;
     strikethrough?: boolean;
     underline?: boolean;
+    /** Fondo de la barra del mes y del ano dentro del panel del calendario. */
+    calendarHeaderFill?: string;
+    /** Colores del control deshabilitado (borde, texto y fondo). */
+    disabledBorderColor?: string;
+    disabledColor?: string;
+    disabledFill?: string;
+    /** Colores y grosor del anillo que se dibuja al tener el foco. */
+    focusedBorderColor?: string;
+    focusedBorderThickness?: number;
+    /** Relleno interior del campo, en pixeles. */
+    paddingBottom?: number;
+    paddingLeft?: number;
+    paddingRight?: number;
+    paddingTop?: number;
+    /** Tamano del campo cerrado, en pixeles; 0 o vacio = el del diseno. */
+    height?: number;
+    width?: number;
+    /** Desplazamiento respecto a la posicion que le da el lienzo, en pixeles. */
+    x?: number;
+    y?: number;
+    /** Tamano minimo del control, en pixeles. */
+    layoutMinHeight?: number;
+    layoutMinWidth?: number;
 }
 
 /** Estilos del control; admite variables CSS propias ademas de las de React. */
@@ -35,7 +58,9 @@ export interface IPickerVisualStyles {
     icon: PickerStyles;
     iconGlyph: PickerStyles;
     chevron: PickerStyles;
+    calendarHeader: PickerStyles;
 }
+
 
 export interface IDateTimePickerProps extends IPickerVisualProps {
     dateTime: string;
@@ -63,8 +88,19 @@ export interface IDateTimePickerProps extends IPickerVisualProps {
     dateTimeZone?: string;
     /** Codigo de idioma de los nombres de meses y dias (por ejemplo es-ES). */
     language?: string;
+    /** Modo de presentacion del selector nativo: Edit (por omision), View o Disabled. */
+    displayMode?: string;
+    /** Posicion del control en el orden de tabulacion. */
+    tabIndex?: number;
+    /** Texto de ayuda que aparece al pasar el puntero sobre el campo. */
+    tooltip?: string;
+    /** Si es falso, el control no dibuja nada. */
+    visible?: boolean;
+    /** Se invoca al abrir el panel; equivale al evento OnSelect del selector nativo. */
+    onSelect?: () => void;
     onDateTimeChange: (dateTime: string) => void;
 }
+
 
 interface ICalendarDay { date: Date; day: number; isCurrentMonth: boolean; key: string; }
 
@@ -139,6 +175,36 @@ function firstWeekday(value: string | undefined): number {
     if (englishIndex >= 0) return englishIndex;
     const number = Number(text);
     return Number.isInteger(number) && number >= 0 && number <= 6 ? number : 1;
+}
+
+/** Modo de presentacion del selector, equivalente al DisplayMode nativo. */
+export type PickerDisplayMode = "edit" | "view" | "disabled";
+
+/**
+ * Modo de presentacion configurado. Acepta Edit, View y Disabled, sus nombres
+ * en espanol y la forma DisplayMode.View del selector nativo. Sin valor = Edit.
+ */
+export function resolveDisplayMode(value: string | undefined): PickerDisplayMode {
+    const text = normalizeAccents((value ?? "").trim().toLowerCase()).replace(/^displaymode\./, "");
+    if (text === "view" || text === "vista" || text === "lectura" || text === "solo lectura" || text === "readonly") return "view";
+    if (text === "disabled" || text === "deshabilitado" || text === "deshabilitada" || text === "bloqueado") return "disabled";
+    return "edit";
+}
+
+/**
+ * Valor inicial del control. DefaultDateHour (el nombre del selector nativo)
+ * tiene prioridad; despues DefaultDate y por ultimo la fecha y hora precargada.
+ */
+export function resolveInitialDateTime(initialDateTime?: string, defaultDate?: string, defaultDateHour?: string): string {
+    const nativeDefault = (defaultDateHour ?? "").trim();
+    if (nativeDefault) return nativeDefault;
+    const legacyDefault = (defaultDate ?? "").trim();
+    return legacyDefault || (initialDateTime ?? "").trim();
+}
+
+/** Valor en pixeles de una propiedad numerica; undefined si no se configuro. */
+export function cssPixels(value: number | undefined): number | undefined {
+    return value !== undefined && Number.isFinite(value) && value >= 0 ? value : undefined;
 }
 
 /** Formato regional del idioma configurado; null si no se indico o no es valido. */
@@ -262,7 +328,7 @@ function cssFontWeight(value: string | undefined): string | number | undefined {
 
 /** Fecha minima o maxima configurada, leida con el formato del control. */
 /** Estilos configurables de cada parte del control a partir de las propiedades visuales. */
-export function visualStyles(props: IPickerVisualProps): IPickerVisualStyles {
+export function visualStyles(props: IPickerVisualProps, disabled?: boolean): IPickerVisualStyles {
     const fill = cssColor(props.fill);
     const color = cssColor(props.color);
     const borderColor = cssColor(props.borderColor);
@@ -273,22 +339,53 @@ export function visualStyles(props: IPickerVisualProps): IPickerVisualStyles {
     const iconFill = cssColor(props.iconFill);
     const chevronBackground = cssColor(props.chevronBackground);
     const chevronFill = cssColor(props.chevronFill);
+    const disabledFill = cssColor(props.disabledFill);
+    const disabledColor = cssColor(props.disabledColor);
+    const disabledBorderColor = cssColor(props.disabledBorderColor);
+    const focusedBorderColor = cssColor(props.focusedBorderColor);
+    const calendarHeaderFill = cssColor(props.calendarHeaderFill);
     const decorations = [props.underline ? "underline" : "", props.strikethrough ? "line-through" : ""].filter((item) => item !== "").join(" ");
+    const background = disabled && disabledFill ? disabledFill : fill;
     const box: PickerStyles = {};
-    if (fill) box.background = fill;
-    if (borderColor) box.borderColor = borderColor;
+    if (background) box.background = background;
+    const boxBorderColor = disabled && disabledBorderColor ? disabledBorderColor : borderColor;
+    if (boxBorderColor) box.borderColor = boxBorderColor;
     if (borderStyle) box.borderStyle = borderStyle;
     if (props.borderThickness !== undefined && props.borderThickness >= 0) box.borderWidth = props.borderThickness;
+    const height = cssPixels(props.height);
+    if (height) box.height = height;
+    const width = cssPixels(props.width);
+    if (width) box.width = width;
+    const minHeight = cssPixels(props.layoutMinHeight);
+    if (minHeight) box.minHeight = minHeight;
+    const minWidth = cssPixels(props.layoutMinWidth);
+    if (minWidth) box.minWidth = minWidth;
+    const paddingTop = cssPixels(props.paddingTop);
+    if (paddingTop !== undefined) box.paddingTop = paddingTop;
+    const paddingRight = cssPixels(props.paddingRight);
+    if (paddingRight !== undefined) box.paddingRight = paddingRight;
+    const paddingBottom = cssPixels(props.paddingBottom);
+    if (paddingBottom !== undefined) box.paddingBottom = paddingBottom;
+    const paddingLeft = cssPixels(props.paddingLeft);
+    if (paddingLeft !== undefined) box.paddingLeft = paddingLeft;
+    const offsetX = cssPixels(props.x);
+    const offsetY = cssPixels(props.y);
+    if (offsetX || offsetY) box.transform = `translate(${offsetX ?? 0}px, ${offsetY ?? 0}px)`;
+    if (focusedBorderColor) box["--dtp-focus-border"] = focusedBorderColor;
+    const focusWidth = props.focusedBorderThickness !== undefined && props.focusedBorderThickness > 0 ? props.focusedBorderThickness : undefined;
+    if (focusWidth !== undefined) box["--dtp-focus-width"] = `${focusWidth}px`;
     const input: PickerStyles = {};
-    if (fill) input.background = fill;
-    if (color) input.color = color;
+    if (background) input.background = background;
+    if (disabled && disabledColor) input.color = disabledColor;
+    else if (color) input.color = color;
     if (font) input.fontFamily = font;
     if (props.size !== undefined && props.size > 0) input.fontSize = props.size;
     if (fontWeight !== undefined) input.fontWeight = fontWeight;
     if (props.italic) input.fontStyle = "italic";
     if (decorations) input.textDecoration = decorations;
     const icon: PickerStyles = {};
-    if (iconBackground) icon.background = iconBackground;
+    if (disabled && disabledFill) icon.background = disabledFill;
+    else if (iconBackground) icon.background = iconBackground;
     const iconGlyph: PickerStyles = {};
     if (iconFill) {
         iconGlyph.borderColor = iconFill;
@@ -297,7 +394,14 @@ export function visualStyles(props: IPickerVisualProps): IPickerVisualStyles {
     const chevron: PickerStyles = {};
     if (chevronBackground) chevron.background = chevronBackground;
     if (chevronFill) chevron.color = chevronFill;
-    return { box, input, icon, iconGlyph, chevron };
+    const calendarHeader: PickerStyles = {};
+    if (calendarHeaderFill) {
+        calendarHeader.background = calendarHeaderFill;
+        calendarHeader.padding = 4;
+        calendarHeader.margin = "-4px -4px 10px";
+        calendarHeader.borderRadius = 10;
+    }
+    return { box, input, icon, iconGlyph, chevron, calendarHeader };
 }
 
 function boundDate(value: string | undefined, dateFormat: string, zone: DateZone): Date | null {
@@ -417,6 +521,21 @@ export class DateTimePickerView extends React.Component<IDateTimePickerProps, ID
         return normalizeZone(this.props.dateTimeZone);
     }
 
+    /** Modo de presentacion configurado (Edit, View o Disabled). */
+    private displayMode(): PickerDisplayMode {
+        return resolveDisplayMode(this.props.displayMode);
+    }
+
+    /** El control no abre el panel ni cambia el valor. */
+    private isBlocked(): boolean {
+        return !!this.props.disabled || this.displayMode() !== "edit";
+    }
+
+    /** El control se pinta con los colores deshabilitados. */
+    private usesDisabledPalette(): boolean {
+        return !!this.props.disabled || this.displayMode() === "disabled";
+    }
+
     /** Cambia la hora manteniendo la fecha seleccionada. */
     private updateTime = (time: string): void => {
         this.setState({ time });
@@ -449,7 +568,7 @@ export class DateTimePickerView extends React.Component<IDateTimePickerProps, ID
 
     private openPicker = (): void => {
         const inputElement = this.compactInput.current;
-        if (!this.props.disabled && inputElement) {
+        if (!this.isBlocked() && inputElement) {
             const bounds = inputElement.getBoundingClientRect();
             const current = parseDateTime(this.props.dateTime, this.zone());
             this.setState((state) => ({
@@ -458,6 +577,7 @@ export class DateTimePickerView extends React.Component<IDateTimePickerProps, ID
                 time: current?.time ?? state.time,
                 overlayPosition: { top: bounds.bottom + 6, left: bounds.left, width: Math.max(bounds.width, 340) },
             }));
+            if (this.props.onSelect) this.props.onSelect();
         }
     };
 
@@ -544,16 +664,55 @@ export class DateTimePickerView extends React.Component<IDateTimePickerProps, ID
         const startOfWeek = firstWeekday(this.props.startOfWeek);
         const editable = this.props.isEditable ?? false;
         const inputValue = this.state.draft ?? (hasValue ? summary : placeholder);
-        const style = visualStyles(this.props);
+        const disabledPalette = this.usesDisabledPalette();
+        const blocked = this.isBlocked();
+        const style = visualStyles(this.props, disabledPalette);
         const monthNames = monthLabels(this.props.language);
-        if (!this.state.isOpen) {
-            return <section className="dtp-root dtp-root-compact" style={style.box} aria-label={label}><input ref={this.compactInput} className={hasValue ? "dtp-compact-input dtp-compact-value" : "dtp-compact-input dtp-compact-placeholder"} style={style.input} type="text" readOnly={!editable} value={inputValue} onChange={this.handleInputChange} onKeyDown={this.handleInputKeyDown} onBlur={this.commitDraft} onClick={editable ? undefined : this.openPicker} onFocus={editable ? undefined : this.openPicker} disabled={disabled} aria-label={label} /><button type="button" className="dtp-calendar-button" style={style.icon} onClick={this.openPicker} disabled={disabled} aria-label={label}><span className="dtp-calendar-icon" style={style.iconGlyph} aria-hidden="true" /></button></section>;
+        const tooltip = (this.props.tooltip ?? "").trim() || undefined;
+        if (this.props.visible === false) {
+            return <section className="dtp-root dtp-root-hidden" aria-hidden="true" />;
+        }
+        if (!this.state.isOpen || blocked) {
+            return (
+                <section className="dtp-root dtp-root-compact" style={style.box} title={tooltip} aria-label={label}>
+                    <input
+                        ref={this.compactInput}
+                        className={hasValue ? "dtp-compact-input dtp-compact-value" : "dtp-compact-input dtp-compact-placeholder"}
+                        style={style.input}
+                        type="text"
+                        readOnly={!editable || blocked}
+                        value={inputValue}
+                        onChange={this.handleInputChange}
+                        onKeyDown={this.handleInputKeyDown}
+                        onBlur={this.commitDraft}
+                        onClick={editable || blocked ? undefined : this.openPicker}
+                        onFocus={editable || blocked ? undefined : this.openPicker}
+                        disabled={disabledPalette}
+                        tabIndex={this.props.tabIndex}
+                        title={tooltip}
+                        aria-label={label}
+                    />
+                    <button
+                        type="button"
+                        className="dtp-calendar-button"
+                        style={style.icon}
+                        onClick={this.openPicker}
+                        disabled={disabledPalette}
+                        aria-disabled={blocked}
+                        tabIndex={this.props.tabIndex}
+                        title={tooltip}
+                        aria-label={label}
+                    >
+                        <span className="dtp-calendar-icon" style={style.iconGlyph} aria-hidden="true" />
+                    </button>
+                </section>
+            );
         }
         const pickerPanel = (
             <section className="dtp-root dtp-root-expanded" style={{ ...this.state.overlayPosition, zIndex: Math.max(1, Math.min(this.props.zIndex, 2147483647)) }} aria-label={label}>
                 <div className="dtp-header"><div><span className="dtp-kicker">FECHA Y HORA</span><div className="dtp-summary">{summary}</div></div><div className="dtp-header-actions"><div className={`dtp-status ${hasValue ? "is-complete" : ""}`}>{hasValue ? "Listo" : "En selección"}</div><button type="button" className="dtp-close" onClick={this.togglePicker} aria-label="Contraer selector">×</button></div></div>
                 <div className="dtp-calendar">
-                    <div className="dtp-monthbar"><button type="button" className="dtp-nav" style={style.chevron} onClick={() => this.moveMonth(-1)} disabled={disabled || !this.canMove(-1)} aria-label="Mes anterior">‹</button><strong>{monthNames[this.state.visibleMonth.getMonth()]} <span>{this.state.visibleMonth.getFullYear()}</span></strong><button type="button" className="dtp-nav" style={style.chevron} onClick={() => this.moveMonth(1)} disabled={disabled || !this.canMove(1)} aria-label="Mes siguiente">›</button></div>
+                    <div className="dtp-monthbar" style={style.calendarHeader}><button type="button" className="dtp-nav" style={style.chevron} onClick={() => this.moveMonth(-1)} disabled={disabled || !this.canMove(-1)} aria-label="Mes anterior">‹</button><strong>{monthNames[this.state.visibleMonth.getMonth()]} <span>{this.state.visibleMonth.getFullYear()}</span></strong><button type="button" className="dtp-nav" style={style.chevron} onClick={() => this.moveMonth(1)} disabled={disabled || !this.canMove(1)} aria-label="Mes siguiente">›</button></div>
                     <div className="dtp-weekdays">{weekdayLabels(startOfWeek, this.props.language).map((day) => <span key={day}>{day}</span>)}</div>
                     <div className="dtp-grid">{createCalendarDays(this.state.visibleMonth, startOfWeek).map(({ date: dayDate, day, isCurrentMonth, key }) => { const selectable = this.isSelectable(dayDate); return <button key={key} type="button" className={`dtp-day ${isCurrentMonth ? "" : "is-muted"} ${sameDate(dayDate, current?.date ?? null) ? "is-selected" : ""} ${sameDate(dayDate, today) ? "is-today" : ""}`} onClick={() => this.selectDate(dayDate)} disabled={disabled || !selectable}>{day}</button>; })}</div>
                 </div>

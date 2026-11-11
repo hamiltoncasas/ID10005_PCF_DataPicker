@@ -1,6 +1,6 @@
 # Ejemplo - DateTimePicker
 
-> Fecha: 2026-10-25
+> Fecha: 2026-11-10
 > Descripcion: Caso completo de registro de una fecha y hora con DateTimePicker, incluida la precarga al editar y la conversion a UTC. Referencia del control en [../DateTimePicker.md](../DateTimePicker.md).
 
 ## 1. Que construye
@@ -48,6 +48,10 @@ Set(varLimpiarVisita, false)
 | *Fecha mínima* | `Text(Today(), "yyyy-mm-dd")` |
 | *Etiqueta accesible* | `Fecha y hora de la visita` |
 | *Ancho x alto* | `360 x 32` (cerrado) |
+| *Fecha y hora inicial (selector nativo)* | Vacia (solo se usa al crear) |
+| *Modo de presentación* | `If(varSoloLectura, "View", "Edit")` |
+| *Color del borde con foco* | `Color.Blue` |
+| *Fondo de la cabecera del calendario* | `Color.White` |
 
 La `T` entre la fecha y la hora es obligatoria: `2026-10-28T08:30`. Un texto que solo traiga la fecha se ignora.
 
@@ -138,6 +142,9 @@ Set(varLimpiarVisita, !varLimpiarVisita)
 | 5 | Editar la visita | El control muestra 28/10/2026 y 08:30 |
 | 6 | Cambiar solo el dia | La hora 08:30 se conserva |
 | 7 | Pulsar Limpiar | Las salidas `dateTime`, `date` y `time` quedan vacias |
+| 8 | Poner *Modo de presentación* en `View` | El campo muestra la fecha y la hora, no abre el panel y `onSelect` no cambia |
+| 9 | Leer `dtpVisita.onChange` despues de elegir otra hora | El contador sube una unidad y `selectedDateHour` publica el valor nuevo |
+| 10 | Poner *Visible* en No | El control deja de dibujarse y `dateTime` conserva el ultimo valor |
 
 ## 6. Variantes utiles
 
@@ -155,7 +162,7 @@ Si la columna de destino guarda UTC, configura *Zona horaria de los valores* = `
 
 ### 6.3 Hora por omision a las 09:00
 
-Deja *Fecha y hora precargada* como `Text(Today(), "yyyy-mm-dd") & "T09:00"` en el formulario de alta. Recuerda que *Fecha y hora precargada por omision* tiene prioridad si tambien la configuras.
+Deja *Fecha y hora precargada* como `Text(Today(), "yyyy-mm-dd") & "T09:00"` en el formulario de alta. Si tambien configuras *Fecha y hora inicial (selector nativo)* o *Fecha y hora precargada por omision*, recuerda el orden: `defaultDateHour` gana sobre `defaultDate`, y este sobre `initialDateTime`.
 
 ### 6.4 Validar que la visita sea futura
 
@@ -168,6 +175,35 @@ If(
 )
 ```
 
+### 6.5 Estilos, foco y eventos del selector nativo
+
+```powerfx
+// Panel de propiedades del control (icono fx)
+// Modo de presentación: solo lectura cuando la visita ya se guardó
+If(varVisitaEditada.Status = "Cerrada", "View", "Edit")
+
+// Color y grosor del anillo de foco
+Color.Blue
+
+// Alto y ancho del campo cerrado (px)
+40
+
+// Fondo de la cabecera del calendario
+Color.White
+```
+
+```powerfx
+// Reaccionar al cambio de fecha y hora sin repetir la acción
+If(
+    dtpVisita.onChange <> varUltimoCambio,
+    Set(varUltimoCambio, dtpVisita.onChange);
+    Set(varVisitaPendiente, true);
+    Notify("Visita a las " & dtpVisita.selectedHour, NotificationType.Information)
+)
+```
+
+El valor completo se sigue leyendo de `dateTime` (o de `selectedDateHour`, que publica el mismo texto). `onChange` cuenta los cambios y `onSelect` cuenta las aperturas del panel.
+
 ## 7. Problemas comunes
 
 | Sintoma | Causa probable | Solucion |
@@ -176,7 +212,7 @@ If(
 | La hora cambia al guardar | Se convirtio dos veces entre local y UTC | Define una sola zona en *Zona horaria de los valores* y no vuelvas a convertir |
 | `dateTime` esta vacio tras elegir fecha | Falta confirmar la hora en el panel | Elige la hora; la seleccion se publica al confirmar el panel |
 | El valor inicial se ignora | Solo se envio la fecha | Agrega la parte `THH:mm` |
-| `defaultDate` pisa la precarga | Las dos propiedades estan enlazadas | Usa una sola fuente de precarga |
+| `defaultDate` pisa la precarga | Las dos propiedades estan enlazadas | Usa una sola fuente de precarga: *Fecha y hora inicial (selector nativo)* (`defaultDateHour`), *Fecha y hora precargada por omision* (`defaultDate`) o *Fecha y hora precargada* (`initialDateTime`), en ese orden de prioridad |
 
 ## 8. Referencia
 

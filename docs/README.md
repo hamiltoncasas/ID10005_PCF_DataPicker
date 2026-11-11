@@ -15,7 +15,7 @@ Excepcion de visibilidad: `TCGPasswordEngine` es un control **invisible** (no di
 | Control | Version | Que resuelve | Salidas principales | Documento |
 | --- | --- | --- | --- | --- |
 | `DatePicker` | 1.0.3 | Seleccionar **una sola fecha** en un calendario | `date`, `selectedDate` | [DatePicker.md](DatePicker.md) |
-| `DateTimePicker` | 1.0.3 | Seleccionar **una sola fecha y hora** | `dateTime`, `date`, `time`, `selectedDate` | [DateTimePicker.md](DateTimePicker.md) |
+| `DateTimePicker` | 1.1.1 | Seleccionar **una sola fecha y hora** | `dateTime`, `date`, `time`, `selectedDate`, `selectedHour`, `selectedDateHour`, `onChange`, `onSelect` | [DateTimePicker.md](DateTimePicker.md) |
 | `TimePicker` | 1.0.0 | Seleccionar **una sola hora** con listas de hora, minuto y segundo | `selectedTime`, `hour`, `minute`, `second` | [TimePicker.md](TimePicker.md) |
 | `DateRangePicker` | 1.0.11 | Seleccionar un **rango de fechas** | `startDate`, `endDate`, `selectedDate` | [DateRangePicker.md](DateRangePicker.md) |
 | `DateTimeRangePicker` | 1.0.11 | Seleccionar un **rango de fecha y hora** | `startDateTime`, `endDateTime`, `selectedDate` | [DateTimeRangePicker.md](DateTimeRangePicker.md) |
@@ -39,7 +39,7 @@ Datos de identidad de los componentes:
 | Dato | Valor |
 | --- | --- |
 | Nombre unico | `ID0005_DataPickers` |
-| Version | `1.0.2.11` |
+| Version | `1.0.2.13` |
 | Publicador / prefijo | `ID0005` / `id5` |
 | Tipo de paquete | `Unmanaged` (`<Managed>0</Managed>`) |
 | Archivo generado | `solution/bin/Release/solution.zip` |
@@ -81,7 +81,7 @@ ID10005_PCF_DataPicker/
 |- solution/solution.cdsproj          Proyecto de solucion y paquetes zip
 |- docs/                              Un documento por control, los ejemplos y este indice
 |- docs/ejemplos/                     Ejemplos JSON inventados (sin datos de clientes)
-|- tools/verificar-controles.js       Arnes de logica (100 comprobaciones)
+|- tools/verificar-controles.js       Arnes de logica (112 comprobaciones)
 |- tools/verificar-nombres-campo.js   Arnes de columnas de ExcelReportPicker (40 comprobaciones)
 |- tools/verificar-password-engine.js Arnes criptografico de TCGPasswordEngine (65 comprobaciones)
 \- out/                               Salida del build (no se versiona)
@@ -163,10 +163,10 @@ El empaquetado toma la carpeta `solution/src/` (los componentes compilados, `Oth
 
 ### 5.1 Version del paquete (`.zip`)
 
-La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.11`.**
+La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.13`.**
 
 ```xml
-<Version>1.0.2.11</Version>
+<Version>1.0.2.13</Version>
 ```
 
 Para una entrega nueva: sube ese valor, ejecuta `dotnet build solution.cdsproj -c Release` y comprueba el paquete **antes de importarlo**:
@@ -176,7 +176,7 @@ Expand-Archive solution\bin\Release\solution.zip -DestinationPath tmp\sol -Force
 Select-String -Path tmp\sol\solution.xml -Pattern '<Version>|<Managed>'
 ```
 
-Salida esperada: `<Version>1.0.2.11</Version>` y `<Managed>0</Managed>` (paquete no administrado).
+Salida esperada: `<Version>1.0.2.13</Version>` y `<Managed>0</Managed>` (paquete no administrado).
 
 La version del paquete es independiente de la version de cada control (`<Control>/ControlManifest.Input.xml`): puedes subir una sin la otra, pero en una entrega conviene subir ambas.
 
@@ -302,7 +302,7 @@ npm run build         # compila los 8 controles en out/controls
 Get-ChildItem out\controls -Directory | Select-Object Name
 ```
 
-### 9.2 Arnes de logica (100 comprobaciones)
+### 9.2 Arnes de logica (112 comprobaciones)
 
 Ejercita las vistas reales con Node, sin navegador:
 
@@ -311,10 +311,10 @@ npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx Sear
 node tools/verificar-controles.js
 ```
 
-Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la conservacion de la hora, la publicacion de `YYYY-MM-DDTHH:mm`, el parseo y el formato de horas, los rangos con cruce de medianoche, el intervalo de minutos, la publicacion de `HH:mm:ss`, la normalizacion de acentos, la busqueda tipo contiene, el resaltado, la seleccion unica y multiple y la navegacion por teclado. Salida esperada:
+Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la conservacion de la hora, la publicacion de `YYYY-MM-DDTHH:mm`, el parseo y el formato de horas, los rangos con cruce de medianoche, el intervalo de minutos, la publicacion de `HH:mm:ss`, la normalizacion de acentos, la busqueda tipo contiene, el resaltado, la seleccion unica y multiple y la navegacion por teclado. Desde la version 1.1.0 tambien cubre el *Modo de presentacion* del `DateTimePicker` (`Edit`, `View` y `Disabled`), la prioridad de la fecha inicial, el tamaño, el relleno y el desplazamiento del campo, la paleta deshabilitada, el fondo de la cabecera del calendario y el aviso de `OnSelect` al abrir el panel. Salida esperada:
 
 ```text
-100 de 100 verificaciones correctas
+112 de 112 verificaciones correctas
 ```
 
 El visor de paginas web no tiene arnes automatizado: depende del navegador y del sitio remoto, por eso se verifica con la tabla manual de [WebPageViewer.md](WebPageViewer.md#9-verificacion).
@@ -360,7 +360,7 @@ node tools/verificar-password-engine.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptacion: lint sin errores, build correcto, `100 de 100`, `40 de 40` y `65 de 65` verificaciones correctas, y paquete de solucion generado con los 9 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.11` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
+Criterios de aceptacion: lint sin errores, build correcto, `112 de 112`, `40 de 40` y `65 de 65` verificaciones correctas, y paquete de solucion generado con los 9 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.13` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
 
 ## 10. Problemas comunes
 

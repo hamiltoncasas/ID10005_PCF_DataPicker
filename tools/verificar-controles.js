@@ -1,20 +1,23 @@
 /*
- * Fecha: 2026-09-16
+ * Fecha: 2026-11-10
  * Descripcion: Arnes de verificacion de la logica de los controles.
  * Comprueba el parseo y formato de fechas, el filtro tipo contiene, la
- * normalizacion de acentos y el comportamiento de seleccion sin abrir un navegador.
+ * normalizacion de acentos, el comportamiento del selector de hora y las
+ * propiedades del selector de fecha y hora nativo (modo de presentacion,
+ * prioridad de la fecha inicial, tamano, relleno, colores y eventos), todo
+ * sin abrir un navegador.
  *
  * Uso (desde la raiz del repositorio):
  *   npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx TimePicker/TimePickerView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
  *   node tools/verificar-controles.js
  *
- * Salida esperada: "70 de 70 verificaciones correctas" y codigo de salida 0.
+ * Salida esperada: "112 de 112 verificaciones correctas" y codigo de salida 0.
  */
 const path = require("path");
 
 const checksDir = path.join(__dirname, "..", "obj", "checks");
 const { DatePickerView, monthLabels, visualStyles, weekdayLabels } = require(path.join(checksDir, "DatePicker", "DatePickerView"));
-const { DateTimePickerView } = require(path.join(checksDir, "DateTimePicker", "DateTimePickerView"));
+const { DateTimePickerView, resolveDisplayMode, resolveInitialDateTime, visualStyles: dateTimeStyles, cssPixels } = require(path.join(checksDir, "DateTimePicker", "DateTimePickerView"));
 const { SearchableComboBoxView, normalizeForSearch } = require(path.join(checksDir, "SearchableComboBox", "SearchableComboBoxView"));
 const timePicker = require(path.join(checksDir, "TimePicker", "TimePickerView"));
 
@@ -105,6 +108,43 @@ const invalidDateTime = mount(new DateTimePickerView({ dateTime: "no-es-fecha", 
 check("DateTimePicker valor invalido no rompe", typeof invalidDateTime.state.time, "string");
 invalidDateTime.selectDate(new Date(2026, 8, 16));
 check("DateTimePicker valor invalido permite elegir", dateTimeChanges.pop(), "2026-09-16T" + invalidDateTime.state.time);
+
+/* Propiedades del selector nativo: modo de presentacion, valor inicial, disposicion y colores. */
+check("DateTimePicker DisplayMode nativo", ["Edit", "View", "DisplayMode.View", "Disabled", "Vista", "Deshabilitado", "otro", ""].map(resolveDisplayMode), ["edit", "view", "view", "disabled", "view", "disabled", "edit", "edit"]);
+check("DateTimePicker prioridad de la fecha inicial", [
+    resolveInitialDateTime("2026-09-16T08:30", "2026-10-01T09:00", "2026-11-10T07:15"),
+    resolveInitialDateTime("2026-09-16T08:30", "2026-10-01T09:00", ""),
+    resolveInitialDateTime("2026-09-16T08:30", "  ", ""),
+    resolveInitialDateTime("", "", ""),
+], ["2026-11-10T07:15", "2026-10-01T09:00", "2026-09-16T08:30", ""]);
+check("DateTimePicker pixeles de las propiedades de disposicion", [cssPixels(0), cssPixels(12), cssPixels(-4), cssPixels(undefined), cssPixels(Number.NaN)], [0, 12, null, null, null]);
+
+const layoutStyles = dateTimeStyles({ height: 40, width: 320, layoutMinHeight: 36, layoutMinWidth: 240, paddingTop: 4, paddingRight: 6, paddingBottom: 2, paddingLeft: 8, x: 10, y: undefined, focusedBorderColor: "Color.Blue", focusedBorderThickness: 3 });
+check("DateTimePicker tamano, relleno y desplazamiento", layoutStyles.box, { height: 40, width: 320, minHeight: 36, minWidth: 240, paddingTop: 4, paddingRight: 6, paddingBottom: 2, paddingLeft: 8, transform: "translate(10px, 0px)", "--dtp-focus-border": "#0b6cff", "--dtp-focus-width": "3px" });
+check("DateTimePicker fondo de la cabecera del calendario", dateTimeStyles({ calendarHeaderFill: "#f3eadc" }).calendarHeader, { background: "#f3eadc", padding: 4, margin: "-4px -4px 10px", borderRadius: 10 });
+
+const disabledStyles = dateTimeStyles({ fill: "#ffffff", color: "#111111", borderColor: "#222222", iconBackground: "#333333", disabledFill: "#eeeeee", disabledColor: "#999999", disabledBorderColor: "#cccccc" }, true);
+check("DateTimePicker colores deshabilitados", [disabledStyles.box.background, disabledStyles.box.borderColor, disabledStyles.input.color, disabledStyles.icon.background], ["#eeeeee", "#cccccc", "#999999", "#eeeeee"]);
+const enabledStyles = dateTimeStyles({ fill: "#ffffff", color: "#111111", borderColor: "#222222", disabledFill: "#eeeeee", disabledColor: "#999999" });
+check("DateTimePicker colores normales sin deshabilitar", [enabledStyles.box.background, enabledStyles.box.borderColor, enabledStyles.input.color], ["#ffffff", "#222222", "#111111"]);
+
+const editModeView = mount(new DateTimePickerView({ dateTime: "2026-09-16T08:30", dateFormat: "YYYY-MM-DD", timeFormat: "24", zIndex: 1, disabled: false, displayMode: "Edit", onDateTimeChange: () => undefined }));
+check("DateTimePicker Edit permite editar", [editModeView.isBlocked(), editModeView.usesDisabledPalette()], [false, false]);
+const viewModeView = mount(new DateTimePickerView({ dateTime: "2026-09-16T08:30", dateFormat: "YYYY-MM-DD", timeFormat: "24", zIndex: 1, disabled: false, displayMode: "View", onDateTimeChange: () => undefined }));
+check("DateTimePicker View bloquea la edicion sin paleta gris", [viewModeView.isBlocked(), viewModeView.usesDisabledPalette()], [true, false]);
+const disabledModeView = mount(new DateTimePickerView({ dateTime: "2026-09-16T08:30", dateFormat: "YYYY-MM-DD", timeFormat: "24", zIndex: 1, disabled: false, displayMode: "Disabled", onDateTimeChange: () => undefined }));
+check("DateTimePicker Disabled bloquea con paleta gris", [disabledModeView.isBlocked(), disabledModeView.usesDisabledPalette()], [true, true]);
+
+let selectEvents = 0;
+const openView = mount(new DateTimePickerView({ dateTime: "2026-09-16T08:30", dateFormat: "YYYY-MM-DD", timeFormat: "24", zIndex: 1, disabled: false, onDateTimeChange: () => undefined, onSelect: () => { selectEvents += 1; } }));
+openView.compactInput = { current: { getBoundingClientRect: () => ({ bottom: 40, left: 12, width: 300 }) } };
+openView.openPicker();
+check("DateTimePicker abre el panel y avisa OnSelect", [openView.state.isOpen, selectEvents], [true, 1]);
+let blockedEvents = 0;
+const viewOpenView = mount(new DateTimePickerView({ dateTime: "2026-09-16T08:30", dateFormat: "YYYY-MM-DD", timeFormat: "24", zIndex: 1, disabled: false, displayMode: "View", onDateTimeChange: () => undefined, onSelect: () => { blockedEvents += 1; } }));
+viewOpenView.compactInput = { current: { getBoundingClientRect: () => ({ bottom: 40, left: 12, width: 300 }) } };
+viewOpenView.openPicker();
+check("DateTimePicker View no abre el panel ni avisa OnSelect", [viewOpenView.state.isOpen, blockedEvents], [false, 0]);
 
 check("normalizeForSearch acentos y mayusculas", normalizeForSearch("  CÓDIGO Ándrés_Ü "), "  codigo andres_u ");
 
