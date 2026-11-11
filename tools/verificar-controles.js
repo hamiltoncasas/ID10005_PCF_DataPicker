@@ -5,7 +5,7 @@
  * normalizacion de acentos y el comportamiento de seleccion sin abrir un navegador.
  *
  * Uso (desde la raiz del repositorio):
- *   npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
+ *   npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx TimePicker/TimePickerView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
  *   node tools/verificar-controles.js
  *
  * Salida esperada: "70 de 70 verificaciones correctas" y codigo de salida 0.
@@ -16,6 +16,7 @@ const checksDir = path.join(__dirname, "..", "obj", "checks");
 const { DatePickerView, monthLabels, visualStyles, weekdayLabels } = require(path.join(checksDir, "DatePicker", "DatePickerView"));
 const { DateTimePickerView } = require(path.join(checksDir, "DateTimePicker", "DateTimePickerView"));
 const { SearchableComboBoxView, normalizeForSearch } = require(path.join(checksDir, "SearchableComboBox", "SearchableComboBoxView"));
+const timePicker = require(path.join(checksDir, "TimePicker", "TimePickerView"));
 
 let failures = 0;
 let total = 0;
@@ -179,6 +180,64 @@ check("estilo del dibujo del icono", styles.iconGlyph, { borderColor: "#ffffff",
 check("estilo de las flechas del calendario", styles.chevron, { background: "#abcdef", color: "#0b6cff" });
 const emptyStyles = visualStyles({});
 check("sin propiedades visuales el diseno no cambia", [emptyStyles.box, emptyStyles.input, emptyStyles.icon, emptyStyles.iconGlyph, emptyStyles.chevron], [{}, {}, {}, {}, {}]);
+
+/* Selector de hora: parseo, formato, rangos y publicacion de la hora tecnica. */
+const timeSamples = ["08:30", "8:30", "08:30:45", "8:30 p. m.", "12:00 AM", "12:00 PM", "2026-11-10T08:30:00-05:00"];
+check("TimePicker parsea horas habituales", timeSamples.map((value) => timePicker.parseTimeOfDay(value)), [
+    { hour: 8, minute: 30, second: 0 }, { hour: 8, minute: 30, second: 0 }, { hour: 8, minute: 30, second: 45 },
+    { hour: 20, minute: 30, second: 0 }, { hour: 0, minute: 0, second: 0 }, { hour: 12, minute: 0, second: 0 },
+    { hour: 8, minute: 30, second: 0 },
+]);
+check("TimePicker rechaza valores invalidos", ["", "25:00", "12:60", "abc", "13:00 PM", "2026-11-10"].map((value) => timePicker.parseTimeOfDay(value)), [null, null, null, null, null, null]);
+check("TimePicker publica HH:mm:ss", timePicker.toTechnical({ hour: 0, minute: 5, second: 9 }), "00:05:09");
+
+check("TimePicker formato 24 horas", timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "", true, true), "13:05:09");
+check("TimePicker formato 12 horas por defecto", timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "", false, false), "01:05 PM");
+check("TimePicker formato 12 horas con segundos", timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "", false, true), "01:05:09 PM");
+check("TimePicker patron personalizado", [timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "HH:mm:ss", true, false), timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "h:mm A", true, false), timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "hh:mm a", true, false)], ["13:05:09", "1:05 PM", "01:05 pm"]);
+check("TimePicker patron sin tokens usa el formato automatico", timePicker.formatTime({ hour: 8, minute: 5, second: 9 }, "sin tokens", true, false), "08:05");
+check("TimePicker respeta el texto literal del patron", timePicker.formatTime({ hour: 13, minute: 5, second: 9 }, "Hora HH:mm", true, false), "Hora 13:05");
+
+check("TimePicker rango normal", [timePicker.isHourInRange(10, 8, 17), timePicker.isHourInRange(18, 8, 17)], [true, false]);
+check("TimePicker rango que cruza la medianoche", [timePicker.isHourInRange(23, 22, 6), timePicker.isHourInRange(12, 22, 6)], [true, false]);
+check("TimePicker rango de una sola hora", [timePicker.isHourInRange(8, 8, 8), timePicker.isHourInRange(9, 8, 8)], [true, false]);
+check("TimePicker horas del rango", timePicker.buildHourOptions(22, 2), [0, 1, 2, 22, 23]);
+check("TimePicker conserva una hora fuera del rango", timePicker.buildHourOptions(8, 17, 4), [4, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+check("TimePicker minutos por intervalo", timePicker.buildMinuteOptions(15), [0, 15, 30, 45]);
+check("TimePicker conserva un minuto fuera del intervalo", timePicker.buildMinuteOptions(15, 7), [0, 7, 15, 30, 45]);
+check("TimePicker intervalo fuera de rango se normaliza", [timePicker.normalizeInterval(0), timePicker.normalizeInterval(120), timePicker.normalizeInterval(undefined)], [1, 60, 1]);
+check("TimePicker equivalencias 12 y 24 horas", [timePicker.to12Hour(0), timePicker.to12Hour(13), timePicker.to24Hour(12, false), timePicker.to24Hour(12, true)], [12, 1, 0, 12]);
+check("TimePicker alinea al intervalo", timePicker.alignToInterval({ hour: 10, minute: 47, second: 33 }, 15), { hour: 10, minute: 45, second: 0 });
+check("TimePicker rango vacio usa todo el dia", timePicker.normalizeHourRange(undefined, undefined), { start: 0, end: 23 });
+
+let timeChanges = [];
+const timeView = mount(new timePicker.TimePickerView({ selectedTime: "08:30", format: "", disabled: false, startHour: 8, endHour: 17, minuteInterval: 15, showSeconds: false, use24HourFormat: true, onTimeChange: (value) => timeChanges.push(value) }));
+check("TimePicker inicia en la hora seleccionada", [timeView.state.hour, timeView.state.minute, timeView.state.second], [8, 30, 0]);
+timeView.changeMinute("45");
+check("TimePicker cambia el minuto", timeChanges.pop(), "08:45:00");
+timeView.changeHour("9");
+check("TimePicker cambia la hora", timeChanges.pop(), "09:45:00");
+timeView.changeSecond("30");
+check("TimePicker sin segundos publica :00", timeChanges.pop(), "09:45:00");
+timeView.changeHour("18");
+check("TimePicker ignora una hora fuera del rango", timeChanges.length, 0);
+timeView.clearTime();
+check("TimePicker limpia la seleccion", timeChanges.pop(), "");
+
+const secondsView = mount(new timePicker.TimePickerView({ selectedTime: "", format: "", disabled: false, minuteInterval: 5, showSeconds: true, use24HourFormat: true, onTimeChange: (value) => timeChanges.push(value) }));
+secondsView.state.hour = 9;
+secondsView.state.minute = 30;
+secondsView.changeSecond("30");
+check("TimePicker con segundos publica el segundo", timeChanges.pop(), "09:30:30");
+
+const clock12View = mount(new timePicker.TimePickerView({ selectedTime: "13:00", format: "", disabled: false, minuteInterval: 1, showSeconds: false, use24HourFormat: false, onTimeChange: (value) => timeChanges.push(value) }));
+clock12View.changeDisplayHour("1");
+check("TimePicker 12 horas conserva PM", timeChanges.pop(), "13:00:00");
+clock12View.changeMeridiem("AM");
+check("TimePicker 12 horas cambia a AM", timeChanges.pop(), "01:00:00");
+
+const timeStyles = timePicker.visualStyles({ borderColor: "Color.Red", borderThickness: 0, focusedBorderColor: "#123456", color: "#ff0000", fill: "#101010", font: "Arial", fontWeight: "Semibold", size: 14 });
+check("TimePicker estilos del campo", [timeStyles.box, timeStyles.input], [{ "--tp-border-color": "#e81123", "--tp-border-width": "0px", "--tp-focus-color": "#123456", "--tp-fill": "#101010", "--tp-font": "'Arial', 'Segoe UI', sans-serif" }, { color: "#ff0000", fontFamily: "'Arial', 'Segoe UI', sans-serif", fontSize: 14, fontWeight: 600 }]);
 
 console.log(`\n${total - failures} de ${total} verificaciones correctas`);
 if (failures > 0) process.exitCode = 1;

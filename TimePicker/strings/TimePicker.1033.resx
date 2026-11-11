@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="TimePicker" xml:space="preserve"><value>Selector de hora</value></data>
+  <data name="TimePicker description" xml:space="preserve"><value>Selecciona una hora con listas de hora, minuto y segundo. La salida selectedTime usa el formato tecnico HH:mm:ss.</value></data>
+  <data name="Default_Time" xml:space="preserve"><value>Hora predeterminada</value></data>
+  <data name="Default_Time_Desc" xml:space="preserve"><value>Valor precargado. Acepta HH:mm, HH:mm:ss, hh:mm AM/PM, una fecha y hora ISO (2026-11-10T08:30:00) o vacio. Se lee la hora tal como esta escrita, sin convertir zonas horarias.</value></data>
+  <data name="Format" xml:space="preserve"><value>Formato</value></data>
+  <data name="Format_Desc" xml:space="preserve"><value>Patron de presentacion de la hora. Admite HH (24 h), H, hh (12 h), h, mm, ss, A (AM/PM) y a (am/pm), por ejemplo HH:mm:ss o hh:mm A. Vacio = se deduce de Usar formato de 24 horas y Mostrar segundos.</value></data>
+  <data name="Reset_Key" xml:space="preserve"><value>Reiniciar selección</value></data>
+  <data name="Reset_Key_Desc" xml:space="preserve"><value>Cuando cambia de valor, el control limpia la hora seleccionada.</value></data>
+  <data name="Start_Hour" xml:space="preserve"><value>Hora inicial</value></data>
+  <data name="Start_Hour_Desc" xml:space="preserve"><value>Primera hora que se puede elegir (0 a 23). Si es mayor que la hora final, el rango cruza la medianoche (por ejemplo 22 a 6). Vacio = 0.</value></data>
+  <data name="End_Hour" xml:space="preserve"><value>Hora final</value></data>
+  <data name="End_Hour_Desc" xml:space="preserve"><value>Ultima hora que se puede elegir (0 a 23). Vacio = 23. Si es igual a la hora inicial, solo se puede elegir esa hora.</value></data>
+  <data name="Minute_Interval" xml:space="preserve"><value>Intervalo de minutos</value></data>
+  <data name="Minute_Interval_Desc" xml:space="preserve"><value>Paso de la lista de minutos, de 1 a 60. Con 15 la lista ofrece 00, 15, 30 y 45. Vacio o 0 = 1. Una hora precargada que no siga el paso se conserva y se agrega a la lista.</value></data>
+  <data name="Show_Seconds" xml:space="preserve"><value>Mostrar segundos</value></data>
+  <data name="Show_Seconds_Desc" xml:space="preserve"><value>Si esta activo, el panel muestra la lista de segundos y la salida conserva los segundos elegidos. Si no, los segundos siempre son 00.</value></data>
+  <data name="Use_24_Hour_Format" xml:space="preserve"><value>Usar formato de 24 horas</value></data>
+  <data name="Use_24_Hour_Format_Desc" xml:space="preserve"><value>Si esta activo, la hora se elige y se muestra de 00 a 23. Si no, de 1 a 12 con AM/PM. La salida selectedTime siempre usa 24 horas.</value></data>
+  <data name="Border_Color" xml:space="preserve"><value>Color del borde</value></data>
+  <data name="Border_Color_Desc" xml:space="preserve"><value>Color del borde del campo. Acepta #RRGGBB, rgb(), nombres CSS y Color.X de Power Apps. Vacio = #8a8a8a.</value></data>
+  <data name="Border_Thickness" xml:space="preserve"><value>Grosor del borde</value></data>
+  <data name="Border_Thickness_Desc" xml:space="preserve"><value>Grosor del borde en pixeles. 0 quita el borde. Vacio = 1.</value></data>
+  <data name="Focused_Border_Color" xml:space="preserve"><value>Color del borde con foco</value></data>
+  <data name="Focused_Border_Color_Desc" xml:space="preserve"><value>Color del borde cuando el campo o una lista del panel tiene el foco. Vacio = #2f5da8.</value></data>
+  <data name="Color" xml:space="preserve"><value>Color del texto</value></data>
+  <data name="Color_Desc" xml:space="preserve"><value>Color del texto del campo. Acepta #RRGGBB, rgb(), nombres CSS y Color.X de Power Apps.</value></data>
+  <data name="Fill" xml:space="preserve"><value>Color de fondo del campo</value></data>
+  <data name="Fill_Desc" xml:space="preserve"><value>Color de fondo del campo de texto principal.</value></data>
+  <data name="Font" xml:space="preserve"><value>Fuente del texto</value></data>
+  <data name="Font_Desc" xml:space="preserve"><value>Familia tipografica del texto, por ejemplo Segoe UI o Arial. Vacio = fuente predeterminada.</value></data>
+  <data name="Font_Weight" xml:space="preserve"><value>Grosor de la fuente</value></data>
+  <data name="Font_Weight_Desc" xml:space="preserve"><value>Bold, Semibold, Normal, Lighter o un numero de 100 a 900. Tambien se acepta FontWeight.Bold.</value></data>
+  <data name="Size" xml:space="preserve"><value>Tamaño de la fuente</value></data>
+  <data name="Size_Desc" xml:space="preserve"><value>Tamaño del texto en pixeles. Vacio o 0 = 13 px.</value></data>
+  <data name="Selected_Time" xml:space="preserve"><value>Hora seleccionada</value></data>
+  <data name="Selected_Time_Desc" xml:space="preserve"><value>Hora elegida en formato tecnico HH:mm:ss (24 horas). Vacia mientras no haya seleccion.</value></data>
+  <data name="Hour" xml:space="preserve"><value>Hora</value></data>
+  <data name="Hour_Desc" xml:space="preserve"><value>Hora de 0 a 23. Devuelve 0 mientras no haya seleccion.</value></data>
+  <data name="Minute" xml:space="preserve"><value>Minuto</value></data>
+  <data name="Minute_Desc" xml:space="preserve"><value>Minuto de 0 a 59. Devuelve 0 mientras no haya seleccion.</value></data>
+  <data name="Second" xml:space="preserve"><value>Segundo</value></data>
+  <data name="Second_Desc" xml:space="preserve"><value>Segundo de 0 a 59. Devuelve 0 mientras no haya seleccion o si Mostrar segundos esta desactivado.</value></data>
+</root>

@@ -1,6 +1,6 @@
 # Ejemplos de la documentacion
 
-> Fecha: 2026-10-25
+> Fecha: 2026-11-10
 > Descripcion: Guias paso a paso y ejemplos JSON inventados que acompanan la documentacion de los controles. Indice general en [../README.md](../README.md).
 
 Cada control tiene una guia de ejemplo con una pantalla completa, datos de prueba, formulas de Power Fx, pruebas sugeridas y problemas comunes. Los dos archivos JSON se pueden copiar y pegar sin abrir ninguna aplicacion. **Nada de esto contiene datos de ningun cliente ni de ningun entorno:** los pedidos, clientes, vendedores y totales son inventados (ver [12. Datos de ejemplo](../README.md#12-datos-de-ejemplo)).
@@ -10,6 +10,7 @@ Cada control tiene una guia de ejemplo con una pantalla completa, datos de prueb
 | [DatePicker.md](DatePicker.md) | Captura y guardado de una sola fecha |
 | [DateRangePicker.md](DateRangePicker.md) | Filtro por rango de fechas, incluido el tratamiento del dia final |
 | [DateTimePicker.md](DateTimePicker.md) | Registro de fecha y hora, precarga al editar y conversion a UTC |
+| [TimePicker.md](TimePicker.md) | Captura de una hora suelta, rango horario, precision en segundos y combinacion con una fecha |
 | [DateTimeRangePicker.md](DateTimeRangePicker.md) | Filtro por intervalo de fecha y hora |
 | [SearchableComboBox.md](SearchableComboBox.md) | Seleccion multiple con busqueda y filtro de una galeria |
 | [ExcelReportPicker.md](ExcelReportPicker.md) | Exportacion de pedidos filtrados a Excel con dos informes |

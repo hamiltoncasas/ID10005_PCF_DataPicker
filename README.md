@@ -1,9 +1,9 @@
 # ID10005 PCF DataPicker
 
-> Fecha: 2026-10-25
-> Descripcion: Ocho controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora y rangos, un combobox con busqueda incremental, un exportador de informes a Excel, un visor de paginas web y un motor invisible de generacion y validacion de contrasenas.
+> Fecha: 2026-11-10
+> Descripcion: Nueve controles personalizados (PCF) para Power Apps Canvas: selectores de fecha, fecha y hora, hora y rangos, un combobox con busqueda incremental, un exportador de informes a Excel, un visor de paginas web y un motor invisible de generacion y validacion de contrasenas.
 
-Componentes personalizados para aplicaciones de lienzo de Power Apps (y para formularios de Dataverse en los siete controles visuales). Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
+Componentes personalizados para aplicaciones de lienzo de Power Apps (y para formularios de Dataverse en los ocho controles visuales). Cada control tiene **su propio documento** con propiedades, salidas, comportamiento, ejemplos y pruebas.
 
 ## Controles
 
@@ -11,6 +11,7 @@ Componentes personalizados para aplicaciones de lienzo de Power Apps (y para for
 | --- | --- | --- | --- | --- |
 | `DatePicker` | Seleccionar una sola fecha en un calendario | `date` | 1.0.3 | [docs/DatePicker.md](docs/DatePicker.md) |
 | `DateTimePicker` | Seleccionar una sola fecha y hora | `dateTime`, `date`, `time` | 1.0.3 | [docs/DateTimePicker.md](docs/DateTimePicker.md) |
+| `TimePicker` | Seleccionar una sola hora con listas de hora, minuto y segundo | `selectedTime`, `hour`, `minute`, `second` | 1.0.0 | [docs/TimePicker.md](docs/TimePicker.md) |
 | `DateRangePicker` | Seleccionar un rango de fechas | `startDate`, `endDate` | 1.0.11 | [docs/DateRangePicker.md](docs/DateRangePicker.md) |
 | `DateTimeRangePicker` | Seleccionar un rango de fecha y hora | `startDateTime`, `endDateTime` | 1.0.11 | [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) |
 | `SearchableComboBox` | Elegir elementos de una tabla o coleccion con busqueda tipo contiene | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | 1.0.1 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) |
@@ -20,7 +21,7 @@ Componentes personalizados para aplicaciones de lienzo de Power Apps (y para for
 
 Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado de 32 px con borde gris y boton azul a la derecha, y panel expandido en superposicion con encabezado, cuerpo y pie. `TCGPasswordEngine` es la excepcion: no dibuja interfaz, se ejecuta como motor criptografico invisible. El espacio de nombres es `ID10005`, por lo que el identificador de cada componente es `id5_ID10005.<Constructor>`.
 
-**Alcance de los proyectos:** el proyecto PCF raiz compila siete controles (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `SearchableComboBox`, `ExcelReportPicker`, `WebPageViewer` y `TCGPasswordEngine`). `DateTimeRangePicker` tiene un proyecto PCF anidado y se compila por separado. El proyecto de solucion referencia ambos proyectos y empaqueta los ocho controles.
+**Alcance de los proyectos:** el proyecto PCF raiz compila ocho controles (`DatePicker`, `DateTimePicker`, `TimePicker`, `DateRangePicker`, `SearchableComboBox`, `ExcelReportPicker`, `WebPageViewer` y `TCGPasswordEngine`). `DateTimeRangePicker` tiene un proyecto PCF anidado y se compila por separado. El proyecto de solucion referencia ambos proyectos y empaqueta los nueve controles.
 
 ## Documentacion
 
@@ -29,6 +30,7 @@ Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado
 | [docs/README.md](docs/README.md) | Indice general: estructura del repositorio, compilacion, paquete de solucion, instalacion, formatos de fecha y hora compartidos, verificacion y convenciones |
 | [docs/DatePicker.md](docs/DatePicker.md) | Selector de una sola fecha |
 | [docs/DateTimePicker.md](docs/DateTimePicker.md) | Selector de una sola fecha y hora |
+| [docs/TimePicker.md](docs/TimePicker.md) | Selector de una sola hora (listas de hora, minuto y segundo, formatos y rangos) |
 | [docs/DateRangePicker.md](docs/DateRangePicker.md) | Selector de rango de fechas |
 | [docs/DateTimeRangePicker.md](docs/DateTimeRangePicker.md) | Selector de rango de fecha y hora |
 | [docs/SearchableComboBox.md](docs/SearchableComboBox.md) | Combobox con busqueda incremental tipo contiene |
@@ -37,7 +39,7 @@ Los controles visuales comparten el mismo lenguaje visual: modo compacto cerrado
 | [docs/TCGPasswordEngine.md](docs/TCGPasswordEngine.md) | Motor invisible de contrasenas PBKDF2-SHA256 (GENERATE/VALIDATE, eventos, iteraciones, seguridad y ejemplos) |
 | [tools/verificar-password-engine.js](tools/verificar-password-engine.js) | Arnes criptografico: vectores de Node, Base64, Unicode, iteraciones y errores (65 comprobaciones) |
 | [docs/ejemplos/](docs/ejemplos/README.md) | Ejemplos JSON inventados (informes y registros de prueba) para copiar y pegar, sin datos de clientes |
-| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, filtro contiene y seleccion (70 comprobaciones) |
+| [tools/verificar-controles.js](tools/verificar-controles.js) | Arnes de logica: fechas, horas, filtro contiene y seleccion (100 comprobaciones) |
 | [tools/verificar-nombres-campo.js](tools/verificar-nombres-campo.js) | Arnes de columnas del exportador: reconocimiento por nombre visible y lectura por nombre logico (40 comprobaciones) |
 
 ## Inicio rapido
@@ -52,7 +54,7 @@ Set-Location solution
 dotnet build solution.cdsproj -c Release
 ```
 
-Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.10**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
+Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.11**, definido en `solution/src/Other/Solution.xml`) en la solucion de tu entorno y agrega el control desde **Insertar > Obtener mas componentes > Codigo**. El detalle esta en [docs/README.md](docs/README.md#6-instalar-y-usar-en-power-apps).
 
 ## Uso en Power Fx
 
@@ -61,6 +63,7 @@ Despues importa `solution/bin/Release/solution.zip` (paquete **1.0.2.10**, defin
 DateValue(DatePicker1.date)
 DateValue(DateRangePicker1.startDate)
 DateTimeValue(DateTimePicker1.dateTime)
+TimeValue(TimePicker1.selectedTime)
 
 // Limpiar un selector desde un boton (propiedad Reiniciar seleccion = reiniciar)
 Set(varReiniciar, !varReiniciar)
@@ -94,7 +97,7 @@ Inicializa `varReiniciar` en `false` al iniciar la pantalla o la aplicacion. La 
 ```powershell
 npm run lint                        # ESLint (0 errores)
 npm run build                       # compila los controles
-node tools/verificar-controles.js    # 70 de 70 verificaciones correctas
+node tools/verificar-controles.js    # 100 de 100 verificaciones correctas
 node tools/verificar-nombres-campo.js  # 40 de 40 verificaciones correctas
 npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
 node tools/verificar-password-engine.js  # 65 de 65 verificaciones correctas

@@ -1,11 +1,11 @@
 # Documentacion - ID10005 PCF DataPicker
 
-> Fecha: 2026-10-25
-> Descripcion: Indice general del proyecto y de la documentacion de los ocho controles PCF para Power Apps Canvas.
+> Fecha: 2026-11-10
+> Descripcion: Indice general del proyecto y de la documentacion de los nueve controles PCF para Power Apps Canvas.
 
-Este repositorio entrega **ocho controles PCF** para Power Apps Canvas: siete visuales de tipo `control-type="virtual"` y un motor invisible de tipo `standard`. La documentacion tiene **un archivo por control** y este indice con todo lo que es comun a los ocho.
+Este repositorio entrega **nueve controles PCF** para Power Apps Canvas: ocho visuales de tipo `control-type="virtual"` y un motor invisible de tipo `standard`. La documentacion tiene **un archivo por control** y este indice con todo lo que es comun a los nueve.
 
-El proyecto PCF de la raiz contiene siete controles. `DateTimeRangePicker` vive en un proyecto anidado independiente; la solucion de Dataverse compila ambos proyectos y empaqueta los ocho. Por eso `npm run build` desde la raiz no compila el selector de rango de fecha y hora.
+El proyecto PCF de la raiz contiene ocho controles. `DateTimeRangePicker` vive en un proyecto anidado independiente; la solucion de Dataverse compila ambos proyectos y empaqueta los nueve. Por eso `npm run build` desde la raiz no compila el selector de rango de fecha y hora.
 
 Excepcion de visibilidad: `TCGPasswordEngine` es un control **invisible** (no dibuja nada). Se agrega a la pantalla solo para ejecutar la generacion o validacion de contrasenas y comunicar el resultado mediante salidas y eventos.
 
@@ -16,6 +16,7 @@ Excepcion de visibilidad: `TCGPasswordEngine` es un control **invisible** (no di
 | --- | --- | --- | --- | --- |
 | `DatePicker` | 1.0.3 | Seleccionar **una sola fecha** en un calendario | `date`, `selectedDate` | [DatePicker.md](DatePicker.md) |
 | `DateTimePicker` | 1.0.3 | Seleccionar **una sola fecha y hora** | `dateTime`, `date`, `time`, `selectedDate` | [DateTimePicker.md](DateTimePicker.md) |
+| `TimePicker` | 1.0.0 | Seleccionar **una sola hora** con listas de hora, minuto y segundo | `selectedTime`, `hour`, `minute`, `second` | [TimePicker.md](TimePicker.md) |
 | `DateRangePicker` | 1.0.11 | Seleccionar un **rango de fechas** | `startDate`, `endDate`, `selectedDate` | [DateRangePicker.md](DateRangePicker.md) |
 | `DateTimeRangePicker` | 1.0.11 | Seleccionar un **rango de fecha y hora** | `startDateTime`, `endDateTime`, `selectedDate` | [DateTimeRangePicker.md](DateTimeRangePicker.md) |
 | `SearchableComboBox` | 1.0.1 | Elegir elementos de una tabla o coleccion con **busqueda tipo contiene** | `selectedValue`, `selectedLabel`, `selectedValues`, `selectedLabels`, `selectedCount` | [SearchableComboBox.md](SearchableComboBox.md) |
@@ -29,7 +30,7 @@ Datos de identidad de los componentes:
 | --- | --- |
 | Espacio de nombres | `ID10005` |
 | Identificador de componente | `id5_ID10005.<Constructor>` (por ejemplo `id5_ID10005.DatePicker`) |
-| Tipo de control | Siete `virtual` (visuales) y `TCGPasswordEngine` `standard` (invisible, solo lienzo) |
+| Tipo de control | Ocho `virtual` (visuales) y `TCGPasswordEngine` `standard` (invisible, solo lienzo) |
 | Biblioteca de plataforma | React 16.14.0 (la carga el host: no se duplica en el bundle) |
 | Servicios externos | Ninguno (`external-service-usage enabled="false"`) |
 
@@ -38,7 +39,7 @@ Datos de identidad de los componentes:
 | Dato | Valor |
 | --- | --- |
 | Nombre unico | `ID0005_DataPickers` |
-| Version | `1.0.2.10` |
+| Version | `1.0.2.11` |
 | Publicador / prefijo | `ID0005` / `id5` |
 | Tipo de paquete | `Unmanaged` (`<Managed>0</Managed>`) |
 | Archivo generado | `solution/bin/Release/solution.zip` |
@@ -57,6 +58,7 @@ ID10005_PCF_DataPicker/
 |  |- strings/DatePicker.1033.resx    Textos del panel de propiedades
 |  \- generated/ManifestTypes.d.ts    Tipos generados por el build (no se versionan)
 |- DateTimePicker/                    Control: una sola fecha y hora (prefijo dtp-)
+|- TimePicker/                        Control: una sola hora (prefijo tp-)
 |- DateRangePicker/                   Control: rango de fechas (prefijo drp-)
 |- SearchableComboBox/                Control: combobox con busqueda contiene (prefijo scb-)
 |- ExcelReportPicker/                 Control: informes en JSON y descarga a Excel
@@ -72,14 +74,14 @@ ID10005_PCF_DataPicker/
 |  |- DateTimeRangePicker.pcfproj     Proyecto MSBuild propio
 |  |- package.json / tsconfig.json    Entorno de build independiente
 |  \- DateTimeRangePicker/            Control (manifest, index.ts, vista, css, resx)
-|- ID10005_PCF_DataPicker.pcfproj     Proyecto MSBuild raiz (paquete con 7 controles)
+|- ID10005_PCF_DataPicker.pcfproj     Proyecto MSBuild raiz (paquete con 8 controles)
 |- package.json                       Scripts de build, lint y arnes local
 |- pcfconfig.json                     outDir: ./out/controls
 |- eslint.config.mjs                  Reglas de calidad (ESLint 9 + reglas Power Apps)
 |- solution/solution.cdsproj          Proyecto de solucion y paquetes zip
 |- docs/                              Un documento por control, los ejemplos y este indice
 |- docs/ejemplos/                     Ejemplos JSON inventados (sin datos de clientes)
-|- tools/verificar-controles.js       Arnes de logica (70 comprobaciones)
+|- tools/verificar-controles.js       Arnes de logica (100 comprobaciones)
 |- tools/verificar-nombres-campo.js   Arnes de columnas de ExcelReportPicker (40 comprobaciones)
 |- tools/verificar-password-engine.js Arnes criptografico de TCGPasswordEngine (65 comprobaciones)
 \- out/                               Salida del build (no se versiona)
@@ -155,16 +157,16 @@ Compilacion correcta. 0 Advertencia(s) 0 Errores
 
 | Archivo | Contenido |
 | --- | --- |
-| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 8 controles en `Controls/id5_ID10005.<Control>/` |
+| `solution/bin/Release/solution.zip` | Solucion **no administrada** con los 9 controles en `Controls/id5_ID10005.<Control>/` |
 
 El empaquetado toma la carpeta `solution/src/` (los componentes compilados, `Other/Solution.xml` y `Other/Customizations.xml`) y arma el `.zip` con `solution.xml`, `customizations.xml`, `Controls/...` y `[Content_Types].xml`.
 
 ### 5.1 Version del paquete (`.zip`)
 
-La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.10`.**
+La version que muestra **Soluciones** al importar el `.zip` sale de `<Version>` en `solution/src/Other/Solution.xml` (formato `x.y.z.b`); el empaquetador no la toma de ningun otro sitio. **Version actual del paquete: `1.0.2.11`.**
 
 ```xml
-<Version>1.0.2.10</Version>
+<Version>1.0.2.11</Version>
 ```
 
 Para una entrega nueva: sube ese valor, ejecuta `dotnet build solution.cdsproj -c Release` y comprueba el paquete **antes de importarlo**:
@@ -174,7 +176,7 @@ Expand-Archive solution\bin\Release\solution.zip -DestinationPath tmp\sol -Force
 Select-String -Path tmp\sol\solution.xml -Pattern '<Version>|<Managed>'
 ```
 
-Salida esperada: `<Version>1.0.2.10</Version>` y `<Managed>0</Managed>` (paquete no administrado).
+Salida esperada: `<Version>1.0.2.11</Version>` y `<Managed>0</Managed>` (paquete no administrado).
 
 La version del paquete es independiente de la version de cada control (`<Control>/ControlManifest.Input.xml`): puedes subir una sin la otra, pero en una entrega conviene subir ambas.
 
@@ -202,16 +204,16 @@ En el **Power Platform admin center** abre el entorno destino, ve a **Configurac
 ### 6.2 Importar la solucion
 
 1. Ve a **make.powerapps.com > Soluciones > Importar solucion** y selecciona `solution/bin/Release/solution.zip`.
-2. Comprueba que la solucion contenga los ocho controles en **Objetos > Controles personalizados**.
+2. Comprueba que la solucion contenga los nueve controles en **Objetos > Controles personalizados**.
 3. Publica todos los cambios personalizados.
 
 ### 6.3 Agregar el control a la aplicacion de lienzo
 
 1. Abre la aplicacion y entra en **Insertar > Obtener mas componentes > Codigo**.
-2. Busca el control por su nombre (`DatePicker`, `DateTimePicker`, `DateRangePicker`, `DateTimeRangePicker`, `SearchableComboBox`, `ExcelReportPicker`, `WebPageViewer` o `TCGPasswordEngine`) y agregalo.
+2. Busca el control por su nombre (`DatePicker`, `DateTimePicker`, `TimePicker`, `DateRangePicker`, `DateTimeRangePicker`, `SearchableComboBox`, `ExcelReportPicker`, `WebPageViewer` o `TCGPasswordEngine`) y agregalo.
 3. Configura las propiedades de entrada en el panel derecho con el control seleccionado.
 
-Los siete controles visuales son de tipo `virtual`, por lo que funcionan igual en aplicaciones de lienzo y en formularios de Dataverse. `TCGPasswordEngine` es de tipo `standard` e invisible: se agrega solo en aplicaciones de lienzo para ejecutar operaciones y leer sus salidas.
+Los ocho controles visuales son de tipo `virtual`, por lo que funcionan igual en aplicaciones de lienzo y en formularios de Dataverse. `TCGPasswordEngine` es de tipo `standard` e invisible: se agrega solo en aplicaciones de lienzo para ejecutar operaciones y leer sus salidas.
 
 ### 6.4 Leer las salidas en Power Fx
 
@@ -220,6 +222,7 @@ Los siete controles visuales son de tipo `virtual`, por lo que funcionan igual e
 | Fecha nativa (zona `Local`) | `DateValue(DatePicker1.date)` |
 | Inicio y fin de un rango | `DateValue(DateRangePicker1.startDate)` y `DateValue(DateRangePicker1.endDate)` |
 | Fecha y hora nativa (zona `Local`) | `DateTimeValue(DateTimePicker1.dateTime)` |
+| Hora nativa | `TimeValue(TimePicker1.selectedTime)` |
 | Valores de un combobox | `SearchableComboBox1.selectedValues` (separados por `;`) |
 | Resultado de una exportacion | `ExcelReportPicker1.lastFile`, `ExcelReportPicker1.lastRows`, `ExcelReportPicker1.lastStatus` |
 | Estado del visor de paginas web | `WebPageViewer1.currentUrl`; el aviso de pagina no visible esta en `WebPageViewer1.hasError` y `WebPageViewer1.errorMessage` |
@@ -228,7 +231,7 @@ Los siete controles visuales son de tipo `virtual`, por lo que funcionan igual e
 
 ## 7. Formatos de fecha y hora
 
-Los cuatro selectores de fecha comparten la propiedad *Formato de fecha* (`format`) y los de fecha y hora agregan *Formato de hora* (`timeFormat`).
+Los selectores de fecha comparten la propiedad *Formato de fecha* (`format`) y los de fecha y hora agregan *Formato de hora* (`timeFormat`). `TimePicker` usa una unica propiedad *Formato* (`format`) con un patron de hora.
 
 ### 7.1 Formatos de fecha
 
@@ -260,6 +263,8 @@ Un formato desconocido no rompe el control: se usa `YYYY-MM-DD`.
 
 `timeFormat` solo cambia la **presentacion**; no agrega precision a la seleccion, que es de 15 minutos. En zona `Local`, las salidas usan `YYYY-MM-DDTHH:mm`. En zona `Utc`, las salidas incluyen el sufijo `Z`, por ejemplo `2026-09-16T08:30Z`.
 
+`TimePicker` no usa `timeFormat`: su propiedad *Formato* (`format`) acepta un patron con los tokens `HH` (24 h), `H`, `hh` (12 h), `h`, `mm`, `ss`, `A` (AM/PM) y `a` (am/pm), por ejemplo `HH:mm:ss` o `hh:mm A`. Si el patron se deja vacio, el formato se deduce de *Usar formato de 24 horas* y *Mostrar segundos*. La salida `selectedTime` siempre es `HH:mm:ss` en 24 horas.
+
 ### 7.3 Conversion en Power Fx
 
 ```powerfx
@@ -267,6 +272,7 @@ DateValue(DatePicker1.date)
 DateValue(DateRangePicker1.startDate)
 DateTimeValue(DateTimePicker1.dateTime)
 DateTimeValue(DateTimeRangePicker1.endDateTime)
+TimeValue(TimePicker1.selectedTime)
 ```
 
 ## 8. Convenciones comunes de los controles
@@ -292,23 +298,23 @@ DateTimeValue(DateTimeRangePicker1.endDateTime)
 
 ```powershell
 npm run lint          # ESLint sobre las fuentes (0 errores)
-npm run build         # compila los 7 controles en out/controls
+npm run build         # compila los 8 controles en out/controls
 Get-ChildItem out\controls -Directory | Select-Object Name
 ```
 
-### 9.2 Arnes de logica (70 comprobaciones)
+### 9.2 Arnes de logica (100 comprobaciones)
 
 Ejercita las vistas reales con Node, sin navegador:
 
 ```powershell
-npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
+npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx TimePicker/TimePickerView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
 node tools/verificar-controles.js
 ```
 
-Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la conservacion de la hora, la publicacion de `YYYY-MM-DDTHH:mm`, la normalizacion de acentos, la busqueda tipo contiene, el resaltado, la seleccion unica y multiple y la navegacion por teclado. Salida esperada:
+Cubre el parseo y el formato de fechas en los 12 formatos, el mes visible, la conservacion de la hora, la publicacion de `YYYY-MM-DDTHH:mm`, el parseo y el formato de horas, los rangos con cruce de medianoche, el intervalo de minutos, la publicacion de `HH:mm:ss`, la normalizacion de acentos, la busqueda tipo contiene, el resaltado, la seleccion unica y multiple y la navegacion por teclado. Salida esperada:
 
 ```text
-70 de 70 verificaciones correctas
+100 de 100 verificaciones correctas
 ```
 
 El visor de paginas web no tiene arnes automatizado: depende del navegador y del sitio remoto, por eso se verifica con la tabla manual de [WebPageViewer.md](WebPageViewer.md#9-verificacion).
@@ -346,7 +352,7 @@ Los tres arneses terminan con codigo de salida 1 si alguna comprobacion falla y 
 # 0. Sube <Version> en solution/src/Other/Solution.xml (version del .zip de esta entrega)
 npm run lint
 npm run build
-npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
+npx tsc DatePicker/DatePickerView.tsx DateTimePicker/DateTimePickerView.tsx SearchableComboBox/SearchableComboBoxView.tsx TimePicker/TimePickerView.tsx --outDir obj/checks --module commonjs --target es2019 --jsx react --esModuleInterop --lib ES2020,DOM --strict --skipLibCheck
 node tools/verificar-controles.js
 node tools/verificar-nombres-campo.js
 npx tsc TCGPasswordEngine/passwordEngine.ts --outDir obj/checks-password --module commonjs --target es2019 --lib ES2020,DOM --strict --skipLibCheck
@@ -354,7 +360,7 @@ node tools/verificar-password-engine.js
 Set-Location solution; dotnet build solution.cdsproj -c Release
 ```
 
-Criterios de aceptacion: lint sin errores, build correcto, `70 de 70`, `40 de 40` y `65 de 65` verificaciones correctas, y paquete de solucion generado con los 8 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.10` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
+Criterios de aceptacion: lint sin errores, build correcto, `100 de 100`, `40 de 40` y `65 de 65` verificaciones correctas, y paquete de solucion generado con los 9 componentes y la version esperada en `solution/src/Other/Solution.xml` (`1.0.2.11` en esta entrega). Cada documento de control incluye ademas su propia lista de comprobaciones manuales en la aplicacion.
 
 ## 10. Problemas comunes
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Fecha: 2026-11-10. Descripcion: Contrato de propiedades, salidas y recursos del selector de hora. -->
+<manifest>
+  <control namespace="ID10005" constructor="TimePicker" version="1.0.0" display-name-key="TimePicker" description-key="TimePicker description" control-type="virtual" >
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <!-- Propiedades de datos: la hora se publica como HH:mm:ss para que sea estable. -->
+    <property name="defaultTime" display-name-key="Default_Time" description-key="Default_Time_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="format" display-name-key="Format" description-key="Format_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="resetKey" display-name-key="Reset_Key" description-key="Reset_Key_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="startHour" display-name-key="Start_Hour" description-key="Start_Hour_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="endHour" display-name-key="End_Hour" description-key="End_Hour_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="minuteInterval" display-name-key="Minute_Interval" description-key="Minute_Interval_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="showSeconds" display-name-key="Show_Seconds" description-key="Show_Seconds_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <property name="use24HourFormat" display-name-key="Use_24_Hour_Format" description-key="Use_24_Hour_Format_Desc" of-type="TwoOptions" usage="input" required="false" />
+    <!-- Propiedades visuales equivalentes a las del selector de hora nativo. -->
+    <property name="borderColor" display-name-key="Border_Color" description-key="Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="borderThickness" display-name-key="Border_Thickness" description-key="Border_Thickness_Desc" of-type="Whole.None" usage="input" required="false" />
+    <property name="focusedBorderColor" display-name-key="Focused_Border_Color" description-key="Focused_Border_Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="color" display-name-key="Color" description-key="Color_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="fill" display-name-key="Fill" description-key="Fill_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="font" display-name-key="Font" description-key="Font_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="fontWeight" display-name-key="Font_Weight" description-key="Font_Weight_Desc" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="size" display-name-key="Size" description-key="Size_Desc" of-type="Whole.None" usage="input" required="false" />
+    <!-- Salidas: se recalculan en cada cambio y disparan las formulas que las usan. -->
+    <property name="selectedTime" display-name-key="Selected_Time" description-key="Selected_Time_Desc" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="hour" display-name-key="Hour" description-key="Hour_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="minute" display-name-key="Minute" description-key="Minute_Desc" of-type="Whole.None" usage="output" required="false" />
+    <property name="second" display-name-key="Second" description-key="Second_Desc" of-type="Whole.None" usage="output" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="TimePicker.css" order="1" />
+      <platform-library name="React" version="16.14.0" />
+      <resx path="strings/TimePicker.1033.resx" version="1.0.0" />
+    </resources>
+  </control>
+</manifest>
